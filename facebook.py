@@ -1,4 +1,9 @@
-from .base import AbstractScraper
+from .base import BaseScraper
 
 class FacebookScraper(BaseScraper):
-	pass
+	def __init__(self,user_agents = None):
+		BaseScraper.__init__(self,user_agents)
+		pass
+
+	def set_user_accts(self):
+		pass

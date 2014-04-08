@@ -1,4 +1,4 @@
-libscrape
+socialscraper
 =========
 
 Social media scrapers
