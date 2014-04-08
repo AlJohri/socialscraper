@@ -17,7 +17,9 @@ class BaseScraper(object):
     ])
 
     class _Browser(Browser):
-        """Subclass of mechanize.Browser that allows the browser to smoothly handle XHTML."""
+        """Subclass of mechanize.Browser that allows the browser to 
+        smoothly handle XHTML.
+        """
         # disable the html check to allow for XHTML
         def viewing_html(self):
             import mechanize
@@ -25,10 +27,10 @@ class BaseScraper(object):
             return True
 
     def __init__(self,user_agents = None):
-        """Optionally supply a list of user agents for the browser to select from.
-
-        If no user agents are supplied, one is picked from a set of sensible defaults 
-        (see BaseScraper.default_user_agents)
+        """Optionally supply a list of user agents for the browser to
+        select from.
+        If no user agents are supplied, one is picked from a set of 
+        sensible defaults (see BaseScraper.default_user_agents).
         """
         self._browser = BaseScraper._Browser()
         self._browser.set_handle_robots(False)
@@ -41,8 +43,8 @@ class BaseScraper(object):
 
     def set_user_agent(self,user_agent):
         """Set the browser's current user agent. 
-        If user_agent is not in the set of user agents maintained by this BaseScraper instance,
-        it is added to the set.
+        If user_agent is not in the set of user agents maintained by this 
+        BaseScraper instance, it is added to the set.
         """
         if user_agent not in self.user_agents:
             self.user_agents.add(user_agent)
@@ -58,5 +60,4 @@ class RateLimitError(Exception):
     """Thrown if a social media service's API is being used along with 
     scraping and the API rate limit is hit.
     """
-    pass
     pass
