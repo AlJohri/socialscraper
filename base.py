@@ -7,6 +7,12 @@ class BaseScraper(object):
     Handles browser emulation (using mechanize) and user agent selection
     for the browser. 
     """
+
+    class UserAccount(object):
+        def __init__(self,email_or_username,password):
+            self.username = email_or_username
+            self.password = password
+
     default_user_agents = set([
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.107 Safari/537.36',
         'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36',
@@ -39,6 +45,8 @@ class BaseScraper(object):
         else:
             self.user_agents = BaseScraper.default_user_agents
         self.set_random_user_agent()
+
+        self.users = []
         return
 
     def set_user_agent(self,user_agent):
@@ -54,3 +62,18 @@ class BaseScraper(object):
     def set_random_user_agent(self):
         """Pick a random user agent from the set of possible agents."""
         self.set_user_agent(random.choice(list(self.user_agents)))
+
+    def add_user_info(self,email_or_username,password):
+        """Set the account information to use when a login is required."""
+        self.users.append(BaseScraper.UserAccount(email_or_username,
+                                                  password))
+        return
+
+    def pick_random_user(self):
+        if len(self.users) == 0:
+            raise UsageError
+        return random.choice(self.users)
+
+
+class UsageError(Exception):
+    pass

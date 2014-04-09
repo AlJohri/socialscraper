@@ -3,5 +3,6 @@ socialscraper
 
 Social media scrapers
 
-- python-twitter
+- requests
 - mechanize
+- beautifulsoup4
