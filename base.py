@@ -53,11 +53,4 @@ class BaseScraper(object):
 
     def set_random_user_agent(self):
         """Pick a random user agent from the set of possible agents."""
-        self.set_user_agent(random.choice(self.user_agents))
-
-
-class RateLimitError(Exception):
-    """Thrown if a social media service's API is being used along with 
-    scraping and the API rate limit is hit.
-    """
-    pass
+        self.set_user_agent(random.choice(list(self.user_agents)))
