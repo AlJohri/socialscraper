@@ -136,10 +136,13 @@ class TwitterScraper(BaseScraper):
         resp = self._browser.open(base_url)
         if "redirect_after_login" in resp.geturl():
             # login first
-            user_acct = self.pick_random_user()
-            self._browser.select_form(nr=1)
-            self._browser.form["session[username_or_email]"] = user_acct.username
-            self._browser.form["session[password]"] = user_acct.password
+            self.login()
             resp = self._browser.submit()
             
         return json.loads(resp.read())
+
+    def login(self):
+        user_acct = self.pick_random_user()
+        self._browser.select_form(nr=1)
+        self._browser.form["session[username_or_email]"] = user_acct.username
+        self._browser.form["session[password]"] = user_acct.password

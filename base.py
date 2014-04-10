@@ -76,4 +76,10 @@ class BaseScraper(object):
 
 
 class UsageError(Exception):
+    def __init__(self,message=None):
+        self.message = message
+    def __repr__(self):
+        return str(type(self)) + ((": %s" % self.message) if self.message else "")
+
+class ScrapingError(Exception):
     pass
