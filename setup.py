@@ -6,7 +6,7 @@ setup(name='socialscraper',
       author='Moritz Gellner',
       author_email='moritz.gellner@gmail.com',
       url='http://dev.alpaca.io/',
-      packages=['socialscraper',''],
+      packages=['twitter','facebook'],
       install_requires=[
       	'beautifulsoup4==4.3.2',
       	'mechanize==0.2.5',
