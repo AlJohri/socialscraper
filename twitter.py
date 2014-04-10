@@ -8,7 +8,7 @@ class TwitterUser(object):
         self.id = id_
 
     def __str__(self):
-        print "%s (%i)" % (self.screen_name, self.id)
+        return "%s (%i)" % (self.screen_name, self.id)
     def __repr__(self):
         return "%s (%i)" % (self.screen_name, self.id)
 
@@ -72,7 +72,6 @@ class TwitterScraper(BaseScraper):
             user.id = self.id_from_screen_name(user.screen_name)
 
         cursor = None
-        followers = []
 
         while True:
             follower_json = self._get_json("followers",user.screen_name,cursor)
@@ -88,15 +87,12 @@ class TwitterScraper(BaseScraper):
                                         .encode('utf-8','ignore'),
                                    int(container['data-user-id']
                                         .encode('utf-8','ignore')))
-
-                followers.append(cur_user)
+                yield cur_user
 
             if not follower_json["has_more_items"]:
                 break
 
             cursor = follower_json["cursor"]
-
-        return followers
 
     def screen_name_from_id(self,user_id):
         """Get a user's screen name from their ID."""
@@ -126,7 +122,7 @@ class TwitterScraper(BaseScraper):
             base_url = "?"
             raise NotImplementedError
         else:
-            raise UsageError
+            raise UsageError()
         
         if cursor and type_ == "followers":
             base_url += "&cursor=" + str(cursor)
