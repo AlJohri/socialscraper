@@ -23,23 +23,32 @@ class TwitterScraper(BaseScraper):
         BaseScraper.__init__(self,user_agents)
 
     def get_feed_by_screen_name(self,screen_name):
-        """Get a twitter user's feed given their username."""
+        """Get a twitter user's feed given their screen name."""
         user = TwitterUser(screen_name,self.id_from_screen_name(screen_name))
-        cursor = None
-        followers = []
+        cursor = str(999999999999999999)
+        tweets = []
 
         while True:
-            follower_json = self._get_json("tweets",user.screen_name,cursor)
+            tweet_json = self._get_json("tweets",user.screen_name,cursor)
 
-            # parse tweets
+            html = tweet_json["items_html"]
+            soup = bs4.BeautifulSoup(html)
+            text_containers = soup.findAll("p","js-tweet-text")
+            timestamp_containers = soup.findAll("span","_timestamp")
+            for container in zip(timestamp_containers,text_containers):
+                cur_tweet = Tweet(container[0]["data-time"],
+                                  container[1].text.encode('utf-8','ignore'))
+                tweets.append(cur_tweet)
 
-        raise NotImplementedError
-        pass
+            if not tweet_json["has_more_items"]:
+                break
+
+            cursor = tweet_json["max_id"]
+        return tweets
 
     def get_feed_by_id(self,id_):
-        """Get a twitter user's feed given their numeric ID."""
-        raise NotImplementedError
-        pass
+        """Get a user's twitter feed given their user ID."""
+        return self.get_feed_by_screen_name(self.screen_name_from_id(int(id_)))
 
     def get_followers(self,id_or_username,max=-1):
         """Get a twitter user's feed given their numeric ID or 
@@ -119,8 +128,10 @@ class TwitterScraper(BaseScraper):
         else:
             raise UsageError
         
-        if cursor:
+        if cursor and type_ == "followers":
             base_url += "&cursor=" + str(cursor)
+        elif cursor and type_ == "tweets":
+            base_url += "&max_id=" + str()
 
         resp = self._browser.open(base_url)
         if "redirect_after_login" in resp.geturl():
