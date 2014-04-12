@@ -3,9 +3,9 @@ import random
 
 class BaseScraper(object):
     """The base class for all social media scrapers in the package.
-    
+
     Handles browser emulation (using mechanize) and user agent selection
-    for the browser. 
+    for the browser.
     """
 
     class UserAccount(object):
@@ -23,7 +23,7 @@ class BaseScraper(object):
     ])
 
     class _Browser(Browser):
-        """Subclass of mechanize.Browser that allows the browser to 
+        """Subclass of mechanize.Browser that allows the browser to
         smoothly handle XHTML.
         """
         # disable the html check to allow for XHTML
@@ -35,7 +35,7 @@ class BaseScraper(object):
     def __init__(self,user_agents = None):
         """Optionally supply a list of user agents for the browser to
         select from.
-        If no user agents are supplied, one is picked from a set of 
+        If no user agents are supplied, one is picked from a set of
         sensible defaults (see BaseScraper.default_user_agents).
         """
         self._browser = BaseScraper._Browser()
@@ -50,8 +50,8 @@ class BaseScraper(object):
         return
 
     def set_user_agent(self,user_agent):
-        """Set the browser's current user agent. 
-        If user_agent is not in the set of user agents maintained by this 
+        """Set the browser's current user agent.
+        If user_agent is not in the set of user agents maintained by this
         BaseScraper instance, it is added to the set.
         """
         if user_agent not in self.user_agents:

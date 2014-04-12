@@ -8,7 +8,6 @@ env.set_envs()
 class TestTwitterScraper(unittest.TestCase):
 	def setUp(self):
 		self.scraper = TwitterScraper()
-		print os.environ
 		self.scraper.add_user_info(os.getenv("TWITTER_USERNAME"),os.getenv('TWITTER_PASSWORD'))
 		pass
 
@@ -25,8 +24,13 @@ class TestFacebookScraper(unittest.TestCase):
 	def setUp(self):
 		self.scraper = FacebookScraper()
 		self.scraper.add_user_info(os.getenv("FACEBOOK_USERNAME"),os.getenv("FACEBOOK_PASSWORD"))
-		self.assertEqual()
+
+	def test_page_scraping(self):
+		self.scraper.login()
+		for item in self.scraper.graph_loop("al.johri","pages-liked"):
+			print item[0]
+
+		self.assertEqual(True,True)
 
 if __name__ == "__main__":
-	print os.environ
 	unittest.main()
