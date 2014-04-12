@@ -153,10 +153,18 @@ class FacebookScraper(BaseScraper):
             post_data.update(cur_post_data)
         return
 
-
     def add_user_info(self,email,password):
         """Set the account information to use when a login is required.
         Overrides BaseScraper.add_user_info
         """
         self.users.append(FacebookScraper.UserAccount(email,password))
         return
+
+    # Wrappers for the various graph search methods
+    def get_pages_liked_by(self, user_name):
+        for result in self.graph_loop(user_name,"pages-liked"):
+            yield result
+
+    def get_likers_of_page(self, page_name):
+        for result in self.graph_loop(page_name,"likers"):
+            yield result
