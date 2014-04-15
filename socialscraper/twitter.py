@@ -3,9 +3,9 @@ import requests, json, bs4
 
 class TwitterUser(object):
     """Container for the info associated w/ a Twitter user"""
-    def __init__(self, screen_name = None, id_ = None):
+    def __init__(self, screen_name = None, id = None):
         self.screen_name = screen_name
-        self.id = id_
+        self.id = id
 
     def __str__(self):
         return "%s (%i)" % (self.screen_name, self.id)
@@ -14,8 +14,8 @@ class TwitterUser(object):
 
 class Tweet(object):
     """Container for a tweet on a timeline."""
-    def __init__(self, id_, content):
-        self.id = int(id_)
+    def __init__(self, id, content):
+        self.id = int(id)
         self.content = content.decode('utf8').encode('utf-8','ignore')
 
     def __str__(self):
@@ -52,9 +52,9 @@ class TwitterScraper(BaseScraper):
             cursor = tweet_json["max_id"]
         return tweets
 
-    def get_feed_by_id(self,id_):
+    def get_feed_by_id(self,id):
         """Get a user's twitter feed given their user ID."""
-        return self.get_feed_by_screen_name(self.screen_name_from_id(int(id_)))
+        return self.get_feed_by_screen_name(self.screen_name_from_id(int(id)))
 
     def get_followers(self,id_or_username,max=-1):
         """Get a twitter user's feed given their numeric ID or 
