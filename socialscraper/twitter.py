@@ -3,9 +3,9 @@ import requests, json, bs4
 
 class TwitterUser(object):
     """Container for the info associated w/ a Twitter user"""
-    def __init__(self, screen_name = None, id_ = None):
+    def __init__(self, screen_name = None, id = None):
         self.screen_name = screen_name
-        self.id = id_
+        self.id = id
 
     def __str__(self):
         return "%s (%i)" % (self.screen_name, self.id)
@@ -15,7 +15,7 @@ class TwitterUser(object):
 class Tweet(FeedItem):
     """Container for a tweet on a timeline."""
     def __init__(self, id, content_timestamp=None,content=None,item_type=None):
-        FeedItem.__init__(self,id, content_timestamp, content, item_type)
+        FeedItem.__init__(self,id, content_timestamp, content.decode('utf8','ignore').encode('utf-8','ignore'), item_type)
 
 class TwitterScraper(BaseScraper):
     def __init__(self,user_agents = None):
@@ -46,9 +46,9 @@ class TwitterScraper(BaseScraper):
             cursor = tweet_json["max_id"]
         return tweets
 
-    def get_feed_by_id(self,id_):
+    def get_feed_by_id(self,id):
         """Get a user's twitter feed given their user ID."""
-        return self.get_feed_by_screen_name(self.screen_name_from_id(int(id_)))
+        return self.get_feed_by_screen_name(self.screen_name_from_id(int(id)))
 
     def get_followers(self,id_or_username,max=-1):
         """Get a twitter user's feed given their numeric ID or 
@@ -111,24 +111,24 @@ class TwitterScraper(BaseScraper):
 
         return json.loads(resp.text)[0]["user"]["id"]
 
+    
     def _get_json(self, type_, screen_name, cursor):
-
         """Internal method to get the JSON response for a particular 
         twitter request (eg. followers or tweets.)
         """
         if type_ == "followers":
             base_url = "https://twitter.com/%s/followers/users?" % screen_name
         elif type_ == "tweets":
-            base_url = "?"
-            raise NotImplementedError
+            base_url = "https://twitter.com/i/profiles/show/%s/timeline?" % screen_name
         else:
             raise UsageError()
         
         if cursor and type_ == "followers":
             base_url += "&cursor=" + str(cursor)
         elif cursor and type_ == "tweets":
-            base_url += "&max_id=" + str()
+            base_url += "&max_id=" + str(cursor)
 
+        # print base_url
         resp = self._browser.open(base_url)
         if "redirect_after_login" in resp.geturl():
             # login first
