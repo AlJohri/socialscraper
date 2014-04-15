@@ -15,7 +15,13 @@ class TwitterUser(object):
 class Tweet(object):
     """Container for a tweet on a timeline."""
     def __init__(self, id_, content):
-        pass
+        self.id = int(id_)
+        self.content = content.decode('utf8').encode('utf-8','ignore')
+
+    def __str__(self):
+        return "%s (%i)" % (self.content, self.id)
+    def __repr__(self):
+        return "%s (%i)" % (self.content, self.id)        
 
 class TwitterScraper(BaseScraper):
     def __init__(self,user_agents = None):
@@ -111,24 +117,24 @@ class TwitterScraper(BaseScraper):
 
         return json.loads(resp.text)[0]["user"]["id"]
 
+    
     def _get_json(self, type_, screen_name, cursor):
-
         """Internal method to get the JSON response for a particular 
         twitter request (eg. followers or tweets.)
         """
         if type_ == "followers":
             base_url = "https://twitter.com/%s/followers/users?" % screen_name
         elif type_ == "tweets":
-            base_url = "?"
-            raise NotImplementedError
+            base_url = "https://twitter.com/i/profiles/show/%s/timeline?" % screen_name
         else:
             raise UsageError()
         
         if cursor and type_ == "followers":
             base_url += "&cursor=" + str(cursor)
         elif cursor and type_ == "tweets":
-            base_url += "&max_id=" + str()
+            base_url += "&max_id=" + str(cursor)
 
+        # print base_url
         resp = self._browser.open(base_url)
         if "redirect_after_login" in resp.geturl():
             # login first
