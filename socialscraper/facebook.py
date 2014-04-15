@@ -1,13 +1,12 @@
 from .base import BaseScraper, UsageError, ScrapingError
 import lxml.html, re, json, urllib
 
+class FacebookUser(BaseUser):
+    """Container for the info associated w/ a Facebook user"""
+    def __init__(self, username=None, id=None):
+        super(FacebookUser, self).__init__(id=id, username=username)
+
 class FacebookScraper(BaseScraper):
-    class ScrapeAccount(BaseScraper.ScrapeAccount):
-        def __init__(self,email,password):
-            BaseScraper.ScrapeAccount.__init__(self, email, password)
-            self.email = email
-            self.id = None
-            self.username = None
 
     def __init__(self,user_agents = None):
         """Initialize the Facebook scraper."""
@@ -151,13 +150,6 @@ class FacebookScraper(BaseScraper):
                 break
             yield cur_results, graph_name
             post_data.update(cur_post_data)
-        return
-
-    def add_user_info(self,email,password):
-        """Set the account information to use when a login is required.
-        Overrides BaseScraper.add_user_info
-        """
-        self.users.append(FacebookScraper.UserAccount(email,password))
         return
 
     # Wrappers for the various graph search methods

@@ -9,8 +9,10 @@ class BaseScraper(object):
     """
 
     class ScrapeAccount(object):
-        def __init__(self,email_or_username,password):
-            self.username = email_or_username
+        def __init__(self, password, email=None, username=None):
+            if not email and not username: raise UsageError
+            self.email = email
+            self.username = username
             self.password = password
 
     default_user_agents = set([
@@ -63,10 +65,11 @@ class BaseScraper(object):
         """Pick a random user agent from the set of possible agents."""
         self.set_user_agent(random.choice(list(self.user_agents)))
 
-    def add_user_info(self,email_or_username,password):
+    def add_user(self, password, email=None, username=None):
         """Set the account information to use when a login is required."""
-        self.users.append(BaseScraper.UserAccount(email_or_username,
-                                                  password))
+        self.users.append(BaseScraper.ScrapeAccount(email=email, 
+                                                    username=username, 
+                                                    password=password))
         return
 
     def pick_random_user(self):
@@ -75,19 +78,29 @@ class BaseScraper(object):
         return random.choice(self.users)
 
 class BaseUser(object):
-    def __init__(self):
-        pass
+    def __init__(self, id=None, username=None, email=None):
+        self.id = id
+        self.username = username
+        self.email = email
+        
+    def __str__(self):
+        return "%s (%i)" % (self.username, self.id)
+
+    def __repr__(self):
+        return "%s(id=%i, username=%s, email=%s)" % (self.__class__.__name__, self.id, self.username, self.email)
 
 class FeedItem(object):
-    def __init__(self, id, content_timestamp=None,content=None,item_type=None):
-        self.type = item_type
+    def __init__(self, id, content=None, timestamp=None, type=None):
         self.id = int(id)
         self.content = content
-        self.content_timestamp = content_timestamp
+        self.type = type
+        self.timestamp = timestamp
+
     def __str__(self):
         return "FeedItem<%s>(%i): %s" % (self.type, self.id, self.content)
+
     def __repr__(self):
-        return "FeedItem<%s>(%i): %s" % (self.type, self.id, self.content)
+        return "%s(id=%i, content=%s, timestamp=%s, type=%s)" % (self.__class__.__name__, self.id, self.content, self.timestamp, self.type)
 
 
 class UsageError(Exception):

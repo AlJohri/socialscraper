@@ -1,16 +1,10 @@
 from .base import BaseScraper, UsageError, FeedItem
 import requests, json, bs4
 
-class TwitterUser(object):
+class TwitterUser(BaseUser):
     """Container for the info associated w/ a Twitter user"""
-    def __init__(self, screen_name = None, id = None):
-        self.screen_name = screen_name
-        self.id = id
-
-    def __str__(self):
-        return "%s (%i)" % (self.screen_name, self.id)
-    def __repr__(self):
-        return "%s (%i)" % (self.screen_name, self.id)
+    def __init__(self, screen_name=None, id=None):
+        super(TwitterUser, self).__init__(id=id, username=screen_name)
 
 class Tweet(FeedItem):
     """Container for a tweet on a timeline."""

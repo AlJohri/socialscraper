@@ -8,7 +8,7 @@ env.set_envs()
 class TestTwitterScraper(unittest.TestCase):
 	def setUp(self):
 		self.scraper = TwitterScraper()
-		self.scraper.add_user_info(os.getenv("TWITTER_USERNAME"),os.getenv('TWITTER_PASSWORD'))
+		self.scraper.add_user(username=os.getenv("TWITTER_USERNAME"), password=os.getenv('TWITTER_PASSWORD'))
 		pass
 
 	def test_with_id_and_screenname(self):
@@ -23,7 +23,7 @@ class TestTwitterScraper(unittest.TestCase):
 class TestFacebookScraper(unittest.TestCase):
 	def setUp(self):
 		self.scraper = FacebookScraper()
-		self.scraper.add_user_info(os.getenv("FACEBOOK_USERNAME"),os.getenv("FACEBOOK_PASSWORD"))
+		self.scraper.add_user(username=os.getenv("FACEBOOK_USERNAME"), password=os.getenv("FACEBOOK_PASSWORD"))
 
 	def test_page_scraping(self):
 		self.scraper.login()
