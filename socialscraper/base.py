@@ -74,6 +74,17 @@ class BaseScraper(object):
             raise UsageError
         return random.choice(self.users)
 
+class FeedItem(object):
+    def __init__(self, id, content_timestamp=None,content=None,item_type=None):
+        self.type = item_type
+        self.id = int(id)
+        self.content = content
+        self.content_timestamp = content_timestamp
+    def __str__(self):
+        return "FeedItem<%s>(%i): %s" % (self.type, self.id, self.content)
+    def __repr__(self):
+        return "FeedItem<%s>(%i): %s" % (self.type, self.id, self.content)
+
 
 class UsageError(Exception):
     def __init__(self,message=None):

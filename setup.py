@@ -10,6 +10,8 @@ setup(name='socialscraper',
       install_requires=[
       	'beautifulsoup4==4.3.2',
       	'mechanize==0.2.5',
-      	'requests==2.2.1'
+      	'requests==2.2.1',
+            'lxml==3.3.4',
+            'cssselect==0.9.1'
       ]
      )

@@ -1,4 +1,4 @@
-from .base import BaseScraper, UsageError
+from .base import BaseScraper, UsageError, FeedItem
 import requests, json, bs4
 
 class TwitterUser(object):
@@ -12,10 +12,10 @@ class TwitterUser(object):
     def __repr__(self):
         return "%s (%i)" % (self.screen_name, self.id)
 
-class Tweet(object):
+class Tweet(FeedItem):
     """Container for a tweet on a timeline."""
-    def __init__(self, id_, content):
-        pass
+    def __init__(self, id, content_timestamp=None,content=None,item_type=None):
+        FeedItem.__init__(self,id, content_timestamp, content, item_type)
 
 class TwitterScraper(BaseScraper):
     def __init__(self,user_agents = None):
