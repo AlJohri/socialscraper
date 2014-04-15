@@ -7,7 +7,7 @@ class TestTwitterScraper(unittest.TestCase):
 		self.email = os.getenv("TWITTER_EMAIL")
 		self.username = os.getenv("TWITTER_USERNAME")
 		self.password = os.getenv('TWITTER_PASSWORD')
-		
+
 		self.test_username = "mogellner"
 		self.test_userid = 2304205154
 		

@@ -139,17 +139,15 @@ class FacebookScraper(BaseScraper):
     def graph_loop(self,graph_name,method_name):
         graph_id = self.get_graph_id(graph_name)
         post_data, cur_results = self.graph_search(graph_id, method_name)
-        if post_data == None or cur_results == None:
-            raise ScrapingError
-        yield cur_results,graph_name
+        if post_data == None or cur_results == None: raise ScrapingError
+        for result in cur_results: yield result
 
         while post_data:
             cur_post_data, cur_results = self.graph_search(graph_id, 
                                                            method_name, 
                                                            post_data)
-            if cur_post_data == None or cur_results == None:
-                break
-            yield cur_results, graph_name
+            if cur_post_data == None or cur_results == None: break
+            for result in cur_results: yield result
             post_data.update(cur_post_data)
         return
 

@@ -17,6 +17,6 @@ class TestFacebookScraper(unittest.TestCase):
 	def test_page_scraping(self):
 		self.scraper.login()
 		for item in self.scraper.graph_loop(self.test_username, "pages-liked"):
-			print item[0]
+			print item
 
 		self.assertEqual(True,True)
