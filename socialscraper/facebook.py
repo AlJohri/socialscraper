@@ -2,9 +2,9 @@ from .base import BaseScraper, UsageError, ScrapingError
 import lxml.html, re, json, urllib
 
 class FacebookScraper(BaseScraper):
-    class UserAccount(BaseScraper.UserAccount):
+    class ScrapeAccount(BaseScraper.ScrapeAccount):
         def __init__(self,email,password):
-            BaseScraper.UserAccount.__init__(self, email, password)
+            BaseScraper.ScrapeAccount.__init__(self, email, password)
             self.email = email
             self.id = None
             self.username = None

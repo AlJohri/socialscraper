@@ -8,7 +8,7 @@ class BaseScraper(object):
     for the browser.
     """
 
-    class UserAccount(object):
+    class ScrapeAccount(object):
         def __init__(self,email_or_username,password):
             self.username = email_or_username
             self.password = password
@@ -73,6 +73,10 @@ class BaseScraper(object):
         if len(self.users) == 0:
             raise UsageError
         return random.choice(self.users)
+
+class BaseUser(object):
+    def __init__(self):
+        pass
 
 class FeedItem(object):
     def __init__(self, id, content_timestamp=None,content=None,item_type=None):
