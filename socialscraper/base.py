@@ -15,6 +15,15 @@ class BaseScraper(object):
             self.username = username
             self.password = password
 
+        def __str__(self):
+            return "ScrapeAccount %s, %s, %s" % (self.email, self.username, "".join(map(lambda x: '*', self.password)))
+
+        def __repr__(self):
+            return "%s(email=%s, username=%s, password=%s)" % (self.__class__.__name__, 
+                                                               self.email, 
+                                                               self.username, 
+                                                               "".join(map(lambda x: '*', self.password)))
+
     default_user_agents = set([
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.107 Safari/537.36',
         'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36',

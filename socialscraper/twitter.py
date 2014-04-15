@@ -1,10 +1,18 @@
-from .base import BaseScraper, UsageError, FeedItem
+from .base import BaseScraper, BaseUser, UsageError, FeedItem
 import requests, json, bs4
 
 class TwitterUser(BaseUser):
     """Container for the info associated w/ a Twitter user"""
     def __init__(self, screen_name=None, id=None):
         super(TwitterUser, self).__init__(id=id, username=screen_name)
+
+    @property
+    def screen_name(self):
+        return self.username
+
+    @screen_name.setter
+    def screen_name(self, value):
+        self.username = value
 
 class Tweet(FeedItem):
     """Container for a tweet on a timeline."""
@@ -18,7 +26,7 @@ class TwitterScraper(BaseScraper):
 
     def get_feed_by_screen_name(self,screen_name):
         """Get a twitter user's feed given their screen name."""
-        user = TwitterUser(screen_name,self.id_from_screen_name(screen_name))
+        user = TwitterUser(screen_name, self.id_from_screen_name(screen_name))
         cursor = str(999999999999999999)
         tweets = []
 

@@ -1,4 +1,4 @@
-from .base import BaseScraper, UsageError, ScrapingError
+from .base import BaseScraper, BaseUser, UsageError, ScrapingError
 import lxml.html, re, json, urllib
 
 class FacebookUser(BaseUser):
@@ -15,13 +15,14 @@ class FacebookScraper(BaseScraper):
 
     def login(self):
         """Log in to Facebook."""
-        user_acct = self.pick_random_user()
-        self.cur_user = user_acct
+        self.cur_user = self.pick_random_user()
+
+        print self.cur_user
 
         self._browser.open('https://m.facebook.com/')
         self._browser.select_form(nr=0)
-        self._browser.form["email"] = user_acct.email
-        self._browser.form["pass"] = user_acct.password
+        self._browser.form["email"] = self.cur_user.email
+        self._browser.form["pass"] = self.cur_user.password
         resp = self._browser.submit()
         if "recognize your email address or phone number." in resp.read():
             raise UsageError("Username or Password incorrect.")

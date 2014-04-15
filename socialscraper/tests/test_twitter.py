@@ -1,21 +1,24 @@
-from ..facebook import FacebookScraper
+import unittest, os
+from ..twitter import TwitterScraper
 
 class TestTwitterScraper(unittest.TestCase):
 
-	username = os.getenv("TWITTER_USERNAME")
-	password = os.getenv('TWITTER_PASSWORD')
-	TWITTER_TESTUSER_SCREENNAME = "mogellner"
-	TWITTER_TESTUSER_ID = 2304205154
-
 	def setUp(self):
+		self.email = os.getenv("TWITTER_EMAIL")
+		self.username = os.getenv("TWITTER_USERNAME")
+		self.password = os.getenv('TWITTER_PASSWORD')
+		
+		self.test_username = "mogellner"
+		self.test_userid = 2304205154
+		
 		self.scraper = TwitterScraper()
-		self.scraper.add_user(username=username, password=password)
+		self.scraper.add_user(username=self.username, password=self.password)
 
 	def test_with_id_and_screenname(self):
-		user = TWITTER_TESTUSER_SCREENNAME
-		id = TWITTER_TESTUSER_ID
+		user = self.test_username
+		id = self.test_userid
 		followers_from_user = self.scraper.get_followers(user)
-		followers_from_id = self.scraper.get_followers(id_)
-		self.assertEqual([f.screen_name for f in followers_from_user].sort(),[f.screen_name for f in followers_from_id].sort())
+		followers_from_id = self.scraper.get_followers(id)
+		self.assertEqual([f.username for f in followers_from_user].sort(),[f.username for f in followers_from_id].sort())
 		for follower in self.scraper.get_followers('aljohri'):
 			print follower
