@@ -1,5 +1,5 @@
 from .base import BaseScraper, BaseUser, UsageError, ScrapingError
-import lxml.html, re, json, urllib
+import lxml.html, re, json, urllib, requests
 
 class FacebookUser(BaseUser):
     """Container for the info associated w/ a Facebook user"""
@@ -16,8 +16,6 @@ class FacebookScraper(BaseScraper):
     def login(self):
         """Log in to Facebook."""
         self.cur_user = self.pick_random_user()
-
-        print self.cur_user
 
         self._browser.open('https://m.facebook.com/')
         self._browser.select_form(nr=0)
@@ -143,9 +141,9 @@ class FacebookScraper(BaseScraper):
         for result in cur_results: yield result
 
         while post_data:
-            cur_post_data, cur_results = self.graph_search(graph_id, 
-                                                           method_name, 
-                                                           post_data)
+            cur_post_data, cur_results = \
+                self.graph_search(graph_id, method_name, post_data)
+            
             if cur_post_data == None or cur_results == None: break
             for result in cur_results: yield result
             post_data.update(cur_post_data)
