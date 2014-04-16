@@ -11,7 +11,6 @@ class FacebookScraper(BaseScraper):
     def __init__(self,user_agents = None):
         """Initialize the Facebook scraper."""
         BaseScraper.__init__(self,user_agents)
-        return
 
     def login(self):
         """Log in to Facebook."""
