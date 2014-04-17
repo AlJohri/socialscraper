@@ -1,5 +1,5 @@
 import unittest, os
-from ....twitter import TwitterScraper
+from ...twitter import TwitterScraper
 
 # from mock import patch 
 # @mock.patch('requests.get', mock.Mock(side_effect = lambda k:{'aurl': 'a response', 'burl' : 'b response'}.get(k, 'unhandled request %s'%k) ))
@@ -25,3 +25,6 @@ class TestTwitterScraper(unittest.TestCase):
 		self.assertEqual([f.username for f in followers_from_user].sort(),[f.username for f in followers_from_id].sort())
 		for follower in self.scraper.get_followers('aljohri'):
 			print follower
+
+if __name__ == "__main__":
+	unittest.main()

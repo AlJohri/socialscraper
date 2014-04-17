@@ -1,5 +1,5 @@
 import unittest, os
-from ....facebook import FacebookScraper
+from ...facebook import FacebookScraper
 
 class TestFacebookScraper(unittest.TestCase):
 
@@ -20,3 +20,6 @@ class TestFacebookScraper(unittest.TestCase):
 			print item
 
 		self.assertEqual(True,True)
+
+if __name__ == "__main__":
+	unittest.main()
