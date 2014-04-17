@@ -1,10 +1,11 @@
-import logging, requests, lxml.html
+import logging, requests, lxml.html, re
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 BASE_URL = 'https://m.facebook.com'
 LOGIN_URL = BASE_URL + '/login.php'
+PROFILE_URL = BASE_URL + '/profile.php'
 CHECKPOINT_URL = BASE_URL + '/login/checkpoint/'
 
 INPUT_ERROR = ["We didn't recognize your email address or phone number."]
@@ -42,6 +43,10 @@ LOGGED_IN = [
 ]
 
 def login(browser, email, password):
+    """
+    Given a requests session, email, and password, authenticate the session.
+    Returns authenticated user's username.
+    """
 
     logger.info("Begin Facebook Authentication")
     response = browser.get(BASE_URL, timeout=1)
@@ -87,3 +92,16 @@ def login(browser, email, password):
             logger.debug('Remember Browser -- Click Don\'t Save')
 
     logger.info("Facebook Authentication Complete")
+
+    def get_auth_username():
+        """Get username of logged in user."""
+        response = browser.get(PROFILE_URL)
+        doc = lxml.html.fromstring(response.content)
+        profile_url = doc.cssselect('.sec')[0].get('href')
+        username = re.sub('\?.*', '', profile_url[1:])
+        logger.debug('Retrieve username from profile')
+        return username
+
+    username = get_auth_username()
+    
+    return username

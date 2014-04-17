@@ -16,20 +16,23 @@ class TestFacebookScraper(unittest.TestCase):
 
         self.scraper = FacebookScraper()
         self.scraper.add_user(email=self.email, password=self.password)
-
-    def test_pages_liked(self):
         self.scraper.login()
-        for item in self.scraper.graph_loop(self.test_username, "pages-liked"):
-            print item
 
-        self.assertEqual(True,True)
 
-    def test_likers(self):
-        self.scraper.login()
-        for item in self.scraper.graph_loop(self.test_pagename, "likers"):
-            print item
+    def test_graph_search(self):
 
-        self.assertEqual(True,True)
+        def test_pages_liked():
+            for item in self.scraper.graph_search(self.test_username, "pages-liked"):
+                print item
+            self.assertEqual(True,True)
+
+        def test_likers():
+            for item in self.scraper.graph_search(self.test_pagename, "likers"):
+                print item
+            self.assertEqual(True,True)
+
+        test_pages_liked()
+        test_likers()
 
 if __name__ == "__main__":
     unittest.main()
