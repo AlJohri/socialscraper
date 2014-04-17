@@ -94,14 +94,15 @@ def search(browser, current_user, graph_name, method_name):
             current_results = _parse_result(raw_html)
         return post_data, current_results
 
+    # Main Facebook Graph Search
+
     graph_id = get_id(graph_name)
     post_data, current_results = _graph_request(graph_id, method_name)
     if post_data == None: raise ScrapingError("Coudln't find initial post data")
     for result in current_results: yield result
 
     while post_data:
-        current_post_data, current_results = \
-            _graph_request(graph_id, method_name, post_data)
+        current_post_data, current_results = _graph_request(graph_id, method_name, post_data)
         if current_post_data == None or current_results == None: break
         for result in current_results: yield result
         post_data.update(current_post_data)
