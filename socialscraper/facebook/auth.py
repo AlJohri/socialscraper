@@ -39,7 +39,7 @@ LOGGED_IN = [
     "logout.php"
 ]
 
-def login(self, browser, email, password):
+def login(browser, email, password):
 
     logger.info("Begin Facebook Authentication")
     response = browser.get(BASE_URL, timeout=1)

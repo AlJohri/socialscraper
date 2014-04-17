@@ -2,7 +2,7 @@ from ..base import BaseScraper, BaseUser, UsageError, ScrapingError
 import lxml.html, re, json, urllib, requests
 from requests.adapters import HTTPAdapter
 
-from . import auth 
+from . import auth
 
 class FacebookUser(BaseUser):
     """Container for the info associated w/ a Facebook user"""
@@ -14,11 +14,13 @@ class FacebookScraper(BaseScraper):
     def __init__(self,user_agents = None):
         """Initialize the Facebook scraper."""
         BaseScraper.__init__(self,user_agents)
-    	self.browser = requests.Session()
-    	self.browser.mount(auth.BASE_URL, HTTPAdapter(max_retries=3))
+        self.browser = requests.Session()
+        self.browser.mount(auth.BASE_URL, HTTPAdapter(max_retries=3))
 
-	def login(self):
-		auth.login(self.browser, self.username, self.password)
+    def login(self):
+        """Logs user into facebook."""
+        self.cur_user = self.pick_random_user()
+        auth.login(self.browser, self.cur_user.username, self.cur_user.password)
 
     def get_graph_id(self, graph_name):
         """Get the graph ID given a name."""
