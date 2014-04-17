@@ -42,7 +42,7 @@ LOGGED_IN = [
     "logout.php"
 ]
 
-def login(browser, email, password):
+def login(browser, email, password, username=None):
     """
     Given a requests session, email, and password, authenticate the session.
     Returns authenticated user's username.
@@ -102,6 +102,6 @@ def login(browser, email, password):
         logger.debug('Retrieve username from profile')
         return username
 
-    username = get_auth_username()
+    username = get_auth_username() if not username
     
     return username
