@@ -7,6 +7,8 @@ BASE_URL = 'https://m.facebook.com'
 LOGIN_URL = BASE_URL + '/login.php'
 CHECKPOINT_URL = BASE_URL + '/login/checkpoint/'
 
+INPUT_ERROR = ["We didn't recognize your email address or phone number."]
+
 REVIEW_RECENT_LOGIN_CONTINUE = [
     "Review Recent Login", 
     "Someone recently tried to log into your account from an unknown browser. " + 
@@ -63,7 +65,9 @@ def login(browser, email, password):
 
         base_payload = get_base_payload(response.content)
 
-        if state(response.text, REVIEW_RECENT_LOGIN_CONTINUE):
+        if state(response.text, INPUT_ERROR):
+            raise UsageError("We didn't recognize your email address or phone number.")
+        elif state(response.text, REVIEW_RECENT_LOGIN_CONTINUE):
             payload = { 'submit[Continue]': 'Continue' }
             payload.update(base_payload)
             response = browser.post(CHECKPOINT_URL, data=payload)

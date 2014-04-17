@@ -15,22 +15,32 @@ class FacebookScraper(BaseScraper):
         """Initialize the Facebook scraper."""
         BaseScraper.__init__(self,user_agents)
         self.browser = requests.Session()
+        self.browser.headers = { 'User-Agent': self.cur_user_agent }
         self.browser.mount(auth.BASE_URL, HTTPAdapter(max_retries=3))
 
     def login(self):
         """Logs user into facebook."""
         self.cur_user = self.pick_random_user()
-        auth.login(self.browser, self.cur_user.username, self.cur_user.password)
+        auth.login(self.browser, self.cur_user.email, self.cur_user.password)
+
+        base_url = 'https://m.facebook.com/profile.php'
+        response = self.browser.get(base_url)
+        doc = lxml.html.fromstring(response.content)
+
+        profile_url = doc.cssselect('.sec')[0].get('href')
+
+        self.cur_user.username = re.sub('\?.*', '', profile_url[1:])
+        self.cur_user.id = self.get_graph_id(self.cur_user.username)
 
     def get_graph_id(self, graph_name):
         """Get the graph ID given a name."""
         response = requests.get('https://graph.facebook.com/' + graph_name)
-        return json.loads(response.text())['id']
+        return json.loads(response.text)['id']
 
     def get_graph_name(self, graph_id):
         """Get the graph name given a graph ID."""
         response = requests.get('https://graph.facebook.com/' + graph_id)
-        return json.loads(response.text())['name']
+        return json.loads(response.text)['name']
 
     def graph_search(self, graph_id, method_name, post_data = None):
         """Graph search."""
@@ -38,63 +48,87 @@ class FacebookScraper(BaseScraper):
         if not post_data:
             base_url = "https://www.facebook.com/search/%s/%s" % (graph_id,
                                                                   method_name)
-            resp = self.browser.get(base_url)
-            raw_html = resp.read()
-            raw_json = self._find_script_tag_with_post_data(raw_html)
-            if not raw_json:
-                raise ScrapingError
+            response = self.browser.get(base_url)
+            raw_html = response.text
+            raw_json_cursor = self._find_script_tag_with_cursor_data(raw_html)
+            raw_json_other = self._find_script_tag_with_other_data(raw_html)
+
+            cursor_data = self.parse_cursor_data(raw_json_cursor)
+            other_data = self.parse_other_data(raw_json_other)
+
+            if not cursor_data and not other_data:
+                raise ScrapingError("Couldn't find post data on initial request.")
+
+            post_data = dict(cursor_data.items() + other_data.items())
 
         else:
-            parameters = {  'data': json.dumps(post_data), 
-                            '__user': self.cur_user.id, 
-                            '__a': 1, 
-                            '__req': 'a', 
-                            '__dyn': '7n8apij35CCzpQ9UmWOGUGy1m9ACwKyaF3pqzAQ',
-                            '__rev': 1106672 }
 
-            base_url = "https://www.facebook.com/ajax/pagelet/generic.php/BrowseScrollingSetPagelet?%s" % urllib.urlencode(parameters)
-            resp = self.browser.get(base_url)
-            resp_json = json.loads(resp.read()[9:])
-            raw_json = resp_json['jsmods']
+            payload = {
+                'data': json.dumps(post_data), 
+                '__user': self.cur_user.id, 
+                '__a': 1, 
+                '__req': 'a', 
+                '__dyn': '7n8apij35CCzpQ9UmWOGUGy1m9ACwKyaF3pqzAQ',
+                '__rev': 1106672
+            }
+
+            # base_url = "https://www.facebook.com/ajax/pagelet/generic.php/BrowseScrollingSetPagelet"
+            # response = self.browser.get(base_url, data=payload)
+            
+            alt_url = "https://www.facebook.com/ajax/pagelet/generic.php/BrowseScrollingSetPagelet?%s" % urllib.urlencode(payload)
+            response = self.browser.get(alt_url)
+            
+            resp_json = json.loads(response.content[9:])
+            raw_json = resp_json
             raw_html = resp_json['payload']
 
-        post_data = self.parse_post_data(raw_json)
+            post_data = self.parse_cursor_data(raw_json)
+
         current_results = self.parse_result(raw_html)
 
         return post_data, current_results
 
-    def parse_post_data(self, raw_json):
-        """Parse post data."""
+    def parse_other_data(self, raw_json):
+        require = raw_json['jsmods']['require']
 
-        require = raw_json['require']
-        data_parameter = map(lambda x: x[3][1], filter(lambda x: 
+        data_parameter = map(lambda x: x[3][1], 
+                            filter(lambda x: 
                                 x[0] == "BrowseScrollingPager" and 
                                 x[1] == "init", 
-                                require))
-        cursor_parameter = map(lambda x: x[3][0], filter(lambda x: 
-                                x[0] == "BrowseScrollingPager" and 
-                                x[1] == "pageletComplete", 
-                                require))
+                                require)
+                            )[0]
 
-        data_parameter = filter(None, data_parameter)
-        cursor_parameter = filter(None, cursor_parameter)
+        return data_parameter
 
-        if data_parameter and cursor_parameter: 
-            return dict(data_parameter[0].items() + 
-                        cursor_parameter[0].items())
-        elif data_parameter:
-            return dict(data_parameter[0].items())
-        elif cursor_parameter:
-            return dict(cursor_parameter[0].items())
-        return None
+    def parse_cursor_data(self, raw_json):
+        require = raw_json['jsmods']['require']
 
-    def _find_script_tag_with_post_data(self, raw_html):
+        cursor_parameter = map(lambda x: x[3][0], 
+                                filter(lambda x: 
+                                    x[0] == "BrowseScrollingPager" and 
+                                    x[1] == "pageletComplete", 
+                                    require)
+                                )[0]
+        
+        return cursor_parameter
+
+
+    def _find_script_tag_with_cursor_data(self, raw_html):
         doc = lxml.html.fromstring(raw_html)
         script_tag = filter(lambda x: x.text_content().find('cursor') != -1, 
                             doc.cssselect('script'))
         if not script_tag: 
             return None
-        return json.loads(script_tag[0].text_content()[35:-2])
+        return json.loads(script_tag[0].text_content()[24:-1])
+
+    def _find_script_tag_with_other_data(self, raw_html):
+        doc = lxml.html.fromstring(raw_html)
+        script_tag = filter(lambda x: x.text_content().find('encoded_query') != -1, 
+                            doc.cssselect('script'))
+        if not script_tag: 
+            return None
+        return json.loads(script_tag[0].text_content()[24:-1])
+
 
     def parse_result(self, raw_html):
         doc = lxml.html.fromstring(raw_html)
