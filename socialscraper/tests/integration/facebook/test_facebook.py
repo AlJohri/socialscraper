@@ -1,5 +1,5 @@
 import unittest, os
-from ..facebook import FacebookScraper
+from ....facebook import FacebookScraper
 
 class TestFacebookScraper(unittest.TestCase):
 
