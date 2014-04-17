@@ -119,6 +119,6 @@ def login(browser, email, password, username=None):
         logger.debug('Retrieve username from profile')
         return username
 
-    username = get_auth_username() if not username
+    if not username: username = get_auth_username()
     
     return username

@@ -31,8 +31,13 @@ class TestFacebookScraper(unittest.TestCase):
                 print item
             self.assertEqual(True,True)
 
-        test_pages_liked()
-        test_likers()
+        def test_about():
+            from ...facebook import about
+            about.search(self.scraper.browser, self.test_username)
+
+        # test_pages_liked()
+        # test_likers()
+        test_about()
 
 if __name__ == "__main__":
     unittest.main()
