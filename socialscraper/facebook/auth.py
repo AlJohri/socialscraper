@@ -1,5 +1,4 @@
 import logging, requests, lxml.html
-from requests.adapters import HTTPAdapter
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

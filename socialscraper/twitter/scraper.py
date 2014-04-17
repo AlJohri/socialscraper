@@ -1,4 +1,4 @@
-from .base import BaseScraper, BaseUser, UsageError, FeedItem
+from ..base import BaseScraper, BaseUser, UsageError, FeedItem
 import requests, json, bs4
 
 class TwitterUser(BaseUser):
