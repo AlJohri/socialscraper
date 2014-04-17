@@ -54,11 +54,20 @@ def search(browser, graph_name):
 							print "--------------------"
 
 			elif "Places Lived" in title:
-				data = thing.cssselect('.profileInfoTable')
-				if not data: continue
 				print title
 				print "==============="
-				print data[0].text_content()
+				data = thing.cssselect('.profileInfoTable')
+				if not data: continue
+				# print data[0].text_content()
+				for table in data[0].cssselect('tbody'): 
+					for row in table.cssselect('tr'): 
+						for cell in row.cssselect('td'):
+							if len(cell.getchildren()) == 1 and (cell.getchildren()[0].tag == 'hr' or cell.getchildren()[0].tag == 'a'): continue
+							name = cell.cssselect('div div div')[0].getchildren()[1].getchildren()[0].text_content()
+							status = cell.cssselect('div div div')[0].getchildren()[1].getchildren()[1].text_content()
+							if name: print name
+							if status: print status
+							print "--------------------"
 			elif "Family" in title: # empty
 				data = thing.cssselect('.profileInfoTable')
 				if not data: continue
