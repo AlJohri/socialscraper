@@ -27,6 +27,8 @@ def search(browser, current_user, graph_name, method_name):
     for result in search(browser, current_user, graph_name, method_name):
         print result
 
+    browser: authenticated requests session (see auth.py)
+    current_user: authenticated user
     graph_name: name of Facebook graph object such as a user name or page name
     method_name: name of internal Facebook graph search methods;
                  list: 'pages-liked' and 'likers'

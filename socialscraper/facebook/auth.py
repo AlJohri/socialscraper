@@ -44,8 +44,25 @@ LOGGED_IN = [
 
 def login(browser, email, password, username=None):
     """
+
+    Facebook Login
+
+    browser: non-authenticated requests session
+    email: email used to log in to Facebook
+    password: password used to log into Facebook
+    username: (optional) if not supplied, it will be found from the PROFILE_URL
+
     Given a requests session, email, and password, authenticate the session.
-    Returns authenticated user's username.
+    Returns authenticated user's username if not given.
+
+    Because logging into Facebook can be relatively non-deterministic based on
+    how often the account has been used, how many friends it has, how recently 
+    it was created, etc. I created a simple state machine and listed the states
+    above. 
+
+    It's very easy to add new states, they are based on strings that are found 
+    on the resulting page.
+
     """
 
     logger.info("Begin Facebook Authentication")
