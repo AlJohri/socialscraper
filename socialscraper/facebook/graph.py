@@ -31,7 +31,7 @@ def search(browser, current_user, graph_name, method_name):
     current_user: authenticated user
     graph_name: name of Facebook graph object such as a user name or page name
     method_name: name of internal Facebook graph search methods;
-                 list: 'pages-liked' and 'likers'
+                 list: 'pages-liked', 'likers', 'users-named'
 
     Example:
 
@@ -75,6 +75,14 @@ def search(browser, current_user, graph_name, method_name):
             '__rev': 1106672
         }
 
+    # https://www.facebook.com/search/str/ruchi/users-named
+    # https://www.facebook.com/search/str/ruchi/users-named/me/friends/intersect?ref=filter
+    # https://www.facebook.com/search/str/ruchi/users-named/228401243342/students/intersect?ref=filter
+    # https://www.facebook.com/search/str/ruchi/users-named/males/intersect?ref=filter
+    # https://www.facebook.com/search/str/ruchi/users-named/females/intersect?ref=filter
+    # https://www.facebook.com/search/str/ruchi/users-named/108641632493225/residents/present/intersect?ref=filter
+    # https://www.facebook.com/search/str/ruchi/users-named/108659242498155/residents/present/intersect?ref=filter
+    # https://www.facebook.com/search/str/ruchi/users-named/106517799384578/residents/present/intersect?ref=filter
     def _graph_request(graph_id, method_name, post_data = None):
         if not post_data:
             response = browser.get(SEARCH_URL + "/%s/%s" % (graph_id, method_name))

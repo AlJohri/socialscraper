@@ -31,6 +31,8 @@ class TestFacebookScraper(unittest.TestCase):
                 print item
             self.assertEqual(True,True)
 
+        # def test
+
         def test_about(username):
             from ...facebook import about
             about.search(self.scraper.browser, username)
