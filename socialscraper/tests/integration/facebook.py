@@ -35,13 +35,12 @@ class TestFacebookScraper(unittest.TestCase):
 
         def test_about(username):
             from ...facebook import about
-            about.search(self.scraper.browser, username)
+            about.search(self.scraper.browser, self.scraper.cur_user, username)
 
         # test_pages_liked(self.test_username)
         # test_likers(self.test_pagename)
         test_about('moritz.gellner')
         test_about('carson.potter.3')
-        test_about('al.johri')
 
 if __name__ == "__main__":
     unittest.main()
