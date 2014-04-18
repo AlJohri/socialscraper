@@ -26,6 +26,12 @@ def search(browser, current_user, graph_name):
 		"event": {}
 	}
 
+	def get_previous(element_list):
+		if element_list: return [element_list[0].getprevious()]
+
+	def get_text(element_list):
+		if element_list: return element_list[0].text_content()
+
 	def get_rows(data):
 		for table in data.cssselect('tbody'): 
 			for row in table.cssselect('tr'): 
@@ -39,18 +45,18 @@ def search(browser, current_user, graph_name):
 
 	def parse_experience(cell):
 		for experience in cell.cssselect(".experienceContent"):
-			experienceTitle = experience.cssselect(".experienceTitle")[0].text_content()
-			experienceBody = experience.cssselect(".experienceBody")[0].text_content()
+			experienceTitle = get_text(experience.cssselect(".experienceTitle"))
+			experienceBody = get_text(experience.cssselect(".experienceBody"))
 			yield experienceTitle, experienceBody
 
 	def parse_generic_cell(cell):
-		name = cell.cssselect('.aboutSubtitle')[0].getprevious().text_content()
-		content = cell.cssselect('.aboutSubtitle')[0].text_content()
+		name = get_text(get_previous(cell.cssselect('.aboutSubtitle')))
+		content = get_text(cell.cssselect('.aboutSubtitle'))
 		return name, content
 
 	def parse_generic_row(row):
-		name = row.cssselect('th')[0].text_content()
-		content = row.cssselect('td')[0].text_content()
+		name = get_text(row.cssselect('th'))
+		content = get_text(row.cssselect('td'))
 		return name, content
 
 	response = browser.get(ABOUT_URL % graph_name)
@@ -70,7 +76,7 @@ def search(browser, current_user, graph_name):
 				ret['family'][name] = status
 
 		if fbTimelineSection:
-			title = fbTimelineSection[0].cssselect('.uiHeaderTitle')[0].text_content()
+			title = get_text(fbTimelineSection[0].cssselect('.uiHeaderTitle'))
 			data = fbTimelineSection[0].cssselect('.profileInfoTable')
 			
 			# experiences
@@ -82,6 +88,7 @@ def search(browser, current_user, graph_name):
 					for cell in row.cssselect('td'): 
 						for experienceTitle, experienceBody in parse_experience(cell): 
 							ret['experiences'][header][experienceTitle] = experienceBody
+
 			# relationships
 			elif "Relationship" in title:
 				for cell in get_cells(data[0]): 
@@ -130,6 +137,4 @@ def search(browser, current_user, graph_name):
 				raise ScrapingError("Unrecognized fbTimelineSection %s" % title)
 
 	return ret
-	# pdb.set_trace()
-
-	# data = thing.cssselect('.profileInfoTable')
+	

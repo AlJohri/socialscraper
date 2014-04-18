@@ -12,7 +12,7 @@ class TestFacebookScraper(unittest.TestCase):
         self.username = os.getenv("FACEBOOK_USERNAME")
         self.password = os.getenv("FACEBOOK_PASSWORD")
 
-        self.test_username = "moritz.gellner"
+        self.test_username = "dthirman"
         self.test_pagename = "mightynest"
 
         self.scraper = FacebookScraper()
