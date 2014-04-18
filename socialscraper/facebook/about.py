@@ -1,6 +1,8 @@
-import requests, lxml.html, lxml.etree
+import logging, requests, lxml.html, lxml.etree
 from ..base import ScrapingError
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 ABOUT_URL = "https://www.facebook.com/%s/info"
 
@@ -8,106 +10,126 @@ import pdb
 
 def search(browser, current_user, graph_name):
 
+	# shit gets weird when graph_name == current_user.username
 	if current_user.username == graph_name:
 		raise ScrapingError("don't scrape yourself plz")
 
-	# shit gets weird when graph_name == current_user.username
+	ret = {
+		"family": {},
+		"experiences": {},
+		"relationships": {},
+		"places": {},
+		"contact": {},
+		"basic": {},
+		"about": [],
+		"quotes": [],
+		"event": {}
+	}
+
+	def get_rows(data):
+		for table in data.cssselect('tbody'): 
+			for row in table.cssselect('tr'): 
+				yield row
+
+	def get_cells(data):
+		for table in data.cssselect('tbody'): 
+			for row in table.cssselect('tr'): 
+				for cell in row.cssselect('td'):
+					yield cell
+
+	def parse_experience(cell):
+		for experience in cell.cssselect(".experienceContent"):
+			experienceTitle = experience.cssselect(".experienceTitle")[0].text_content()
+			experienceBody = experience.cssselect(".experienceBody")[0].text_content()
+			yield experienceTitle, experienceBody
+
+	def parse_generic_cell(cell):
+		name = cell.cssselect('.aboutSubtitle')[0].getprevious().text_content()
+		content = cell.cssselect('.aboutSubtitle')[0].text_content()
+		return name, content
+
+	def parse_generic_row(row):
+		name = row.cssselect('th')[0].text_content()
+		content = row.cssselect('td')[0].text_content()
+		return name, content
 
 	response = browser.get(ABOUT_URL % graph_name)
-	doc = lxml.html.fromstring(response.text)
-	for element in doc.cssselect(".hidden_elem"): 
+	for element in lxml.html.fromstring(response.text).cssselect(".hidden_elem"): 
 		comment = element.xpath("comment()")
 		if not comment: continue
-		element_from_comment = lxml.html.tostring(comment[0])[5:-4]
-		doc2 = lxml.html.fromstring(element_from_comment)
-		fbTimelineSection = doc2.cssselect('.fbTimelineSection')
-		fbTimelineFamilyGrid = doc2.cssselect('.fbTimelineFamilyGrid')
 		
-		if not fbTimelineSection and not fbTimelineFamilyGrid: continue
+		element_from_comment = lxml.html.tostring(comment[0])[5:-4]
+		doc = lxml.html.fromstring(element_from_comment)
+		fbTimelineSection = doc.cssselect('.fbTimelineSection.fbTimelineCompactSection')
+		fbTimelineFamilyGrid = doc.cssselect('.fbTimelineFamilyGrid')
 
 		if fbTimelineFamilyGrid:
-			print ""			
-			print "Family (for real)"
-			print "=================================================="						
 			familyList = fbTimelineFamilyGrid[0].cssselect('.familyList')[0]
 			for member in familyList:
-				name = member.cssselect('.aboutSubtitle')[0].getprevious().text_content()
-				content = member.cssselect('.aboutSubtitle')[0].text_content()
-				print name, content
+				name, status = parse_generic_cell(member)
+				ret['family'][name] = status
 
-		for thing in fbTimelineSection:
-			title = thing.cssselect('.uiHeaderTitle')
-			if not title: continue
-			title = title[0].text_content()
-			print ""
-			print title
-			print "=================================================="			
-			if title == "Work and Education":
-				data = thing.cssselect('.profileInfoTable')
-				if not data: continue
-				for table in data[0].cssselect('tbody'): 
-					for row in table.cssselect('tr'): 
-						for header in row.cssselect('th'):
-							print ""
-							print header.text_content()
+		if fbTimelineSection:
+			title = fbTimelineSection[0].cssselect('.uiHeaderTitle')[0].text_content()
+			data = fbTimelineSection[0].cssselect('.profileInfoTable')
+			
+			# experiences
+			if "Work and Education" in title:
+				for row in get_rows(data[0]):
+					if not row.cssselect('th'): continue
+					header = row.cssselect('th')[0].text_content() 
+					ret['experiences'][header] = {}
+					for cell in row.cssselect('td'): 
+						for experienceTitle, experienceBody in parse_experience(cell): 
+							ret['experiences'][header][experienceTitle] = experienceBody
+			# relationships
+			elif "Relationship" in title:
+				for cell in get_cells(data[0]): 
+					name, status = parse_generic_cell(cell)
+					ret['relationships'][name] = status
 
-						for cell in row.cssselect('td'):
-							for experience in cell.cssselect(".experienceContent"):
-								experienceTitle = experience.cssselect(".experienceTitle")[0].text_content()
-								experienceBody = experience.cssselect(".experienceBody")[0].text_content()
-								print experienceTitle, experienceBody
-			elif title == "Relationship":
-				data = thing.cssselect('.profileInfoTable')
-				if not data: continue
-				for table in data[0].cssselect('tbody'): 
-					for row in table.cssselect('tr'): 
-						for cell in row.cssselect('td'):
-							name = cell.cssselect('div div div div div div div')[0].text_content()
-							status = cell.cssselect('div div div div div div div')[1].text_content()
-							print name, status
+			# places
 			elif "Places Lived" in title:
-				data = thing.cssselect('.profileInfoTable')
-				if not data: continue
-				# print data[0].text_content()
-				for table in data[0].cssselect('tbody'): 
-					for row in table.cssselect('tr'): 
-						for cell in row.cssselect('td'):
-							if len(cell.getchildren()) == 1 and (cell.getchildren()[0].tag == 'hr' or cell.getchildren()[0].tag == 'a'): continue
-							name = cell.cssselect('div div div')[0].getchildren()[1].getchildren()[0].text_content()
-							status = cell.cssselect('div div div')[0].getchildren()[1].getchildren()[1].text_content()
-							print name, status
+				for cell in get_cells(data[0]): 
+					name, status = parse_generic_cell(cell)
+					ret['places'][name] = status
+
+			# contact
+			elif "Contact Information" in title:
+				for row in get_rows(data[0]): 
+					name, status = parse_generic_row(row)
+					ret['contact'][name] = status
+
+			# basic
+			elif "Basic Information" in title:
+				for row in get_rows(data[0]): 
+					name, status = parse_generic_row(row)
+					ret['basic'][name] = status					
+
+			# about
+			elif "About" in title:
+				data = fbTimelineSection[0].getchildren()[1]
+				for quote in data.cssselect('.profileText'): 
+					ret['about'].append(quote.text_content())
+
+			# quotes
+			elif "Favorite Quotations" in title:
+				data = fbTimelineSection[0].getchildren()[1]
+				for quote in data.cssselect('.profileText'):
+					ret['quotes'].append(quote.text_content())
+			# family
 			elif "Family" in title: # empty
 				pass # this will be empty Family information above in 'fbTimelineFamilyGrid'
-			elif "Contact Information" in title:
-				data = thing.cssselect('.profileInfoTable')
-				if not data: continue
-				for table in data[0].cssselect('tbody'): 
-					for row in table.cssselect('tr'): 
-						header = row.cssselect('th')[0]
-						content = row.cssselect('td')[0]
-						print header.text_content(), content.text_content()
-			elif "Basic Information" in title:
-				data = thing.cssselect('.profileInfoTable')
-				if not data: continue
-				for table in data[0].cssselect('tbody'): 					
-					for row in table.cssselect('tr'): 
-						header = row.cssselect('th')[0]
-						content = row.cssselect('td')[0]
-						print header.text_content(), content.text_content()
+
+			# events
 			elif "Life Events" in title:
-				data = thing.getchildren()[1].text_content()
-				print data
-			elif "About" in title: # About Carson
-				data = thing.getchildren()[1].text_content()
-				print data
-			elif "Favorite Quotations" in title:
-				data = thing.getchildren()[1].text_content()
-				print data
+				# TODO: parse life events
+				data = fbTimelineSection[0].getchildren()[1].text_content()
+				pass
 			else:
-				data = thing.getchildren()[1].text_content()
-				print data
-			
-			
+				raise ScrapingError("Unrecognized fbTimelineSection %s" % title)
+
+	return ret
 	# pdb.set_trace()
 
 	# data = thing.cssselect('.profileInfoTable')

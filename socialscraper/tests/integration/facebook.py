@@ -1,8 +1,9 @@
 import unittest, os
 from ...facebook import FacebookScraper
 
-import json
-import urllib
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
 
 class TestFacebookScraper(unittest.TestCase):
 
@@ -31,16 +32,16 @@ class TestFacebookScraper(unittest.TestCase):
                 print item
             self.assertEqual(True,True)
 
-        # def test
-
         def test_about(username):
-            from ...facebook import about
-            about.search(self.scraper.browser, self.scraper.cur_user, username)
+            stuff = self.scraper.get_about(username)
+            pp.pprint(stuff)
+            self.assertEqual(True,True)
 
-        # test_pages_liked(self.test_username)
+        test_pages_liked(self.test_username)
+        test_about(self.test_username)
+
+        # takes too long
         # test_likers(self.test_pagename)
-        test_about('moritz.gellner')
-        test_about('carson.potter.3')
 
 if __name__ == "__main__":
     unittest.main()
