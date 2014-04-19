@@ -1,6 +1,6 @@
 import logging, requests, lxml.html, re
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 BASE_URL = 'https://m.facebook.com'

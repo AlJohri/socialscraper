@@ -1,14 +1,14 @@
-import logging, requests, lxml.html, lxml.etree
+import logging, requests, lxml.html
 from ..base import ScrapingError
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 ABOUT_URL = "https://www.facebook.com/%s/info"
 
 import pdb
 
-def search(browser, current_user, graph_name):
+def get(browser, current_user, graph_name):
 
 	# shit gets weird when graph_name == current_user.username
 	if current_user.username == graph_name:

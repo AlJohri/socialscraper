@@ -33,7 +33,7 @@ class FacebookScraper(BaseScraper):
         return graph.get_name(graph_id)
 
     def get_about(self, graph_name):
-        return about.search(self.browser, self.cur_user, graph_name)
+        return about.get(self.browser, self.cur_user, graph_name)
 
     def graph_search(self, graph_name, method_name):
         """Graph Search Wrapper."""

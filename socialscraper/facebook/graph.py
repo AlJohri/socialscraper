@@ -1,7 +1,7 @@
 import logging, requests, lxml.html, json, urllib
 from ..base import ScrapingError
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 SEARCH_URL = 'https://www.facebook.com/search'
