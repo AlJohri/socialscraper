@@ -42,8 +42,8 @@ class TestFacebookScraper(unittest.TestCase):
             from ...facebook import timeline
             timeline.search(self.scraper.browser, self.scraper.cur_user, username)
 
-        # test_pages_liked(self.test_username)
-        # test_about(self.test_username)
+        test_about(self.test_username)
+        test_pages_liked(self.test_username)
         test_timeline(self.test_username)
 
         # takes too long
