@@ -1,6 +1,10 @@
 import logging, requests, lxml.html, json, urllib, re
 from ..base import ScrapingError
 
+import datetime
+import dateutil
+from dateutil.relativedelta import relativedelta
+
 import pdb
 
 # logging.basicConfig(level=logging.DEBUG)
@@ -12,6 +16,11 @@ AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/ProfileTimelineSec
 
 from . import graph
 
+from enum import Enum
+class QueryType(Enum):
+    everything = 25
+    highlights = 8
+    recent = 36
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
@@ -31,14 +40,9 @@ def search(browser, current_user, graph_name):
         return {
             "ajaxpipe": 1,
             "ajaxpipe_token": ajaxpipe_token,
-            "no_script_path": 1,
             "data": json.dumps(ajax_data),
             "__user": current_user.id,
-            "__a": 1,
             "__dyn": "7n8ajEAMCBynzpQ9UoHaEWy6zECiq78hAKGgyiGGeqheCu6popG",
-            "__req": "jsonp_22",
-            "__rev": "1213535",
-            "__adt": page
         }
 
     response = browser.get(BASE_URL % graph_name)
@@ -48,56 +52,68 @@ def search(browser, current_user, graph_name):
     r = regex.search(response.text)
     
     ajax_data = json.loads(str(cursor_tag['jscc_map'])[105:-93])
+
     del ajax_data['section_container_id']
     del ajax_data['section_pagelet_id']
     del ajax_data['unit_container_id']
     del ajax_data['current_scrubber_key']
     del ajax_data['require_click']
-    # del ajax_data['num_visible_units']
     del ajax_data['buffer']
     del ajax_data['adjust_buffer']
     del ajax_data['showing_esc']
     del ajax_data['remove_dupes']
-    # del ajax_data['tipld']
+    del ajax_data['num_visible_units']
+    del ajax_data['tipld']
 
-    # del ajax_data['start']
-    # del ajax_data['end']
+    ajax_data['query_type'] = QueryType.everything.value
 
-    # del ajax_data['tipld']['sc']
-    # del ajax_data['tipld']['vc']
-    # del ajax_data['tipld']['rc']
+    # datetime.datetime.fromtimestamp(1398927599)
+    # datetime.datetime(2012,04,01,0,0).strftime('%s')
+    tNow = datetime.datetime.now()
+    start = datetime.date(tNow.year, tNow.month, 1)
+    end = datetime.date(tNow.year, tNow.month+1, 1)
 
-    # get first page
-    for i in range(1,10):
-        ajax_data['page_index'] = i
-        ajax_data['tipld']['sc'] = 5 * (i-1)
-        payload = _get_payload(ajax_data, current_user.id, r.groups()[0], i)
-        # pp.pprint(payload)
-        response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload))
-        doc = lxml.html.fromstring(response.text)
-        test = doc.cssselect('script')[2].text_content()
-        regex = re.compile("if \(self != top\) {parent\.require\(\"JSONPTransport\"\)\.respond\(\d, ({.*}),\"jsmods\"", re.MULTILINE|re.DOTALL)
-        blah = regex.findall(test)[0]
-        blah = blah + "}}"
-        yay = json.loads(blah)
-        da_html = yay['payload']['content']['_segment_' + str(i) + '_0_left']
-        if not da_html: break
-        uh = lxml.html.fromstring(da_html)
+    month_counter = 0
 
-        for el in uh.cssselect('div[role]'):
-            print el.text_content()
-            print ""
+    while True:
+        start += dateutil.relativedelta.relativedelta(months=-month_counter)
+        end += dateutil.relativedelta.relativedelta(months=-month_counter)
 
-    # # get second page
-    # # ajax_data['start']
-    # # ajax_data['end']
-    # ajax_data['page_index'] = 3
-    # payload = _get_payload(ajax_data, current_user.id, r.groups()[0])
-    # pp.pprint(payload)
-    # response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload))
-    # print response.text.decode('unicode-escape')
+        print start.strftime('%Y-%m-%d %H:%M:%S')
+        print end.strftime('%Y-%m-%d %H:%M:%S')
 
+        ajax_data['start'] = start.strftime('%s') 
+        ajax_data['end'] = end.strftime('%s')
 
+        page_counter = 0
+
+        while True:
+            ajax_data['page_index'] = page_counter
+            payload = _get_payload(ajax_data, current_user.id, r.groups()[0], page_counter)
+            response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload))
+            doc = lxml.html.fromstring(response.text)
+            test = doc.cssselect('script')[2].text_content()
+            regex = re.compile("if \(self != top\) {parent\.require\(\"JSONPTransport\"\)\.respond\(\d+, ({.*}),\"jsmods\"", re.MULTILINE|re.DOTALL)
+            blah = regex.findall(test)[0]
+            blah = blah + "}}"
+            yay = json.loads(blah)
+            da_html = yay['payload']['content']['_segment_' + str(page_counter) + '_0_left']
+            if not da_html: 
+                # pp.pprint(payload)
+                break
+            uh = lxml.html.fromstring(da_html)
+
+            for el in uh.cssselect('div[role]'):
+                print el.text_content()
+                print ""
+
+            page_counter += 1
+
+        if not da_html and page_counter == 0: 
+            # pp.pprint(payload)
+            break
+
+        month_counter += 1
 
     # pdb.set_trace()
 

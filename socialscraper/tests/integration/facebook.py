@@ -4,6 +4,9 @@ from ...facebook import FacebookScraper
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 class TestFacebookScraper(unittest.TestCase):
 
     def setUp(self):
@@ -11,7 +14,7 @@ class TestFacebookScraper(unittest.TestCase):
         self.username = os.getenv("FACEBOOK_USERNAME")
         self.password = os.getenv("FACEBOOK_PASSWORD")
 
-        self.test_username = "moritz.gellner"
+        self.test_username = "dthirman"
         self.test_pagename = "mightynest"
 
         self.scraper = FacebookScraper()
