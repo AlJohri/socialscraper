@@ -5,14 +5,12 @@ import datetime
 import dateutil
 from dateutil.relativedelta import relativedelta
 
-import pdb
-
-# logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 BASE_URL = 'https://www.facebook.com/%s'
 AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/ProfileTimelineSectionPagelet"
-
+regex_4real = re.compile("if \(self != top\) {parent\.require\(\"JSONPTransport\"\)\.respond\(\d+, ({.*}),\"jsmods\"", re.MULTILINE|re.DOTALL)
 
 from . import graph
 
@@ -79,8 +77,7 @@ def search(browser, current_user, graph_name):
         start += dateutil.relativedelta.relativedelta(months=-1)
         end += dateutil.relativedelta.relativedelta(months=-1)
 
-        print start.strftime('%Y-%m-%d %H:%M:%S')
-        print end.strftime('%Y-%m-%d %H:%M:%S')
+        logger.info(start.strftime("%A %d %B %Y") + "to" + end.strftime("%A %d %B %Y"))
 
         ajax_data['start'] = start.strftime('%s') 
         ajax_data['end'] = end.strftime('%s')
@@ -92,25 +89,43 @@ def search(browser, current_user, graph_name):
             payload = _get_payload(ajax_data, current_user.id, r.groups()[0], page_counter)
             response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload))
             doc = lxml.html.fromstring(response.text)
+            
             test = doc.cssselect('script')[2].text_content()
-            regex = re.compile("if \(self != top\) {parent\.require\(\"JSONPTransport\"\)\.respond\(\d+, ({.*}),\"jsmods\"", re.MULTILINE|re.DOTALL)
-            blah = regex.findall(test)[0]
+            blah = regex_4real.findall(test)[0]
             blah = blah + "}}"
             yay = json.loads(blah)
             da_html = yay['payload']['content']['_segment_' + str(page_counter) + '_0_left']
-            if not da_html: 
-                # pp.pprint(payload)
-                break
-            uh = lxml.html.fromstring(da_html)
 
-            for el in uh.cssselect('div[role]'):
-                print el.text_content()
-                print ""
+            test2 = doc.cssselect('script')[4].text_content()
+            if len(test2) > 750:
+                blah2 = regex_4real.findall(test2)[0]
+                blah2 = blah2 + "}}"
+                yay2 = json.loads(blah2)
+                da_html2 = yay2['payload']['content']['_segment_' + str(page_counter) + '_1_left']
+            else:
+                da_html2 = None
+            
+            if da_html: 
+                uh = lxml.html.fromstring(da_html)
+                for el in uh.cssselect('div[role]'):
+                    print el.text_content()
+                    print ""
+            if da_html2:
+                uh2 = lxml.html.fromstring(da_html2)
+                for el2 in uh2.cssselect('div[role]'):
+                    print el2.text_content()
+                    print ""
+
+            if not da_html and not da_html2:
+                break
 
             page_counter += 1
 
-        if not da_html and page_counter == 0: 
-            # pp.pprint(payload)
+        # if not da_html and page_counter == 0: 
+        #     pp.pprint(payload)
+        #     break
+
+        if end < datetime.date(2004,1,1):
             break
 
     # pdb.set_trace()
