@@ -76,8 +76,8 @@ def search(browser, current_user, graph_name):
     month_counter = 0
 
     while True:
-        start += dateutil.relativedelta.relativedelta(months=-month_counter)
-        end += dateutil.relativedelta.relativedelta(months=-month_counter)
+        start += dateutil.relativedelta.relativedelta(months=-1)
+        end += dateutil.relativedelta.relativedelta(months=-1)
 
         print start.strftime('%Y-%m-%d %H:%M:%S')
         print end.strftime('%Y-%m-%d %H:%M:%S')
@@ -112,8 +112,6 @@ def search(browser, current_user, graph_name):
         if not da_html and page_counter == 0: 
             # pp.pprint(payload)
             break
-
-        month_counter += 1
 
     # pdb.set_trace()
 
