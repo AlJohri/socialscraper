@@ -45,12 +45,10 @@ def search(browser, current_user, graph_name, method_name):
 
     """
 
-    # This method should NOT raise an error.
-    # You cannot do _find_script_tag for user's with only 1 page of likes.
     def _find_script_tag(raw_html, phrase):
         doc = lxml.html.fromstring(raw_html)
         script_tag = filter(lambda x: x.text_content().find(phrase) != -1, doc.cssselect('script'))
-        if not script_tag: raise ScrapingError("Couldn't find script tag. See comment in code.")
+        if not script_tag: return None
         return json.loads(script_tag[0].text_content()[24:-1])
 
     def _parse_ajax_data(raw_json):
@@ -93,18 +91,25 @@ def search(browser, current_user, graph_name, method_name):
             response = browser.get(SEARCH_URL + "/%s/%s" % (graph_id, method_name))
             cursor_tag = _find_script_tag(response.text, "cursor")
             ajax_tag = _find_script_tag(response.text, "encoded_query")
-            cursor_data = _parse_cursor_data(cursor_tag)
-            ajax_data = _parse_ajax_data(ajax_tag)
-            if not ajax_data: raise ScrapingError("Couldn't find ajax post data")
+            cursor_data = _parse_cursor_data(cursor_tag) if cursor_tag else None
+            ajax_data = _parse_ajax_data(ajax_tag) if ajax_tag else None
+            post_data = dict(cursor_data.items() + ajax_data.items()) if ajax_data and cursor_data else None
 
-            post_data = dict(cursor_data.items() + ajax_data.items())
-            current_results = [] # TODO: implement getting results from first page
+            current_results = []
+
+            # Extract current_results from first page
+            for element in lxml.html.fromstring(response.text).cssselect(".hidden_elem"): 
+                comment = element.xpath("comment()")
+                if not comment: continue
+                element_from_comment = lxml.html.tostring(comment[0])[5:-4]
+                doc = lxml.html.fromstring(element_from_comment)
+                current_results += map(lambda x: (x.get('href'), x.text_content()), doc.cssselect('div[data-bt*=title] a'))
         else:
             payload = _get_payload(post_data, current_user.id)
             response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload))
             raw_json = json.loads(response.content[9:])
             raw_html = raw_json['payload']
-            
+
             post_data = _parse_cursor_data(raw_json)
             current_results = _parse_result(raw_html)
         return post_data, current_results
@@ -113,7 +118,6 @@ def search(browser, current_user, graph_name, method_name):
 
     graph_id = get_id(graph_name)
     post_data, current_results = _graph_request(graph_id, method_name)
-    if post_data == None: raise ScrapingError("Coudln't find initial post data")
     for result in current_results: yield result
 
     while post_data:
