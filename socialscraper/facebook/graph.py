@@ -83,6 +83,7 @@ def search(browser, current_user, graph_name, method_name):
     # https://www.facebook.com/search/str/ruchi/users-named/108641632493225/residents/present/intersect?ref=filter
     # https://www.facebook.com/search/str/ruchi/users-named/108659242498155/residents/present/intersect?ref=filter
     # https://www.facebook.com/search/str/ruchi/users-named/106517799384578/residents/present/intersect?ref=filter
+    # https://www.facebook.com/search/str/ruchi/users-named/108007405887967/visitors/intersect
     def _graph_request(graph_id, method_name, post_data = None):
         if not post_data:
             response = browser.get(SEARCH_URL + "/%s/%s" % (graph_id, method_name))

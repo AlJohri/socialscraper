@@ -1,3 +1,9 @@
+"""
+
+Currently scrapes user's timeline until January 1st, 2004 (the year Facebook was started).
+Need to find method to scrape until "Birth" or "Join" date.
+
+"""
 import logging, requests, lxml.html, json, urllib, re
 from ..base import ScrapingError
 
@@ -23,6 +29,7 @@ class QueryType(Enum):
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
+import pdb
 
 def search(browser, current_user, graph_name):
 
@@ -94,14 +101,16 @@ def search(browser, current_user, graph_name):
             blah = regex_4real.findall(test)[0]
             blah = blah + "}}"
             yay = json.loads(blah)
-            da_html = yay['payload']['content']['_segment_' + str(page_counter) + '_0_left']
+            da_html = yay['payload']['content'].get('_segment_' + str(page_counter) + '_0_left', None)
+            if not da_html: da_html = yay['payload']['content'].get('_segment_0_0', None)
 
             test2 = doc.cssselect('script')[4].text_content()
             if len(test2) > 750:
                 blah2 = regex_4real.findall(test2)[0]
                 blah2 = blah2 + "}}"
                 yay2 = json.loads(blah2)
-                da_html2 = yay2['payload']['content']['_segment_' + str(page_counter) + '_1_left']
+                da_html2 = yay2['payload']['content'].get('_segment_' + str(page_counter) + '_1_left', None)
+                if not da_html2: da_html2 = yay2['payload']['content'].get('_segment_0_0', None)
             else:
                 da_html2 = None
             

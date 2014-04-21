@@ -26,11 +26,11 @@ def get(browser, current_user, graph_name):
 		"event": {}
 	}
 
-	def get_previous(element_list):
-		if element_list: return [element_list[0].getprevious()]
-
 	def get_text(element_list):
 		if element_list: return element_list[0].text_content()
+
+	def get_previous(element_list):
+		if element_list: return [element_list[0].getprevious()]
 
 	def get_rows(data):
 		for table in data.cssselect('tbody'): 
@@ -68,6 +68,16 @@ def get(browser, current_user, graph_name):
 		doc = lxml.html.fromstring(element_from_comment)
 		fbTimelineSection = doc.cssselect('.fbTimelineSection.fbTimelineCompactSection')
 		fbTimelineFamilyGrid = doc.cssselect('.fbTimelineFamilyGrid')
+		fbTimelineAboutMeHeader = doc.cssselect('.fbTimelineAboutMeHeader')
+
+		if fbTimelineAboutMeHeader:
+			title = get_text(fbTimelineAboutMeHeader[0].cssselect('.uiHeaderTitle'))
+			print title
+
+			if "About" in title:
+				print doc.text_content() 
+			elif "Basic Info" in title:
+				print doc.text_content()
 
 		if fbTimelineFamilyGrid:
 			familyList = fbTimelineFamilyGrid[0].cssselect('.familyList')[0]
@@ -77,7 +87,9 @@ def get(browser, current_user, graph_name):
 
 		if fbTimelineSection:
 			title = get_text(fbTimelineSection[0].cssselect('.uiHeaderTitle'))
-			data = fbTimelineSection[0].cssselect('.profileInfoTable')
+			data = fbTimelineSection[0].cssselect('.profileInfoTable') if fbTimelineSection else None
+
+			if not title or not data: continue
 			
 			# experiences
 			if "Work and Education" in title:

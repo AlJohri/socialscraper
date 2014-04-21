@@ -3,5 +3,7 @@ cssselect==0.9.1
 enum34==0.9.23
 lxml==3.3.5
 mechanize==0.2.5
+python-dateutil==2.2
 requests==2.2.1
+six==1.6.1
 wsgiref==0.1.2
