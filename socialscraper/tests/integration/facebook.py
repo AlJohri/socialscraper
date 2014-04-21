@@ -14,7 +14,7 @@ class TestFacebookScraper(unittest.TestCase):
         self.username = os.getenv("FACEBOOK_USERNAME")
         self.password = os.getenv("FACEBOOK_PASSWORD")
 
-        self.test_username = "sergio.camargo.355"
+        self.test_username = "sabina.shamayeva" # sabina.shamayeva
         self.test_pagename = "mightynest"
 
         self.scraper = FacebookScraper()
@@ -44,12 +44,12 @@ class TestFacebookScraper(unittest.TestCase):
 
         # test_about(self.test_username)
         # test_timeline(self.test_username)
-        # test_pages_liked(self.test_username)
+        test_pages_liked(self.test_username)
 
         # takes too long
-        test_about(self.test_pagename) # not fully supported yet
-        test_timeline(self.test_pagename)
-        test_likers(self.test_pagename)
+        # test_about(self.test_pagename) # not fully supported yet
+        # test_timeline(self.test_pagename)
+        # test_likers(self.test_pagename)
 
 if __name__ == "__main__":
     unittest.main()

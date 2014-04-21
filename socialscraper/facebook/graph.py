@@ -1,6 +1,8 @@
 import logging, requests, lxml.html, json, urllib
 from ..base import ScrapingError
 
+import pdb
+
 # logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
@@ -43,10 +45,12 @@ def search(browser, current_user, graph_name, method_name):
 
     """
 
+    # This method should NOT raise an error.
+    # You cannot do _find_script_tag for user's with only 1 page of likes.
     def _find_script_tag(raw_html, phrase):
         doc = lxml.html.fromstring(raw_html)
         script_tag = filter(lambda x: x.text_content().find(phrase) != -1, doc.cssselect('script'))
-        if not script_tag: raise ScrapingError("Couldn't find script tag")
+        if not script_tag: raise ScrapingError("Couldn't find script tag. See comment in code.")
         return json.loads(script_tag[0].text_content()[24:-1])
 
     def _parse_ajax_data(raw_json):
