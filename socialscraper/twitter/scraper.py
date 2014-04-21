@@ -17,7 +17,7 @@ class TwitterUser(BaseUser):
 class Tweet(FeedItem):
     """Container for a tweet on a timeline."""
     def __init__(self, id, content_timestamp=None,content=None,item_type=None):
-        FeedItem.__init__(self,id, content_timestamp, content.decode('utf8','ignore').encode('utf-8','ignore'), item_type)
+        FeedItem.__init__(self,id, timestamp=int(content_timestamp), content=content.decode('utf8','ignore').encode('utf-8','ignore'), type=item_type)
 
 class TwitterScraper(BaseScraper):
     def __init__(self,user_agents = None):
@@ -38,8 +38,9 @@ class TwitterScraper(BaseScraper):
             text_containers = soup.findAll("p","js-tweet-text")
             timestamp_containers = soup.findAll("span","_timestamp")
             for container in zip(timestamp_containers,text_containers):
-                cur_tweet = Tweet(container[0]["data-time"],
-                                  container[1].text.encode('utf-8','ignore'))
+                cur_tweet = Tweet(id=hash(container[1].text.encode('utf-8','ignore')),
+                                  content_timestamp=container[0]["data-time"],
+                                  content=container[1].text.encode('utf-8','ignore'))
                 tweets.append(cur_tweet)
 
             if not tweet_json["has_more_items"]:
@@ -110,8 +111,11 @@ class TwitterScraper(BaseScraper):
         # @TODO: need to investigate if this is scalable
         url = "http://mytwitterid.com/api.php?screen_name=%s" % screen_name
         resp = requests.get(url)
-
-        return json.loads(resp.text)[0]["user"]["id"]
+        print resp.text
+        try:
+            return json.loads(resp.text)[0]["user"]["id"]
+        except KeyError:
+            return hash(screen_name)
 
     
     def _get_json(self, type_, screen_name, cursor):
