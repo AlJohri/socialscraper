@@ -41,13 +41,15 @@ class TwitterScraper(BaseScraper):
                 cur_tweet = Tweet(id=hash(container[1].text.encode('utf-8','ignore')),
                                   content_timestamp=container[0]["data-time"],
                                   content=container[1].text.encode('utf-8','ignore'))
-                tweets.append(cur_tweet)
+                # tweets.append(cur_tweet)
+                yield cur_tweet
 
+            
             if not tweet_json["has_more_items"]:
                 break
 
             cursor = tweet_json["max_id"]
-        return tweets
+        #return tweets
 
     def get_feed_by_id(self,id):
         """Get a user's twitter feed given their user ID."""
