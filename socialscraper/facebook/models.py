@@ -1,49 +1,6 @@
-from ..base import ScrapingError
+from ..base import ScrapingError, BaseModel, Column
 
-
-class Base(object):
-    """
-    Usage: 
-
-    Base(uid=10, username="test")
-    """
-
-    @classmethod
-    def get_columns(cls):
-        column_names = filter(lambda x: x[0:2] != '__' and x[-1: -2] != '__', cls.__dict__.keys())
-        columns = map(lambda x: getattr(cls, x), column_names)
-        return columns
-
-    def __init__(self,**kwargs):
-
-        columns = self.get_columns()
-        print columns
-
-        for column in columns:
-            setattr(self,column.name,kwargs.get(column.name,None))
-
-class Column(Base):
-    """
-    Usage:
-
-    Column('uid', 'BigInteger', primary_key=True, foreign_key=True, foreign_key_reference="user.uid")
-
-    If no type is specified, it is assumed to be "String".
-    """
-
-    def __init__(self, name, column_type=None, **options):
-        self.name = name
-        self.type = column_type if column_type else "String"
-        self.primary_key = options.get('primary_key', False)
-        self.foreign_key = options.get('foreign_key', False)
-        
-        if self.foreign_key:
-            try:
-                self.foreign_key_reference = options['foreign_key_reference']
-            except IndexError:
-                raise ScrapingError("Foreign Key Reference must be defined if foreign_key=True")
-
-class User(Base):
+class User(BaseModel):
     __table__ = "user"
 
     uid = Column("uid", "BigInteger", primary_key=True)
@@ -55,7 +12,7 @@ class User(Base):
     profile_url = Column("profile_url")
     sex = Column("sex")
 
-class Family(Base):
+class Family(BaseModel):
     __table__ = "family"
 
     profile_id = Column("profile_id", "BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="user.uid")
@@ -63,13 +20,13 @@ class Family(Base):
     uid = Column("uid","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="user.uid") # foreign key
     name = Column("name","String")
 
-class Friend(Base):
+class Friend(BaseModel):
     __table__ = "friend"
 
     uid1 = Column("uid1","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="user.uid")
     uid2 = Column("uid2","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="user.uid")
 
-class Page(Base):
+class Page(BaseModel):
     __table__ = "page"
 
     about = Column("about","Text")
@@ -83,13 +40,13 @@ class Page(Base):
     type = Column("type","String")
     num_likes = Column("num_likes","BigInteger")
 
-class CategoriesPages(Base):
+class CategoriesPages(BaseModel):
     __table__ = "categories_pages"
 
     page_id = Column("page_id","BigInteger",primary_key=True)
     category = Column("category","String",primary_key=True)
 
-class Status(Base):
+class Status(BaseModel):
     __table__ = "status"
 
     like_count = Column("like_count","Integer")
@@ -98,7 +55,7 @@ class Status(Base):
     uid = Column("uid","BigInteger")
     time = Column("time","Date")
 
-class PagesUsers(Base):
+class PagesUsers(BaseModel):
     __table__ = "pages_users"
 
     uid = Column("uid","BigInteger",primary_key=True)
@@ -106,7 +63,7 @@ class PagesUsers(Base):
     type = Column("type","String")
     created_time = Column("created_time","Date")
 
-class Location(Base):
+class Location(BaseModel):
     __table__ = "location"
 
     gid = Column("gid","BigInteger")

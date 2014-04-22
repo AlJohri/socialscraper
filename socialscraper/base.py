@@ -122,3 +122,46 @@ class UsageError(Exception):
 
 class ScrapingError(Exception):
     pass
+
+
+class BaseModel(object):
+    """
+    Usage: 
+
+    Base(uid=10, username="test")
+    """
+
+    @classmethod
+    def get_columns(cls):
+        column_names = filter(lambda x: x[0:2] != '__' and x[-1: -2] != '__', cls.__dict__.keys())
+        columns = map(lambda x: getattr(cls, x), column_names)
+        return columns
+
+    def __init__(self,**kwargs):
+
+        columns = self.get_columns()
+        print columns
+
+        for column in columns:
+            setattr(self,column.name,kwargs.get(column.name,None))
+
+class Column(BaseModel):
+    """
+    Usage:
+
+    Column('uid', 'BigInteger', primary_key=True, foreign_key=True, foreign_key_reference="user.uid")
+
+    If no type is specified, it is assumed to be "String".
+    """
+
+    def __init__(self, name, column_type=None, **options):
+        self.name = name
+        self.type = column_type if column_type else "String"
+        self.primary_key = options.get('primary_key', False)
+        self.foreign_key = options.get('foreign_key', False)
+        
+        if self.foreign_key:
+            try:
+                self.foreign_key_reference = options['foreign_key_reference']
+            except IndexError:
+                raise ScrapingError("Foreign Key Reference must be defined if foreign_key=True")
