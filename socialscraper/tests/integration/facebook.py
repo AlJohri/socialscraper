@@ -14,7 +14,7 @@ class TestFacebookScraper(unittest.TestCase):
         self.username = os.getenv("FACEBOOK_USERNAME")
         self.password = os.getenv("FACEBOOK_PASSWORD")
 
-        self.test_username = "sabina.shamayeva" # sabina.shamayeva
+        self.test_username = "dthirman" # sabina.shamayeva
         self.test_pagename = "mightynest"
 
         self.scraper = FacebookScraper()
@@ -42,8 +42,8 @@ class TestFacebookScraper(unittest.TestCase):
             from ...facebook import timeline
             timeline.search(self.scraper.browser, self.scraper.cur_user, username)
 
-        # test_about(self.test_username)
-        # test_timeline(self.test_username)
+        test_about(self.test_username)
+        #test_timeline(self.test_username)
         test_pages_liked(self.test_username)
 
         # takes too long
