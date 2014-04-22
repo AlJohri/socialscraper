@@ -38,7 +38,7 @@ def search(browser, current_user, graph_name):
     def _find_script_tag(raw_html, phrase):
         doc = lxml.html.fromstring(raw_html)
         script_tag = filter(lambda x: x.text_content().find(phrase) != -1, doc.cssselect('script'))
-        if not script_tag: raise ScrapingError("Couldn't find script tag")
+        if not script_tag: return None
         return json.loads(script_tag[0].text_content()[24:-1])
 
     def _get_payload(ajax_data, uid, ajaxpipe_token, page):
@@ -52,6 +52,7 @@ def search(browser, current_user, graph_name):
 
     response = browser.get(BASE_URL % graph_name)
     cursor_tag = _find_script_tag(response.text, "section_container_id")
+    if not cursor_tag: return None
     
     regex = re.compile("{\"ajaxpipe_token\":\"(.*)\",\"lhsh\":\"(.*)\"}")
     r = regex.search(response.text)
