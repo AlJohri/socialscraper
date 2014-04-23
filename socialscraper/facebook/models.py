@@ -1,7 +1,7 @@
 from ..base import ScrapingError, BaseModel, Column
 
-class User(BaseModel):
-    __table__ = "user"
+class FacebookUser(BaseModel):
+    __tablename__ = "facebook_users"
 
     uid = Column("uid", "BigInteger", primary_key=True)
     username = Column("username")
@@ -12,42 +12,42 @@ class User(BaseModel):
     profile_url = Column("profile_url")
     sex = Column("sex")
 
-class Family(BaseModel):
-    __table__ = "family"
+class FacebookFamily(BaseModel):
+    __tablename__ = "facebook_families"
 
-    profile_id = Column("profile_id", "BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="user.uid")
+    profile_id = Column("profile_id", "BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
     relationship = Column("relationship","String")
-    uid = Column("uid","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="user.uid") # foreign key
+    uid = Column("uid","BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid") # foreign key
     name = Column("name","String")
 
-class Friend(BaseModel):
-    __table__ = "friend"
+class FacebookFriend(BaseModel):
+    __tablename__ = "facebook_friends"
 
-    uid1 = Column("uid1","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="user.uid")
-    uid2 = Column("uid2","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="user.uid")
+    uid1 = Column("uid1","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    uid2 = Column("uid2","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
 
-class Page(BaseModel):
-    __table__ = "page"
+class FacebookPage(BaseModel):
+    __tablename__ = "facebook_pages"
 
     about = Column("about","Text")
     username = Column("username","String")
     page_id = Column("page_id","BigInteger", primary_key=True) # primary key
     is_verified = Column("is_verified","Boolean")
     keywords = Column("keywords","String")
-    location = Column("location","BigInteger", foreign_key=True, foreign_key_reference="location.loc_id") # foreign key
+    location = Column("location","BigInteger", foreign_key=True, foreign_key_reference="facebook_locations.loc_id") # foreign key
     name = Column("name","String")
     url = Column("url","String")
     type = Column("type","String")
     num_likes = Column("num_likes","BigInteger")
 
-class CategoriesPages(BaseModel):
-    __table__ = "categories_pages"
+class FacebookCategoriesPages(BaseModel):
+    __tablename__ = "facebook_categories_pages"
 
     page_id = Column("page_id","BigInteger",primary_key=True)
     category = Column("category","String",primary_key=True)
 
-class Status(BaseModel):
-    __table__ = "status"
+class FacebookStatus(BaseModel):
+    __tablename__ = "facebook_statuses"
 
     like_count = Column("like_count","Integer")
     message = Column("message","Text")
@@ -55,16 +55,16 @@ class Status(BaseModel):
     uid = Column("uid","BigInteger")
     time = Column("time","Date")
 
-class PagesUsers(BaseModel):
-    __table__ = "pages_users"
+class FacebookPagesUsers(BaseModel):
+    __tablename__ = "facebook_pages_users"
 
     uid = Column("uid","BigInteger",primary_key=True)
     page_id = Column("page_id","BigInteger",primary_key=True)
     type = Column("type","String")
     created_time = Column("created_time","Date")
 
-class Location(BaseModel):
-    __table__ = "location"
+class FacebookLocation(BaseModel):
+    __tablename__ = "facebook_locations"
 
     gid = Column("gid","BigInteger")
     loc_id = Column("loc_id","BigInteger",primary_key=True)
