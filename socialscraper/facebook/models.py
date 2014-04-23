@@ -13,6 +13,12 @@ class FacebookUser(BaseModel):
     locale = Column("locale")
     profile_url = Column("profile_url")
     sex = Column("sex")
+    
+    college = Column("college")
+    employer = Column("employer")
+    highschool = Column("highschool")
+    currentcity = Column("currentcity")
+    hometown = Column("hometown")
 
 class FacebookFamily(BaseModel):
     __tablename__ = "facebook_families"

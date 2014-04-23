@@ -46,14 +46,18 @@ def get(browser, current_user, graph_name):
 
 	def parse_experience(cell):
 		for experience in cell.cssselect(".experienceContent"):
-			experienceTitle = get_text(experience.cssselect(".experienceTitle"))
-			experienceBody = get_text(experience.cssselect(".experienceBody"))
-			yield experienceTitle, experienceBody
+			experience_title = get_text(experience.cssselect(".experienceTitle"))
+			# experience_title_url = experience.cssselect(".experienceTitle")[0]
+			experience_body = get_text(experience.cssselect(".experienceBody"))
+			# pdb.set_trace()
+			yield experience_title, experience_body
 
 	def parse_generic_cell(cell):
-		name = get_text(get_previous(cell.cssselect('.aboutSubtitle')))
+		previous_cell = get_previous(cell.cssselect('.aboutSubtitle'))
+		name_url = previous_cell[0].cssselect('a')[0].get('href') if previous_cell[0].cssselect('a') else None
+		name = get_text(previous_cell)
 		content = get_text(cell.cssselect('.aboutSubtitle'))
-		return name, content
+		return (name, name_url), content
 
 	def parse_generic_row(row):
 		name = get_text(row.cssselect('th'))
@@ -86,6 +90,8 @@ def get(browser, current_user, graph_name):
 			for member in familyList:
 				name, status = parse_generic_cell(member)
 				ret['family'][status] = name
+
+				# FacebookFamily(profile_id=, relationship=status, uid=, name=name)
 
 		if fbTimelineSection:
 			title = get_text(fbTimelineSection[0].cssselect('.uiHeaderTitle'))
