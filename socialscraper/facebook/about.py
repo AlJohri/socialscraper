@@ -1,5 +1,6 @@
 import logging, requests, lxml.html
 from ..base import ScrapingError
+from .models import *
 
 # logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -84,7 +85,7 @@ def get(browser, current_user, graph_name):
 			familyList = fbTimelineFamilyGrid[0].cssselect('.familyList')[0]
 			for member in familyList:
 				name, status = parse_generic_cell(member)
-				ret['family'][name] = status
+				ret['family'][status] = name
 
 		if fbTimelineSection:
 			title = get_text(fbTimelineSection[0].cssselect('.uiHeaderTitle'))
@@ -106,13 +107,13 @@ def get(browser, current_user, graph_name):
 			elif "Relationship" in title:
 				for cell in get_cells(data[0]): 
 					name, status = parse_generic_cell(cell)
-					ret['relationships'][name] = status
+					ret['relationships'][status] = name
 
 			# places
 			elif "Places Lived" in title:
 				for cell in get_cells(data[0]): 
 					name, status = parse_generic_cell(cell)
-					ret['places'][name] = status
+					ret['places'][status] = name
 
 			# contact
 			elif "Contact Information" in title:
