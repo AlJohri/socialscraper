@@ -159,7 +159,10 @@ class Column(BaseModel):
         self.type = column_type if column_type else "String"
         self.primary_key = options.get('primary_key', False)
         self.foreign_key = options.get('foreign_key', False)
+        self.unique = options.get('unique', False)
         
+        if self.primary_key: self.unique = True
+
         if self.foreign_key:
             try:
                 self.foreign_key_reference = options['foreign_key_reference']

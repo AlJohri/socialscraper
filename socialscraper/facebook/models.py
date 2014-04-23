@@ -1,4 +1,4 @@
-from ..base import ScrapingError, BaseModel, Column
+from ..base import BaseModel, Column
 
 class FacebookUser(BaseModel):
     __tablename__ = "facebook_users"

@@ -1,8 +1,6 @@
 import logging, requests, lxml.html
 from ..base import ScrapingError
 
-from .models import FacebookUser, FacebookFamily, FacebookFriend, FacebookPage, FacebookCategoriesPages, FacebookStatus, FacebookPagesUsers, FacebookLocation
-
 # logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
