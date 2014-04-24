@@ -148,21 +148,21 @@ class BaseModel(object):
     # putting quotes around BigInteger/Integer or None
     # might want to create a datetime out of column.type == "Date" ?
     def __repr__(self):
-        attributes = ""
+        attributes = u""
         columns = self.get_columns()
         for column in columns:
             value = getattr(self,column.name)
 
             if value is None:
-                attributes += "%s=None, " % (column.name)
+                attributes += u"%s=None, " % (column.name)
             elif column.type == "BigInteger" or column.type == "Integer": 
-                attributes += "%s=%i, " % (column.name, value)
+                attributes += u"%s=%i, " % (column.name, value)
             else: 
-                attributes += "%s=\"%s\", " % (column.name, value)
+                attributes += u"%s=\"%s\", " % (column.name, value)
 
         attributes = attributes[:-2] # remove comma and space at the end
-        ret = "%s(%s)" % (self.__class__.__name__, attributes)
-        return ret
+        ret = u"%s(%s)" % (self.__class__.__name__, attributes)
+        return ret.encode('utf-8', 'ignore')
 
 class Column(BaseModel):
     """

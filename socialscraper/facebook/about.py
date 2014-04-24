@@ -171,11 +171,11 @@ def get(browser, current_user, graph_name):
 	hometown = ret['places'].get('Hometown', None)
 
 	email = email if not "Ask for" in email else None
-	college = str(college) if college is not None else None
-	employer = str(employer) if employer is not None else None
-	highschool = str(highschool) if highschool is not None else None
-	currentcity = str(currentcity) if currentcity is not None else None
-	hometown = str(hometown) if hometown is not None else None
+	college = unicode(college) if college is not None else None
+	employer = unicode(employer) if employer is not None else None
+	highschool = unicode(highschool) if highschool is not None else None
+	currentcity = unicode(currentcity) if currentcity is not None else None
+	hometown = unicode(hometown) if hometown is not None else None
 
 	user = FacebookUser(
 		uid=graph_id, 
