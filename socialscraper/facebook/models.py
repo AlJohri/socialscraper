@@ -69,27 +69,25 @@ class FacebookLocation(BaseModel):
 
 ######################################## Join Tables ########################################
 
-# class FacebookCategoriesPages(BaseModel):
-#     __tablename__ = "facebook_categories"
 
 class FacebookFriend(BaseModel):
     __tablename__ = "facebook_friends"
 
-    uid1 = Column("uid1","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
-    uid2 = Column("uid2","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    uid1 = Column("uid1","BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    uid2 = Column("uid2","BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
 
 class FacebookPagesUsers(BaseModel):
     __tablename__ = "facebook_pages_users"
 
-    uid = Column("uid","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
-    page_id = Column("page_id","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="facebook_pages.page_id")
+    uid = Column("uid","BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    page_id = Column("page_id","BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_pages.page_id")
     type = Column("type")
     created_time = Column("created_time","Date")
 
-class FacebookCategoriesPages(BaseModel):
-    __tablename__ = "facebook_categories_pages"
+# class FacebookCategoriesPages(BaseModel):
+#     __tablename__ = "facebook_categories_pages"
 
-    page_id = Column("page_id","BigInteger",primary_key=True)
-    category = Column("category",primary_key=True)
+#     page_id = Column("page_id","BigInteger",primary_key=True)
+#     category = Column("category",primary_key=True)
 
-__all__ = ['FacebookUser', 'FacebookFamily', 'FacebookLocation', 'FacebookFriend', 'FacebookPage', 'FacebookCategoriesPages', 'FacebookStatus', 'FacebookPagesUsers']
+__all__ = ['FacebookUser', 'FacebookFamily', 'FacebookLocation', 'FacebookFriend', 'FacebookPage', 'FacebookStatus', 'FacebookPagesUsers']

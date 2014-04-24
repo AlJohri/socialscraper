@@ -86,7 +86,7 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
         url = result[0]
         name = result[1]
         username = regex_result[0] if regex_result else None
-        uid = get_id(graph_name)
+        uid = get_id(username)
 
         if method_name == "pages-liked":
             return FacebookPage(page_id=uid, username=username, url=url, name=name)
