@@ -1,4 +1,4 @@
-import logging, requests, lxml.html, json, urllib
+import logging, requests, lxml.html, json, urllib, re
 from ..base import ScrapingError
 from .models import *
 
@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 SEARCH_URL = 'https://www.facebook.com/search'
 AJAX_URL = 'https://www.facebook.com/ajax/pagelet/generic.php/BrowseScrollingSetPagelet'
+regex = re.compile("https:\/\/www.facebook.com\/(.*)\?ref")
 
 def get_id(graph_name):
     "Get the graph ID given a name."""
@@ -78,6 +79,22 @@ def search(browser, current_user, graph_name, method_name):
             '__rev': 1106672
         }
 
+    def _result_to_model(result, method_name):
+
+        regex_result = regex.findall(result[0])
+
+        url = result[0]
+        name = result[1]
+        username = regex_result[0] if regex_result else None
+        uid = int(get_id(graph_name))
+
+        if method_name == "pages-liked":
+            return FacebookPage(page_id=uid, username=username, url=url, name=name)
+        elif method_name == "likers":
+            return FacebookUser(uid=uid, username=username, url=url, name=name)
+        else:
+            raise ScrapingError("Wut kinda model is %. Check out da _result_to_model method" % method_name)
+
     # https://www.facebook.com/search/str/ruchi/users-named
     # https://www.facebook.com/search/str/ruchi/users-named/me/friends/intersect?ref=filter
     # https://www.facebook.com/search/str/ruchi/users-named/228401243342/students/intersect?ref=filter
@@ -119,10 +136,10 @@ def search(browser, current_user, graph_name, method_name):
 
     graph_id = get_id(graph_name)
     post_data, current_results = _graph_request(graph_id, method_name)
-    for result in current_results: yield result
+    for result in current_results: yield _result_to_model(result, method_name)
 
     while post_data:
         current_post_data, current_results = _graph_request(graph_id, method_name, post_data)
         if current_post_data == None or current_results == None: break
-        for result in current_results: yield result
+        for result in current_results: yield _result_to_model(result, method_name)
         post_data.update(current_post_data)
