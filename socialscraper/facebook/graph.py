@@ -1,5 +1,6 @@
 import logging, requests, lxml.html, json, urllib
 from ..base import ScrapingError
+from .models import *
 
 import pdb
 

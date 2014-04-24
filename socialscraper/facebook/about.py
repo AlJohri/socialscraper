@@ -1,4 +1,5 @@
 import logging, requests, lxml.html
+from . import graph
 from ..base import ScrapingError
 from .models import *
 
@@ -57,7 +58,8 @@ def get(browser, current_user, graph_name):
 		name_url = previous_cell[0].cssselect('a')[0].get('href') if previous_cell[0].cssselect('a') else None
 		name = get_text(previous_cell)
 		content = get_text(cell.cssselect('.aboutSubtitle'))
-		return (name, name_url), content
+		return name, content
+		# return (name, name_url), content
 
 	def parse_generic_row(row):
 		name = get_text(row.cssselect('th'))
@@ -99,7 +101,7 @@ def get(browser, current_user, graph_name):
 
 			if not title or not data: continue
 			
-			# experiences
+			# experiences_keys = ['College', 'Employers', 'High School']
 			if "Work and Education" in title:
 				for row in get_rows(data[0]):
 					if not row.cssselect('th'): continue
@@ -109,46 +111,47 @@ def get(browser, current_user, graph_name):
 						for experienceTitle, experienceBody in parse_experience(cell): 
 							ret['experiences'][header][experienceTitle] = experienceBody
 
-			# relationships
+			# relationships_keys = ['In a relationship']
 			elif "Relationship" in title:
 				for cell in get_cells(data[0]): 
 					name, status = parse_generic_cell(cell)
 					ret['relationships'][status] = name
 
-			# places
+			# places_keys = ['Current City', 'Hometown']
 			elif "Places Lived" in title:
 				for cell in get_cells(data[0]): 
 					name, status = parse_generic_cell(cell)
 					ret['places'][status] = name
 
-			# contact
+			# contact_keys = ['Address', 'Email', 'Mobile Phones']
 			elif "Contact Information" in title:
 				for row in get_rows(data[0]): 
 					name, status = parse_generic_row(row)
 					ret['contact'][name] = status
 
-			# basic
+			# basic_keys = ['Birthday', 'Gender', 'Interested In', 'Languages', 'Political Views', 'Relationship Status']
 			elif "Basic Information" in title:
 				for row in get_rows(data[0]): 
 					name, status = parse_generic_row(row)
-					ret['basic'][name] = status					
+					ret['basic'][name] = status
 
-			# about
+			# about_keys = None
 			elif "About" in title:
 				data = fbTimelineSection[0].getchildren()[1]
 				for quote in data.cssselect('.profileText'): 
 					ret['about'].append(quote.text_content())
 
-			# quotes
+			# quotes_keys = None
 			elif "Favorite Quotations" in title:
 				data = fbTimelineSection[0].getchildren()[1]
 				for quote in data.cssselect('.profileText'):
 					ret['quotes'].append(quote.text_content())
-			# family
+
+			# family_keys = ['Brother']
 			elif "Family" in title: # empty
 				pass # this will be empty Family information above in 'fbTimelineFamilyGrid'
 
-			# events
+			# events_keys = None
 			elif "Life Events" in title:
 				# TODO: parse life events
 				data = fbTimelineSection[0].getchildren()[1].text_content()
@@ -156,5 +159,36 @@ def get(browser, current_user, graph_name):
 			else:
 				raise ScrapingError("Unrecognized fbTimelineSection %s" % title)
 
-	return ret
+
+	graph_id = int(graph.get_id(graph_name))
+	birthday = ret['basic'].get('Birthday', None)
+	sex = ret['basic'].get('Gender', None)
+	email = ret['contact'].get('Email', None)
+	college = ret['experiences'].get('College', None)
+	employer = ret['experiences'].get('Employers', None)
+	highschool = ret['experiences'].get('High School', None)
+	currentcity = ret['places'].get('Current City', None)
+	hometown = ret['places'].get('Hometown', None)
+
+	email = email if not "Ask for" in email else None
+	college = str(college) if college is not None else None
+	employer = str(employer) if employer is not None else None
+	highschool = str(highschool) if highschool is not None else None
+	currentcity = str(currentcity) if currentcity is not None else None
+	hometown = str(hometown) if hometown is not None else None
+
+	user = FacebookUser(
+		uid=graph_id, 
+		username=graph_name, 
+		email=email, 
+		birthday=birthday, 
+		sex=sex, 
+		college=college, 
+		employer=employer,
+		highschool=highschool,
+		currentcity=currentcity,
+		hometown=hometown
+	)
+
+	return user
 	

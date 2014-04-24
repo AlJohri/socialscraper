@@ -24,9 +24,9 @@ class FacebookFamily(BaseModel):
     __tablename__ = "facebook_families"
 
     profile_id = Column("profile_id", "BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
-    relationship = Column("relationship","String")
+    relationship = Column("relationship")
     uid = Column("uid","BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid") # foreign key
-    name = Column("name","String")
+    name = Column("name")
 
 class FacebookFriend(BaseModel):
     __tablename__ = "facebook_friends"
@@ -38,14 +38,14 @@ class FacebookPage(BaseModel):
     __tablename__ = "facebook_pages"
 
     about = Column("about","Text")
-    username = Column("username","String")
+    username = Column("username")
     page_id = Column("page_id","BigInteger", primary_key=True) # primary key
     is_verified = Column("is_verified","Boolean")
-    keywords = Column("keywords","String")
+    keywords = Column("keywords")
     # location = Column("location","BigInteger", foreign_key=True, foreign_key_reference="facebook_locations.loc_id") # foreign key
-    name = Column("name","String")
-    url = Column("url","String")
-    type = Column("type","String")
+    name = Column("name")
+    url = Column("url")
+    type = Column("type")
     num_likes = Column("num_likes","BigInteger")
 
 class FacebookStatus(BaseModel):
@@ -62,35 +62,35 @@ class FacebookLocation(BaseModel):
 
     gid = Column("gid", "BigInteger")
     loc_id = Column("loc_id", "BigInteger", primary_key=True)
-    street = Column("street", "String")
-    city = Column("city", "String")
-    state = Column("state", "String")
-    country = Column("country", "String")
-    zip = Column("zip", "String")
-    address = Column("address", "String")
-    latitude = Column("latitude", "Float")
-    longitude = Column("longitude", "Float")
-    name = Column("name", "String")
+    street = Column("street")
+    city = Column("city")
+    state = Column("state")
+    country = Column("country")
+    zip = Column("zip")
+    address = Column("address")
+    latitude = Column("latitude")
+    longitude = Column("longitude")
+    name = Column("name")
 
 # class FacebookCategory(BaseModel):
 #     __tablename__ = "facebook_categories"
 
 ######################################## Join Tables ########################################
 
-class FacebookCategory(BaseModel):
-    __tablename__ = "facebook_categories"
+# class FacebookCategoriesPages(BaseModel):
+#     __tablename__ = "facebook_categories"
 
 class FacebookPagesUsers(BaseModel):
     __tablename__ = "facebook_pages_users"
 
     uid = Column("uid","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
     page_id = Column("page_id","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="facebook_pages.page_id")
-    type = Column("type","String")
+    type = Column("type")
     created_time = Column("created_time","Date")
 
 class FacebookCategoriesPages(BaseModel):
     __tablename__ = "facebook_categories_pages"
 
     page_id = Column("page_id","BigInteger",primary_key=True)
-    category = Column("category","String",primary_key=True)
+    category = Column("category",primary_key=True)
 
