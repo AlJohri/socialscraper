@@ -10,7 +10,7 @@ ABOUT_URL = "https://www.facebook.com/%s/info"
 
 import pdb
 
-def get(browser, current_user, graph_name):
+def get(browser, current_user, graph_name, graph_id=None):
 
 	# shit gets weird when graph_name == current_user.username
 	if current_user.username == graph_name:
@@ -159,8 +159,8 @@ def get(browser, current_user, graph_name):
 			else:
 				raise ScrapingError("Unrecognized fbTimelineSection %s" % title)
 
-
-	graph_id = int(graph.get_id(graph_name))
+	if not graph_id: graph_id = graph.get_id(graph_name)
+	
 	birthday = ret['basic'].get('Birthday', None)
 	sex = ret['basic'].get('Gender', None)
 	email = ret['contact'].get('Email', None)

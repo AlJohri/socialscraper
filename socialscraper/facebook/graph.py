@@ -14,14 +14,14 @@ regex = re.compile("https:\/\/www.facebook.com\/(.*)\?ref")
 def get_id(graph_name):
     "Get the graph ID given a name."""
     response = requests.get('https://graph.facebook.com/' + graph_name)
-    return json.loads(response.text)['id']
+    return int(json.loads(response.text)['id'])
 
 def get_name(graph_id):
     """Get the graph name given a graph ID."""
     response = requests.get('https://graph.facebook.com/' + graph_id)
     return json.loads(response.text)['name']
 
-def search(browser, current_user, graph_name, method_name):
+def search(browser, current_user, graph_name, method_name, graph_id=None):
     """
     
     Facebook Graph Search Generator
@@ -86,7 +86,7 @@ def search(browser, current_user, graph_name, method_name):
         url = result[0]
         name = result[1]
         username = regex_result[0] if regex_result else None
-        uid = int(get_id(graph_name))
+        uid = get_id(graph_name)
 
         if method_name == "pages-liked":
             return FacebookPage(page_id=uid, username=username, url=url, name=name)
@@ -134,7 +134,7 @@ def search(browser, current_user, graph_name, method_name):
 
     # Main Facebook Graph Search
 
-    graph_id = get_id(graph_name)
+    if not graph_id: graph_id = get_id(graph_name)
     post_data, current_results = _graph_request(graph_id, method_name)
     for result in current_results: yield _result_to_model(result, method_name)
 

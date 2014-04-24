@@ -1,7 +1,5 @@
 from ..base import BaseModel, Column
 
-__all__ = ['FacebookUser', 'FacebookFamily', 'FacebookLocation', 'FacebookFriend', 'FacebookPage', 'FacebookCategoriesPages', 'FacebookStatus', 'FacebookPagesUsers']
-
 class FacebookUser(BaseModel):
     __tablename__ = "facebook_users"
 
@@ -27,12 +25,6 @@ class FacebookFamily(BaseModel):
     relationship = Column("relationship")
     uid = Column("uid","BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid") # foreign key
     name = Column("name")
-
-class FacebookFriend(BaseModel):
-    __tablename__ = "facebook_friends"
-
-    uid1 = Column("uid1","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
-    uid2 = Column("uid2","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
 
 class FacebookPage(BaseModel):
     __tablename__ = "facebook_pages"
@@ -80,6 +72,12 @@ class FacebookLocation(BaseModel):
 # class FacebookCategoriesPages(BaseModel):
 #     __tablename__ = "facebook_categories"
 
+class FacebookFriend(BaseModel):
+    __tablename__ = "facebook_friends"
+
+    uid1 = Column("uid1","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    uid2 = Column("uid2","BigInteger",primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
+
 class FacebookPagesUsers(BaseModel):
     __tablename__ = "facebook_pages_users"
 
@@ -94,3 +92,4 @@ class FacebookCategoriesPages(BaseModel):
     page_id = Column("page_id","BigInteger",primary_key=True)
     category = Column("category",primary_key=True)
 
+__all__ = ['FacebookUser', 'FacebookFamily', 'FacebookLocation', 'FacebookFriend', 'FacebookPage', 'FacebookCategoriesPages', 'FacebookStatus', 'FacebookPagesUsers']

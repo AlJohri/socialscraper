@@ -32,12 +32,12 @@ class FacebookScraper(BaseScraper):
     def get_graph_name(self, graph_id):
         return graph.get_name(graph_id)
 
-    def get_about(self, graph_name):
-        return about.get(self.browser, self.cur_user, graph_name)
+    def get_about(self, graph_name, graph_id=None):
+        return about.get(self.browser, self.cur_user, graph_name, graph_id=graph_id)
 
-    def graph_search(self, graph_name, method_name):
+    def graph_search(self, graph_name, method_name, graph_id=None):
         """Graph Search Wrapper."""
-        for result in graph.search(self.browser, self.cur_user, graph_name, method_name): yield result
+        for result in graph.search(self.browser, self.cur_user, graph_name, method_name, graph_id=graph_id): yield result
 
     def get_pages_liked_by(self, user_name):
         """Graph Search Alias - pages-liked."""
