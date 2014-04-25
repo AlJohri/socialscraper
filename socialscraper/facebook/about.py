@@ -170,7 +170,7 @@ def get(browser, current_user, graph_name, graph_id=None):
 	currentcity = ret['places'].get('Current City', None)
 	hometown = ret['places'].get('Hometown', None)
 
-	email = email if not "Ask for" in email else None
+	email = email if email and not "Ask for" in email else None
 	college = unicode(college) if college is not None else None
 	employer = unicode(employer) if employer is not None else None
 	highschool = unicode(highschool) if highschool is not None else None
