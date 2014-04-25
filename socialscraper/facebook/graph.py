@@ -14,7 +14,12 @@ regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")
 
 def get_id(graph_name):
     "Get the graph ID given a name."""
-    response = requests.get('https://graph.facebook.com/' + graph_name)
+    get_response = lambda : requests.get('https://graph.facebook.com/' + graph_name)
+    response = get_response()
+    counter = 0
+    while response.status_code == 400 and counter < 3:
+        response = get_response()
+        counter += 1
     id = json.loads(response.text).get('id', None)
     return int(id) if id else None
 
@@ -92,7 +97,7 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
             username = regex_result[0]
             if username == None: raise ValueError("No username was parsed %s" % url)
             uid = get_id(username)
-            if uid == None: raise ValueError("No userid was parsed %s" % url) # just added this
+            if uid == None: raise ValueError("No userid was parsed %s" % username) # just added this
             # it errors out when it HAS username but no uid (didn't think this was possible)
         else: # old style user that doesn't have username, only uid
             regex_result = regex2.findall(result[0])
@@ -148,10 +153,18 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
 
     if not graph_id: graph_id = get_id(graph_name)
     post_data, current_results = _graph_request(graph_id, method_name)
-    for result in current_results: yield _result_to_model(result, method_name)
+    for result in current_results: 
+        try:
+            yield _result_to_model(result, method_name)
+        except ValueError:
+            continue
 
     while post_data:
         current_post_data, current_results = _graph_request(graph_id, method_name, post_data)
         if current_post_data == None or current_results == None: break
-        for result in current_results: yield _result_to_model(result, method_name)
+        for result in current_results: 
+            try:
+                yield _result_to_model(result, method_name)
+            except ValueError:
+                continue            
         post_data.update(current_post_data)
