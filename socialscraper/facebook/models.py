@@ -73,14 +73,14 @@ class FacebookLocation(BaseModel):
 class FacebookFriend(BaseModel):
     __tablename__ = "facebook_friends"
 
-    uid1 = Column("uid1","BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
-    uid2 = Column("uid2","BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    uid1 = Column("uid1","BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    uid2 = Column("uid2","BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
 
 class FacebookPagesUsers(BaseModel):
     __tablename__ = "facebook_pages_users"
 
-    uid = Column("uid","BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
-    page_id = Column("page_id","BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_pages.page_id")
+    uid = Column("uid","BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    page_id = Column("page_id","BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_pages.page_id")
     type = Column("type")
     created_time = Column("created_time","Date")
 

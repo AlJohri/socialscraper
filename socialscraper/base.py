@@ -180,7 +180,7 @@ class Column(BaseModel):
         self.foreign_key = options.get('foreign_key', False)
         self.unique = options.get('unique', False)
         
-        if self.primary_key: self.unique = True
+        # if self.primary_key: self.unique = True
 
         if self.foreign_key:
             try:

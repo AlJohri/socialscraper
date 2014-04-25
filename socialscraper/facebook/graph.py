@@ -10,16 +10,19 @@ logger = logging.getLogger(__name__)
 SEARCH_URL = 'https://www.facebook.com/search'
 AJAX_URL = 'https://www.facebook.com/ajax/pagelet/generic.php/BrowseScrollingSetPagelet'
 regex = re.compile("https:\/\/www.facebook.com\/(.*)\?ref")
+regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")
 
 def get_id(graph_name):
     "Get the graph ID given a name."""
     response = requests.get('https://graph.facebook.com/' + graph_name)
-    return int(json.loads(response.text)['id'])
+    id = json.loads(response.text).get('id', None)
+    return int(id) if id else None
 
 def get_name(graph_id):
     """Get the graph name given a graph ID."""
     response = requests.get('https://graph.facebook.com/' + graph_id)
-    return json.loads(response.text)['name']
+    name = json.loads(response.text).get('name', None)
+    return name
 
 def search(browser, current_user, graph_name, method_name, graph_id=None):
     """
@@ -85,8 +88,15 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
 
         url = result[0]
         name = result[1]
-        username = regex_result[0] if regex_result else None
-        uid = get_id(username)
+        if regex_result:
+            username = regex_result[0]
+            if username == None: raise ValueError("No username was parsed %s" % url)
+            uid = get_id(username)
+        else: # old style user that doesn't have username, only uid
+            regex_result = regex2.findall(result[0])
+            uid = regex_result[0]
+            username = regex_result[0]
+            if uid == None: raise ValueError("No userid was parsed %s" % url)
 
         if method_name == "pages-liked":
             return FacebookPage(page_id=uid, username=username, url=url, name=name)
