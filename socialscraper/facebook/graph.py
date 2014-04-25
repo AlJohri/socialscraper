@@ -92,6 +92,8 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
             username = regex_result[0]
             if username == None: raise ValueError("No username was parsed %s" % url)
             uid = get_id(username)
+            if uid == None: raise ValueError("No userid was parsed %s" % url) # just added this
+            # it errors out when it HAS username but no uid (didn't think this was possible)
         else: # old style user that doesn't have username, only uid
             regex_result = regex2.findall(result[0])
             uid = regex_result[0]
