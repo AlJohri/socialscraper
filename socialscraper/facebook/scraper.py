@@ -18,7 +18,7 @@ class FacebookScraper(BaseScraper):
         BaseScraper.__init__(self,user_agents)
         self.browser = requests.Session()
         self.browser.headers = { 'User-Agent': self.cur_user_agent }
-        self.browser.mount(auth.BASE_URL, HTTPAdapter(max_retries=3))
+        self.browser.mount(auth.BASE_URL, HTTPAdapter(pool_connections=500, pool_maxsize=500, max_retries=3))
 
     def login(self):
         """Logs user into facebook."""
