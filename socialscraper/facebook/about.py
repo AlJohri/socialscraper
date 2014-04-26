@@ -1,4 +1,5 @@
 import logging, requests, lxml.html
+from dateutil import parser
 from . import graph
 from ..base import ScrapingError
 from .models import *
@@ -55,7 +56,11 @@ def get(browser, current_user, graph_name, graph_id=None):
 
 	def parse_generic_cell(cell):
 		previous_cell = get_previous(cell.cssselect('.aboutSubtitle'))
-		name_url = previous_cell[0].cssselect('a')[0].get('href') if previous_cell[0].cssselect('a') else None
+		if previous_cell and previous_cell[0].cssselect('a'):
+			name_url = previous_cell[0].cssselect('a')[0].get('href')
+		else:
+			name_url = None
+
 		name = get_text(previous_cell)
 		content = get_text(cell.cssselect('.aboutSubtitle'))
 		return name, content
@@ -156,12 +161,16 @@ def get(browser, current_user, graph_name, graph_id=None):
 				# TODO: parse life events
 				data = fbTimelineSection[0].getchildren()[1].text_content()
 				pass
+			elif "Pages" in title:
+				pass
+				# TODO: parse pages admined/owned by user
 			else:
 				raise ScrapingError("Unrecognized fbTimelineSection %s" % title)
 
 	if not graph_id: graph_id = graph.get_id(graph_name)
 	
 	birthday = ret['basic'].get('Birthday', None)
+	birthday = parser.parse(birthday) if birthday else None
 	sex = ret['basic'].get('Gender', None)
 	email = ret['contact'].get('Email', None)
 	college = ret['experiences'].get('College', None)
