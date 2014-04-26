@@ -164,6 +164,8 @@ def get(browser, current_user, graph_name, graph_id=None):
 			elif "Pages" in title:
 				pass
 				# TODO: parse pages admined/owned by user
+			elif 'Favorites' in title:
+				pass
 			else:
 				raise ScrapingError("Unrecognized fbTimelineSection %s" % title)
 
