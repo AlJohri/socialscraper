@@ -1,5 +1,5 @@
 from ..base import BaseScraper, BaseUser, UsageError, ScrapingError
-import requests
+import requests, pickle
 from requests.adapters import HTTPAdapter
 
 from . import auth
@@ -13,10 +13,13 @@ class FacebookUser(BaseUser):
 
 class FacebookScraper(BaseScraper):
 
-    def __init__(self,user_agents = None):
+    def __init__(self,user_agents=None, pickled_session=None):
         """Initialize the Facebook scraper."""
         BaseScraper.__init__(self,user_agents)
-        self.browser = requests.Session()
+        if pickled_session:
+            self.browser = pickle.loads(pickled_session)
+        else: 
+            self.browser = requests.Session()
         self.browser.headers = { 'User-Agent': self.cur_user_agent }
         self.browser.mount(auth.BASE_URL, HTTPAdapter(pool_connections=500, pool_maxsize=500, max_retries=3))
 

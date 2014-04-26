@@ -86,7 +86,8 @@ class BaseScraper(object):
     def pick_random_user(self):
         if len(self.users) == 0:
             raise UsageError
-        return random.choice(self.users)
+        self.cur_user = random.choice(self.users)
+        return self.cur_user
 
 class BaseUser(object):
     def __init__(self, id=None, username=None, email=None):
