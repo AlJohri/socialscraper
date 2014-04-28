@@ -8,6 +8,9 @@ from . import auth
 from . import graph
 from . import about
 
+regex = re.compile("https:\/\/www.facebook.com\/(.*)")
+regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")
+
 class FacebookUser(BaseUser):
     """Container for the info associated w/ a Facebook user"""
     def __init__(self, username=None, id=None):
@@ -51,6 +54,32 @@ class FacebookScraper(BaseScraper):
         """Graph Search Wrapper."""
         for result in graph.search(self.browser, self.cur_user, graph_name, method_name, graph_id=graph_id): yield result
 
+    def _find_page_username(self, url):
+        regex_result = regex.findall(url)
+
+        if regex_result:
+            username = regex_result[0]
+            if 'pages/' in username:
+                uid = username.split('/')[-1]
+                username = uid
+                return username,uid
+
+            if username == None: raise ValueError("No username was parsed %s" % url)
+            uid = self.get_graph_id(username)
+            # pages/The-Talking-Heads/110857288936141
+            if uid == None: raise ValueError("No userid was parsed %s" % username) # just added this
+            # it errors out when it HAS username but no uid (didn't think this was possible)
+        else: # old style user that doesn't have username, only uid
+            try:
+                regex_result = regex2.findall(url)
+                uid = regex_result[0]
+                username = regex_result[0]
+                if uid == None: raise ValueError("No userid was parsed %s" % url)
+            except IndexError:
+                import pdb
+                pdb.set_trace()
+        return username,uid
+
     def _get_pages_liked_nograph(self, username):
         url = "https://www.facebook.com/%s/likes" % username
         resp = requests.get(url)
@@ -60,19 +89,28 @@ class FacebookScraper(BaseScraper):
         container = soup.findAll("div",["timelineFavorites"])[0]
         
         for link in container.findAll('a','mediaRowItem'):
+            print "link: %s" % link
+
+            username,uid = self._find_page_username(link['href'])
             try:
                 link['class']
                 yield { 'link': link['href'],
-                        'name': link.text }
+                        'name': link.text,
+                        'username': username,
+                        'uid': uid }
             except KeyError:
                 pass
 
         for link in container.findAll('a'):
+            print "link: %s" % link
             try:
                 link['class']
             except KeyError:
+                username,uid = self._find_page_username(link['href'])
                 yield { 'link': link['href'],
-                        'name': link.text }
+                        'name': link.text,
+                        'username': username,
+                        'uid': uid }
 
     def get_pages_liked_by(self, user_name, use_graph_search = False):
         """Graph Search Alias - pages-liked."""
