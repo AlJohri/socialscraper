@@ -39,6 +39,8 @@ class FacebookPage(BaseModel):
     url = Column("url")
     type = Column("type")
     num_likes = Column("num_likes","BigInteger")
+    talking_about_count = Column("talking_about_count","BigInteger")
+    hometown = Column("hometown","String")
 
 class FacebookStatus(BaseModel):
     __tablename__ = "facebook_statuses"

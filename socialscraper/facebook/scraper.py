@@ -47,6 +47,9 @@ class FacebookScraper(BaseScraper):
     def get_graph_name(self, graph_id):
         return graph.get_name(graph_id)
 
+    def get_graph_attribute(self, graph_id, attribute):
+        return graph.get_attribute(graph_id,attribute)
+
     def get_about(self, graph_name, graph_id=None):
         return about.get(self.browser, self.cur_user, graph_name, graph_id=graph_id)
 
@@ -72,6 +75,7 @@ class FacebookScraper(BaseScraper):
             if uid == None: raise ValueError("No userid was parsed %s" % username) # just added this
             # it errors out when it HAS username but no uid (didn't think this was possible)
         else: # old style user that doesn't have username, only uid
+<<<<<<< HEAD
             try:
                 regex_result = regex2.findall(url)
                 uid = regex_result[0]
@@ -79,6 +83,18 @@ class FacebookScraper(BaseScraper):
                 if uid == None: raise ValueError("No userid was parsed %s" % url)
             except IndexError:
                 pdb.set_trace()
+=======
+            # try:
+            regex_result = regex2.findall(url)
+            if not regex_result:
+                raise ValueError("URL not parseable")
+            uid = regex_result[0]
+            username = regex_result[0]
+            if uid == None: raise ValueError("No userid was parsed %s" % url)
+            # except IndexError:
+            #     import pdb
+                # pdb.set_trace()
+>>>>>>> 4d4ce79c80fb6e54c2a9f57938805ead392c4e59
         return username,uid
 
     def _get_pages_liked_nograph(self, username):
@@ -105,14 +121,16 @@ class FacebookScraper(BaseScraper):
         
             for link in container.findAll('a','mediaRowItem'):
                 print "link: %s" % link
-
                 username,uid = self._find_page_username(link['href'])
                 try:
                     link['class']
                     yield { 'link': link['href'],
                             'name': link.text,
                             'username': username,
-                            'uid': uid }
+                            'uid': uid,
+                            'num_likes': self.get_graph_attribute(username,'likes'),
+                            'talking_about_count': self.get_graph_attribute(username,'talking_about_count'),
+                            'hometown': self.get_graph_attribute(username,'hometown') }
                 except KeyError:
                     pass
 
@@ -121,11 +139,17 @@ class FacebookScraper(BaseScraper):
                 try:
                     link['class']
                 except KeyError:
-                    username,uid = self._find_page_username(link['href'])
-                    yield { 'link': link['href'],
+                    try:
+                        username,uid = self._find_page_username(link['href'])
+                        yield { 'link': link['href'],
                             'name': link.text,
                             'username': username,
-                            'uid': uid }
+                            'uid': uid,
+                            'num_likes': self.get_graph_attribute(username,'likes'),
+                            'talking_about_count': self.get_graph_attribute(username,'talking_about_count'),
+                            'hometown': self.get_graph_attribute(username,'hometown') }
+                    except ValueError:
+                        continue
         else:
             pdb.set_trace()
             print "User %s has no likes or tight privacy settings." % username
