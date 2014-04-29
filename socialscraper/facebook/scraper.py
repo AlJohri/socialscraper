@@ -75,25 +75,12 @@ class FacebookScraper(BaseScraper):
             if uid == None: raise ValueError("No userid was parsed %s" % username) # just added this
             # it errors out when it HAS username but no uid (didn't think this was possible)
         else: # old style user that doesn't have username, only uid
-<<<<<<< HEAD
-            try:
-                regex_result = regex2.findall(url)
-                uid = regex_result[0]
-                username = regex_result[0]
-                if uid == None: raise ValueError("No userid was parsed %s" % url)
-            except IndexError:
-                pdb.set_trace()
-=======
-            # try:
             regex_result = regex2.findall(url)
             if not regex_result:
                 raise ValueError("URL not parseable")
             uid = regex_result[0]
             username = regex_result[0]
             if uid == None: raise ValueError("No userid was parsed %s" % url)
-            # except IndexError:
-            #     import pdb
-                # pdb.set_trace()
 >>>>>>> 4d4ce79c80fb6e54c2a9f57938805ead392c4e59
         return username,uid
 
