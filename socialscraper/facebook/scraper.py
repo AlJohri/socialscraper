@@ -8,6 +8,8 @@ from . import auth
 from . import graph
 from . import about
 
+import pdb
+
 regex = re.compile("https:\/\/www.facebook.com\/(.*)")
 regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")
 
@@ -62,7 +64,7 @@ class FacebookScraper(BaseScraper):
             if 'pages/' in username:
                 uid = username.split('/')[-1]
                 username = uid
-                return username,uid
+                return username, uid
 
             if username == None: raise ValueError("No username was parsed %s" % url)
             uid = self.get_graph_id(username)
@@ -76,41 +78,57 @@ class FacebookScraper(BaseScraper):
                 username = regex_result[0]
                 if uid == None: raise ValueError("No userid was parsed %s" % url)
             except IndexError:
-                import pdb
                 pdb.set_trace()
         return username,uid
 
     def _get_pages_liked_nograph(self, username):
         url = "https://www.facebook.com/%s/likes" % username
-        resp = requests.get(url)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.131 Safari/537.36',
+            'Accept': 'accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Encoding': 'gzip,deflate,sdch',
+            'Accept-Language': 'en-US,en;q=0.8,nb;q=0.6',
+            'Cache-Control': 'max-age=0'
+        }
+        resp = requests.get(url, headers = headers)
+
+        if "Security Check" in resp.text:
+            pdb.set_trace()
+            raise ScrapingError("Security Check")
+
         html = re.sub(r'(<!--)|(-->)',' ',resp.text)
         soup = BeautifulSoup(html)
 
-        container = soup.findAll("div",["timelineFavorites"])[0]
+        container = soup.findAll("div",["timelineFavorites"])
+        if container: 
+            container = container[0]
         
-        for link in container.findAll('a','mediaRowItem'):
-            print "link: %s" % link
+            for link in container.findAll('a','mediaRowItem'):
+                print "link: %s" % link
 
-            username,uid = self._find_page_username(link['href'])
-            try:
-                link['class']
-                yield { 'link': link['href'],
-                        'name': link.text,
-                        'username': username,
-                        'uid': uid }
-            except KeyError:
-                pass
-
-        for link in container.findAll('a'):
-            print "link: %s" % link
-            try:
-                link['class']
-            except KeyError:
                 username,uid = self._find_page_username(link['href'])
-                yield { 'link': link['href'],
-                        'name': link.text,
-                        'username': username,
-                        'uid': uid }
+                try:
+                    link['class']
+                    yield { 'link': link['href'],
+                            'name': link.text,
+                            'username': username,
+                            'uid': uid }
+                except KeyError:
+                    pass
+
+            for link in container.findAll('a'):
+                print "link: %s" % link
+                try:
+                    link['class']
+                except KeyError:
+                    username,uid = self._find_page_username(link['href'])
+                    yield { 'link': link['href'],
+                            'name': link.text,
+                            'username': username,
+                            'uid': uid }
+        else:
+            pdb.set_trace()
+            print "User %s has no likes or tight privacy settings." % username
 
     def get_pages_liked_by(self, user_name, use_graph_search = False):
         """Graph Search Alias - pages-liked."""
