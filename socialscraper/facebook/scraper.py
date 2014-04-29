@@ -45,6 +45,9 @@ class FacebookScraper(BaseScraper):
     def get_graph_name(self, graph_id):
         return graph.get_name(graph_id)
 
+    def get_graph_attribute(self, graph_id, attribute):
+        return graph.get_attribute(graph_id,attribute)
+
     def get_about(self, graph_name, graph_id=None):
         return about.get(self.browser, self.cur_user, graph_name, graph_id=graph_id)
 
@@ -70,14 +73,16 @@ class FacebookScraper(BaseScraper):
             if uid == None: raise ValueError("No userid was parsed %s" % username) # just added this
             # it errors out when it HAS username but no uid (didn't think this was possible)
         else: # old style user that doesn't have username, only uid
-            try:
-                regex_result = regex2.findall(url)
-                uid = regex_result[0]
-                username = regex_result[0]
-                if uid == None: raise ValueError("No userid was parsed %s" % url)
-            except IndexError:
-                import pdb
-                pdb.set_trace()
+            # try:
+            regex_result = regex2.findall(url)
+            if not regex_result:
+                raise ValueError("URL not parseable")
+            uid = regex_result[0]
+            username = regex_result[0]
+            if uid == None: raise ValueError("No userid was parsed %s" % url)
+            # except IndexError:
+            #     import pdb
+                # pdb.set_trace()
         return username,uid
 
     def _get_pages_liked_nograph(self, username):
@@ -97,7 +102,10 @@ class FacebookScraper(BaseScraper):
                 yield { 'link': link['href'],
                         'name': link.text,
                         'username': username,
-                        'uid': uid }
+                        'uid': uid,
+                        'num_likes': self.get_graph_attribute(username,'likes'),
+                        'talking_about_count': self.get_graph_attribute(username,'talking_about_count'),
+                        'hometown': self.get_graph_attribute(username,'hometown') }
             except KeyError:
                 pass
 
@@ -106,11 +114,17 @@ class FacebookScraper(BaseScraper):
             try:
                 link['class']
             except KeyError:
-                username,uid = self._find_page_username(link['href'])
-                yield { 'link': link['href'],
+                try:
+                    username,uid = self._find_page_username(link['href'])
+                    yield { 'link': link['href'],
                         'name': link.text,
                         'username': username,
-                        'uid': uid }
+                        'uid': uid,
+                        'num_likes': self.get_graph_attribute(username,'likes'),
+                        'talking_about_count': self.get_graph_attribute(username,'talking_about_count'),
+                        'hometown': self.get_graph_attribute(username,'hometown') }
+                except ValueError:
+                    continue
 
     def get_pages_liked_by(self, user_name, use_graph_search = False):
         """Graph Search Alias - pages-liked."""

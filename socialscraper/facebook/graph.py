@@ -29,6 +29,12 @@ def get_name(graph_id):
     name = json.loads(response.text).get('name', None)
     return name
 
+def get_attribute(graph_id,attribute):
+    """Get the graph name given a graph ID."""
+    response = requests.get('https://graph.facebook.com/' + graph_id)
+    name = json.loads(response.text).get('attribute', None)
+    return name
+
 def search(browser, current_user, graph_name, method_name, graph_id=None):
     """
     
