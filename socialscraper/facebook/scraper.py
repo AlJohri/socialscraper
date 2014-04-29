@@ -81,7 +81,6 @@ class FacebookScraper(BaseScraper):
             uid = regex_result[0]
             username = regex_result[0]
             if uid == None: raise ValueError("No userid was parsed %s" % url)
->>>>>>> 4d4ce79c80fb6e54c2a9f57938805ead392c4e59
         return username,uid
 
     def _get_pages_liked_nograph(self, username):
