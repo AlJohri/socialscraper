@@ -17,6 +17,8 @@ class FacebookUser(BaseModel):
     highschool = Column("highschool")
     currentcity = Column("currentcity")
     hometown = Column("hometown")
+    misc = Column("misc")
+    data = Column("data")
 
 class FacebookFamily(BaseModel):
     __tablename__ = "facebook_families"
@@ -40,7 +42,10 @@ class FacebookPage(BaseModel):
     type = Column("type")
     num_likes = Column("num_likes","BigInteger")
     talking_about_count = Column("talking_about_count","BigInteger")
-    hometown = Column("hometown","String")
+    hometown = Column("hometown")
+    talking_about_count = Column("talking_about_count")
+    misc = Column("misc")
+    data = Column("data")
 
 class FacebookStatus(BaseModel):
     __tablename__ = "facebook_statuses"
