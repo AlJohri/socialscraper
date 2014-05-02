@@ -1,7 +1,0 @@
-export TWITTER_EMAIL=""
-export TWITTER_USERNAME=""
-export TWITTER_PASSWORD=""
-
-export FACEBOOK_EMAIL=""
-export FACEBOOK_USERNAME=""
-export FACEBOOK_PASSWORD=""

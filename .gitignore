@@ -1,5 +1,4 @@
 *.pyc
 .DS_Store
-env.py
-env.sh
+.secret
 venv
