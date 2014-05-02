@@ -1,2 +1,7 @@
+from facebook import GraphAPIError
+
 def get_about(api, username):
-	pass
+	try:
+		pass
+	except GraphAPIError:
+		pass

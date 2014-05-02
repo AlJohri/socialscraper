@@ -80,15 +80,17 @@ def get_about(browser, current_user, graph_name, graph_id=None):
         fbTimelineFamilyGrid = doc.cssselect('.fbTimelineFamilyGrid')
         fbTimelineAboutMeHeader = doc.cssselect('.fbTimelineAboutMeHeader')
 
-        # # this is for scraping a Page
-        # if fbTimelineAboutMeHeader:
-        #   title = get_text(fbTimelineAboutMeHeader[0].cssselect('.uiHeaderTitle'))
-        #   print title
+        # this is for scraping a Page
+        if fbTimelineAboutMeHeader:
+          title = get_text(fbTimelineAboutMeHeader[0].cssselect('.uiHeaderTitle'))
+          # print title
 
-        #   if "About" in title:
-        #       print doc.text_content() 
-        #   elif "Basic Info" in title:
-        #       print doc.text_content()
+          if "About" in title:
+            pass
+              # print doc.text_content() 
+          elif "Basic Info" in title:
+            pass
+              # print doc.text_content()
 
         if fbTimelineFamilyGrid:
             familyList = fbTimelineFamilyGrid[0].cssselect('.familyList')[0]

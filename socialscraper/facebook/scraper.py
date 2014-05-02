@@ -1,6 +1,6 @@
-import requests, pickle, re, os
+import requests, pickle, os
 from requests.adapters import HTTPAdapter
-from facebook import GraphAPI, GraphAPIError
+from facebook import GraphAPI
 from ..base import BaseScraper, BaseUser, ScrapingError
 
 from . import auth
@@ -36,7 +36,7 @@ class FacebookScraper(BaseScraper):
         self.cur_user.id = self.get_graph_id(self.cur_user.username)
 
     def logout(self):
-        auth.logout()
+        auth.logout(self.browser)
         self.cur_user = None
 
     def login_required(func):
@@ -98,4 +98,4 @@ class FacebookScraper(BaseScraper):
 
     # for result in self.graph_search(page_name,"likers"): yield result
     # for result in self.graph_search(user_name,"pages-liked"): yield result
-    # for result in self._get_pages_liked_nograph(user_name): yield result
+    # for result in public.get_pages_liked_nograph(user_name): yield result

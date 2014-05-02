@@ -124,5 +124,5 @@ def login(browser, email, password, username=None):
     
     return username
 
-def logout():
-    requests.post('http://www.facebook.com/logout.php')
+def logout(browser):
+    browser.post('http://www.facebook.com/logout.php')
