@@ -1,11 +1,8 @@
-import unittest, os
+import unittest, os, pprint, logging
 from ...facebook import FacebookScraper
 
-import pprint
+logging.basicConfig(level=logging.WARN)
 pp = pprint.PrettyPrinter(indent=4)
-
-import logging
-logging.basicConfig(level=logging.INFO)
 
 class TestFacebookScraper(unittest.TestCase):
 
@@ -13,42 +10,36 @@ class TestFacebookScraper(unittest.TestCase):
         self.email = os.getenv("FACEBOOK_EMAIL")
         self.username = os.getenv("FACEBOOK_USERNAME")
         self.password = os.getenv("FACEBOOK_PASSWORD")
+        self.app_token = os.getenv('FACEBOOK_APP_TOKEN')
+        self.user_token = os.getenv('FACEBOOK_USER_TOKEN')
 
-        self.test_username = "dthirman" # sabina.shamayeva
+        self.test_username = "todd.warren.seattle"
         self.test_pagename = "mightynest"
 
         self.scraper = FacebookScraper()
-        # self.scraper.add_user(email=self.email, password=self.password)
-        # self.scraper.login()
 
-    def test_graph_search(self):
-        pass
-        # def test_pages_liked(username):
-        #     for item in self.scraper.graph_search(username, "pages-liked"):
-        #         print item
-        #     self.assertEqual(True,True)
+    def test_graphapi(self):
+        self.scraper.init_api()
+        # print self.scraper.get_about_api(self.test_username)
+        # self.scraper.get_feed_api(self.test_username)
+        pp.pprint(self.scraper.get_likes_api(self.test_username))
 
-        # def test_likers(pagename):
-        #     for item in self.scraper.graph_search(pagename, "likers"):
-        #         print item
-        #     self.assertEqual(True,True)
+    def test_graphsearch(self):
 
-        # def test_about(username):
-        #     stuff = self.scraper.get_about(username)
-        #     pp.pprint(stuff)
-        #     self.assertEqual(True,True)
+        def init_graphsearch():
+            self.scraper.add_user(email=self.email, password=self.password)
+            self.scraper.login()
 
-        # def test_timeline(username):
-        #     from ...facebook import timeline
-        #     timeline.search(self.scraper.browser, self.scraper.cur_user, username)
+        def test_pages_liked(username):
+            for item in self.scraper.graph_search(username, "pages-liked"):
+                print item
 
-        # test_about(self.test_username)
-        #test_timeline(self.test_username)
+        def test_likers(pagename):
+            for item in self.scraper.graph_search(pagename, "likers"):
+                print item
+
+        # init_graphsearch()
         # test_pages_liked(self.test_username)
-
-        # takes too long
-        # test_about(self.test_pagename) # not fully supported yet
-        # test_timeline(self.test_pagename)
         # test_likers(self.test_pagename)
 
 if __name__ == "__main__":

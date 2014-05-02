@@ -8,8 +8,6 @@ logger = logging.getLogger(__name__)
 
 SEARCH_URL = 'https://www.facebook.com/search'
 AJAX_URL = 'https://www.facebook.com/ajax/pagelet/generic.php/BrowseScrollingSetPagelet'
-regex = re.compile("https:\/\/www.facebook.com\/(.*)\?ref")
-regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")
 
 def search(browser, current_user, graph_name, method_name, graph_id=None):
     """
@@ -71,21 +69,10 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
 
     def _result_to_model(result, method_name):
 
-        regex_result = regex.findall(result[0])
-
         url = result[0]
         name = result[1]
-        if regex_result:
-            username = regex_result[0]
-            if username == None: raise ValueError("No username was parsed %s" % url)
-            uid = public.get_id(username)
-            if uid == None: raise ValueError("No userid was parsed %s" % username) # just added this
-            # it errors out when it HAS username but no uid (didn't think this was possible)
-        else: # old style user that doesn't have username, only uid
-            regex_result = regex2.findall(result[0])
-            uid = regex_result[0]
-            username = regex_result[0]
-            if uid == None: raise ValueError("No userid was parsed %s" % url)
+
+        username, uid  = public.parse_url(url)
 
         if method_name == "pages-liked":
             return FacebookPage(page_id=uid, username=username, url=url, name=name)

@@ -31,30 +31,28 @@ def get_attribute(graph_id,attribute):
     name = json.loads(response.text).get('attribute', None)
     return name
 
-def find_page_username(url):
+regex1 = re.compile("^https:\/\/www.facebook.com\/([^?\n]+)(?:\?ref.*)?$")
+regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")
 
-    regex_result = regex.findall(url)
-
-    if regex_result:
-        username = regex_result[0]
+def parse_url(url):
+    regex_result1 = regex1.findall(url)
+    if regex_result1:
+        username = regex_result1[0]
+        if username == None: raise ValueError("No username was parsed %s" % url)
         if 'pages/' in username:
             uid = username.split('/')[-1]
             username = uid
-            return username, uid
-
-        if username == None: raise ValueError("No username was parsed %s" % url)
-        uid = get_id(username)
-        # pages/The-Talking-Heads/110857288936141
-        if uid == None: raise ValueError("No userid was parsed %s" % username) # just added this
-        # it errors out when it HAS username but no uid (didn't think this was possible)
+        else:
+            uid = get_id(username)
+            if uid == None: raise ValueError("No userid was parsed %s" % username)
     else: # old style user that doesn't have username, only uid
-        regex_result = regex2.findall(url)
-        if not regex_result:
-            raise ValueError("URL not parseable")
-        uid = regex_result[0]
-        username = regex_result[0]
-        if uid == None: raise ValueError("No userid was parsed %s" % url)
-    return username,uid
+        regex_result2 = regex2.findall(url)
+        if not regex_result2: raise ValueError("URL not parseable %s" % url)
+        uid = regex_result2[0]
+        username = regex_result2[0]
+        if uid == None: raise ValueError("No userid was parsed for username %s and url %s" % username, url)
+
+    return username, int(uid)
 
 def get_pages_liked(username):
     url = "https://www.facebook.com/%s/likes" % username
@@ -80,7 +78,7 @@ def get_pages_liked(username):
     
         for link in container.findAll('a','mediaRowItem'):
             print "link: %s" % link
-            username,uid = find_page_username(link['href'])
+            username,uid = parse_url(link['href'])
             try:
                 link['class']
                 yield { 'link': link['href'],
@@ -99,7 +97,7 @@ def get_pages_liked(username):
                 link['class']
             except KeyError:
                 try:
-                    username,uid = find_page_username(link['href'])
+                    username,uid = parse_url(link['href'])
                     yield { 'link': link['href'],
                         'name': link.text,
                         'username': username,

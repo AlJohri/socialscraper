@@ -4,10 +4,13 @@ from ..base import ScrapingError
 # logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-BASE_URL = 'https://m.facebook.com'
-LOGIN_URL = BASE_URL + '/login.php'
-PROFILE_URL = BASE_URL + '/profile.php'
-CHECKPOINT_URL = BASE_URL + '/login/checkpoint/'
+FACEBOOK_MOBILE_URL = 'https://m.facebook.com'
+MOBILE_LOGIN_URL = FACEBOOK_MOBILE_URL + '/login.php'
+MOBILE_PROFILE_URL = FACEBOOK_MOBILE_URL + '/profile.php'
+MOBILE_CHECKPOINT_URL = FACEBOOK_MOBILE_URL + '/login/checkpoint/'
+
+FACEBOOK_DESKTOP_URL = 'https://www.facebook.com'
+DESKTOP_PROFILE_URL = FACEBOOK_DESKTOP_URL + '/profile.php'
 
 INPUT_ERROR = ["We didn't recognize your email address or phone number."]
 
@@ -67,10 +70,10 @@ def login(browser, email, password, username=None):
     """
 
     logger.info("Begin Facebook Authentication")
-    response = browser.get(BASE_URL, timeout=1)
+    response = browser.get(FACEBOOK_MOBILE_URL, timeout=1)
     logger.debug('Loaded Facebook Mobile Browser')
     payload = {'email': email, 'pass': password}
-    response = browser.post(LOGIN_URL , data=payload)
+    response = browser.post(MOBILE_LOGIN_URL , data=payload)
     logger.debug('Initial Login')
 
     def get_base_payload(response_content):
@@ -84,21 +87,21 @@ def login(browser, email, password, username=None):
     def state(response_text, test_strings):
         return all(s in response_text for s in test_strings)
 
-    while not state(response.text, LOGGED_IN):
+    base_payload = get_base_payload(response.content)
 
-        base_payload = get_base_payload(response.content)
+    while not state(response.text, LOGGED_IN):
 
         if state(response.text, INPUT_ERROR):
             raise ScrapingError("We didn't recognize your email address or phone number.")
         elif state(response.text, REVIEW_RECENT_LOGIN_CONTINUE):
             payload = { 'submit[Continue]': 'Continue' }
             payload.update(base_payload)
-            response = browser.post(CHECKPOINT_URL, data=payload)
+            response = browser.post(MOBILE_CHECKPOINT_URL, data=payload)
             logger.debug('Review Recent Login -- Click Continue')
         elif state(response.text, REVIEW_RECENT_LOGIN_OKAY):
             payload = { 'submit[This is Okay]': 'This is Okay' }
             payload.update(base_payload)
-            response = browser.post(CHECKPOINT_URL, data=payload)
+            response = browser.post(MOBILE_CHECKPOINT_URL, data=payload)
             logger.debug('Review Recent Login -- Click Okay')
         elif state(response.text, REMEMBER_BROWSER):
             payload = {
@@ -106,17 +109,16 @@ def login(browser, email, password, username=None):
                 'name_action_selected': 'dont_save'
             }
             payload.update(base_payload)
-            response = browser.post(CHECKPOINT_URL, data=payload)
+            response = browser.post(MOBILE_CHECKPOINT_URL, data=payload)
             logger.debug('Remember Browser -- Click Don\'t Save')
 
     logger.info("Facebook Authentication Complete")
 
     def get_auth_username():
         """Get username of logged in user."""
-        response = browser.get(PROFILE_URL)
+        response = browser.get(DESKTOP_PROFILE_URL)
         doc = lxml.html.fromstring(response.content)
-        profile_url = doc.cssselect('.sec')[0].get('href')
-        username = re.sub('\?.*', '', profile_url[1:])
+        username = doc.cssselect('noscript meta')[0].get('content').replace('0; URL=/', '').replace('?_fb_noscript=1', '')
         logger.debug('Retrieve username from profile')
         return username
 
