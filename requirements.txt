@@ -1,6 +1,7 @@
 beautifulsoup4==4.3.2
 cssselect==0.9.1
 enum34==0.9.23
+facebook-sdk==0.4.0
 lxml==3.3.5
 mechanize==0.2.5
 python-dateutil==2.2

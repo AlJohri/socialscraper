@@ -1,39 +1,15 @@
-import logging, requests, lxml.html, json, urllib, re
-from ..base import ScrapingError
-from .models import *
+import logging, lxml.html, json, urllib, re
+from ...base import ScrapingError
+from ..models import FacebookUser, FacebookPage
 
-import pdb
+from ..import public
 
-# logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 SEARCH_URL = 'https://www.facebook.com/search'
 AJAX_URL = 'https://www.facebook.com/ajax/pagelet/generic.php/BrowseScrollingSetPagelet'
 regex = re.compile("https:\/\/www.facebook.com\/(.*)\?ref")
 regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")
-
-def get_id(graph_name):
-    "Get the graph ID given a name."""
-    get_response = lambda : requests.get('https://graph.facebook.com/' + graph_name)
-    response = get_response()
-    counter = 0
-    while response.status_code == 400 and counter < 3:
-        response = get_response()
-        counter += 1
-    id = json.loads(response.text).get('id', None)
-    return int(id) if id else None
-
-def get_name(graph_id):
-    """Get the graph name given a graph ID."""
-    response = requests.get('https://graph.facebook.com/' + graph_id)
-    name = json.loads(response.text).get('name', None)
-    return name
-
-def get_attribute(graph_id,attribute):
-    """Get the graph name given a graph ID."""
-    response = requests.get('https://graph.facebook.com/' + graph_id)
-    name = json.loads(response.text).get('attribute', None)
-    return name
 
 def search(browser, current_user, graph_name, method_name, graph_id=None):
     """
@@ -102,7 +78,7 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
         if regex_result:
             username = regex_result[0]
             if username == None: raise ValueError("No username was parsed %s" % url)
-            uid = get_id(username)
+            uid = public.get_id(username)
             if uid == None: raise ValueError("No userid was parsed %s" % username) # just added this
             # it errors out when it HAS username but no uid (didn't think this was possible)
         else: # old style user that doesn't have username, only uid
@@ -157,7 +133,7 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
 
     # Main Facebook Graph Search
 
-    if not graph_id: graph_id = get_id(graph_name)
+    if not graph_id: graph_id = public.get_id(graph_name)
     post_data, current_results = _graph_request(graph_id, method_name)
     for result in current_results: 
         try:

@@ -1,4 +1,5 @@
-import logging, requests, lxml.html, re
+import logging, lxml.html, re
+from ..base import ScrapingError
 
 # logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -88,7 +89,7 @@ def login(browser, email, password, username=None):
         base_payload = get_base_payload(response.content)
 
         if state(response.text, INPUT_ERROR):
-            raise UsageError("We didn't recognize your email address or phone number.")
+            raise ScrapingError("We didn't recognize your email address or phone number.")
         elif state(response.text, REVIEW_RECENT_LOGIN_CONTINUE):
             payload = { 'submit[Continue]': 'Continue' }
             payload.update(base_payload)
@@ -122,3 +123,6 @@ def login(browser, email, password, username=None):
     if not username: username = get_auth_username()
     
     return username
+
+def logout():
+    requests.post('http://www.facebook.com/logout.php')

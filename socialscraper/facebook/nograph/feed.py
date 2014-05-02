@@ -1,24 +1,13 @@
-"""
+import logging, lxml.html, json, urllib, re, datetime, dateutil
+# from .models import FacebookUser, FacebookStatus
 
-Currently scrapes user's timeline until January 1st, 2004 (the year Facebook was started).
-Need to find method to scrape until "Birth" or "Join" date.
+from .. import public
 
-"""
-import logging, requests, lxml.html, json, urllib, re
-from ..base import ScrapingError
-
-import datetime
-import dateutil
-from dateutil.relativedelta import relativedelta
-
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 BASE_URL = 'https://www.facebook.com/%s'
 AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/ProfileTimelineSectionPagelet"
 regex_4real = re.compile("if \(self != top\) {parent\.require\(\"JSONPTransport\"\)\.respond\(\d+, ({.*}),\"jsmods\"", re.MULTILINE|re.DOTALL)
-
-from . import graph
 
 from enum import Enum
 class QueryType(Enum):
@@ -29,11 +18,10 @@ class QueryType(Enum):
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
-import pdb
+def get_feed(browser, current_user, graph_name, graph_id = None):
 
-def search(browser, current_user, graph_name):
-
-    graph_id = graph.get_id(graph_name)
+    if not graph_id:
+        graph_id = public.get_id(graph_name)
 
     def _find_script_tag(raw_html, phrase):
         doc = lxml.html.fromstring(raw_html)
@@ -78,8 +66,6 @@ def search(browser, current_user, graph_name):
     tNow = datetime.datetime.now()
     start = datetime.date(tNow.year, tNow.month, 1)
     end = datetime.date(tNow.year, tNow.month+1, 1)
-
-    month_counter = 0
 
     while True:
         start += dateutil.relativedelta.relativedelta(months=-1)
@@ -137,32 +123,3 @@ def search(browser, current_user, graph_name):
 
         if end < datetime.date(2004,1,1):
             break
-
-    # pdb.set_trace()
-
-
-# ?no_script_path=1
-# &data= {
-#   "profile_id":1006531897,
-#   "start":1230796800,
-#   "end":1262332799,
-#   "query_type":8,
-#   "page_index":1,
-#   "section_container_id":"u_jsonp_21_1",
-#   "section_pagelet_id":"pagelet_timeline_year_2009",
-#   "unit_container_id":"u_jsonp_21_0",
-#   "current_scrubber_key":"year_2009",
-#   "buffer":500,
-#   "require_click":false,
-#   "showing_esc":false,
-#   "adjust_buffer":true,
-#   "tipld":{"sc":8,"rc":7,"rt":1250609387,"vc":11},
-#   "num_visible_units":11,
-#   "remove_dupes":true
-# }
-# &__user=100000862956701
-# &__a=1
-# &__dyn=7n8ajEAMCBynzpQ9UoHaEWy6zECiq78hAKGgyiGGeqheCu6popG
-# &__req=jsonp_22
-# &__rev=1210030
-# &__adt=22
