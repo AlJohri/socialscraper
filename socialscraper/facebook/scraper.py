@@ -21,24 +21,29 @@ class FacebookUser(BaseUser):
 
 class FacebookScraper(BaseScraper):
 
-    def __init__(self,user_agents=None, pickled_session=None, scraper_type="graphapi"):
+    def __init__(self,user_agents=None, pickled_session=None, pickled_api=None, scraper_type="graphapi"):
         """Initialize the Facebook scraper."""
         
         self.scraper_type = scraper_type
 
-        self.api = None
         self.cur_user = None
 
         if pickled_session: self.browser = pickle.loads(pickled_session)
         else:  self.browser = requests.Session()
+
+        if pickled_api: self.api = pickle.loads(pickled_api)
+        else: self.api = None
+
         # TODO: write method to just pickle the whole FacebookScraper instead
 
         BaseScraper.__init__(self, user_agents)
         self.browser.headers = { 'User-Agent': self.cur_user_agent }
         self.browser.mount(FACEBOOK_MOBILE_URL, HTTPAdapter(pool_connections=500, pool_maxsize=500, max_retries=3))
 
-    def init_api(self):
-        self.api = GraphAPI(FACEBOOK_USER_TOKEN)
+    def init_api(self, pickled_api=None):
+
+        if pickled_api: self.api = pickle.loads(pickled_api)
+        else: self.api = GraphAPI(FACEBOOK_USER_TOKEN)
 
         try:
             profile = self.api.get_object('me')
