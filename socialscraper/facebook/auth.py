@@ -37,13 +37,16 @@ REMEMBER_BROWSER = [
 
 LOGGED_IN = [
     "Home", 
-    "Profile", 
-    "Groups", 
     "Messages", 
     "Notifications", 
     "Chat", 
     "Friends", 
     "logout.php"
+]
+
+LOCKED = [
+    "Your Account is Temporarily Locked",
+    "We’ve detected suspicious activity coming from your IP address"
 ]
 
 def login(browser, email, password, username=None):
@@ -87,7 +90,8 @@ def login(browser, email, password, username=None):
     def state(response_text, test_strings):
         return all(s in response_text for s in test_strings)
 
-    base_payload = get_base_payload(response.content)
+    if not state(response.text, LOGGED_IN):
+        base_payload = get_base_payload(response.content)
 
     while not state(response.text, LOGGED_IN):
 
@@ -111,6 +115,8 @@ def login(browser, email, password, username=None):
             payload.update(base_payload)
             response = browser.post(MOBILE_CHECKPOINT_URL, data=payload)
             logger.debug('Remember Browser -- Click Don\'t Save')
+        elif state(response.text, LOCKED):
+            raise ScrapingError("Account is locked.")
 
     logger.info("Facebook Authentication Complete")
 

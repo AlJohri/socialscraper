@@ -201,4 +201,6 @@ def get_about(browser, current_user, graph_name, graph_id=None):
         hometown=hometown
     )
 
+    print ret
+    
     return user
