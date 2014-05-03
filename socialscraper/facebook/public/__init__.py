@@ -40,19 +40,13 @@ def parse_url(url):
         username = regex_result1[0]
         if username == None: raise ValueError("No username was parsed %s" % url)
         if 'pages/' in username:
-            uid = username.split('/')[-1]
-            username = uid
-        else:
-            uid = get_id(username)
-            if uid == None: raise ValueError("No userid was parsed %s" % username)
+            username = username.split('/')[-1]
     else: # old style user that doesn't have username, only uid
         regex_result2 = regex2.findall(url)
         if not regex_result2: raise ValueError("URL not parseable %s" % url)
-        uid = regex_result2[0]
         username = regex_result2[0]
-        if uid == None: raise ValueError("No userid was parsed for username %s and url %s" % username, url)
 
-    return username, int(uid)
+    return username
 
 def get_pages_liked(username):
     url = "https://www.facebook.com/%s/likes" % username

@@ -72,7 +72,8 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
         url = result[0]
         name = result[1]
 
-        username, uid  = public.parse_url(url)
+        username = public.parse_url(url)
+        uid = public.get_id(username)
 
         if method_name == "pages-liked":
             return FacebookPage(page_id=uid, username=username, url=url, name=name)
