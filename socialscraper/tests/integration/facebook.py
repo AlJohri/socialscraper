@@ -20,9 +20,11 @@ class TestFacebookScraper(unittest.TestCase):
 
     def test_graphapi(self):
         self.scraper.init_api()
-        # print self.scraper.get_about_api(self.test_username)
+        print self.scraper.get_about_api(self.test_username)
+        for page in self.scraper.get_likes_api(self.test_username):
+            pp.pprint(page)
+
         # self.scraper.get_feed_api(self.test_username)
-        pp.pprint(self.scraper.get_likes_api(self.test_username))
 
     def test_graphsearch(self):
 
