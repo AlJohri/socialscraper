@@ -1,9 +1,12 @@
+import logging
 from time import time
 from datetime import datetime
 from urlparse import urlparse, parse_qs
 from facebook import GraphAPIError
 
 from . import get_object
+
+logger = logging.getLogger(__name__)
 
 def get_feed(api, username):
 

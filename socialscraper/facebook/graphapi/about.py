@@ -1,6 +1,9 @@
+import logging
 from ...base import ScrapingError
 
 from . import get_object
+
+logger = logging.getLogger(__name__)
 
 """
 Ignoring the idea of tiered permissions, we consider any user for whom 
@@ -11,12 +14,13 @@ Non-public data is defined as any key not defined in PUBLIC_KEYS.
 
 PUBLIC_KEYS = [
     'id', 
+    'name',     
     'first_name', 
-    'gender', 
-    'last_name', 
+    'middle_name',
+    'last_name',
+    'gender',  
     'link', 
     'locale', 
-    'name', 
     'updated_time', 
     'username'
 ]

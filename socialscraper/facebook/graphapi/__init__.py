@@ -1,4 +1,9 @@
+import logging
 from facebook import GraphAPIError
+
+from ...base import ScrapingError
+
+logger = logging.getLogger(__name__)
 
 def get_object(api, username):
     try:

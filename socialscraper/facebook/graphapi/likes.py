@@ -1,3 +1,4 @@
+import logging
 from time import time
 from datetime import datetime
 from ...base import ScrapingError
@@ -5,6 +6,8 @@ from ..models import FacebookPage
 
 from . import get_object
 from . import get_connections
+
+logger = logging.getLogger(__name__)
 
 def get_likes(api, username):
     profile = get_connections(api, username, 'likes')

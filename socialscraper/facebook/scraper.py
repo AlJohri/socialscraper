@@ -1,4 +1,4 @@
-import requests, pickle, os
+import logging, requests, pickle, os
 from requests.adapters import HTTPAdapter
 from facebook import GraphAPI, GraphAPIError
 from ..base import BaseScraper, BaseUser, ScrapingError
@@ -8,6 +8,8 @@ from . import public
 from . import nograph
 from . import graphapi
 from . import graphsearch
+
+logger = logging.getLogger(__name__)
 
 FACEBOOK_MOBILE_URL = 'https://m.facebook.com'
 FACEBOOK_USER_TOKEN = os.getenv('FACEBOOK_USER_TOKEN')
@@ -21,9 +23,16 @@ class FacebookScraper(BaseScraper):
 
     def __init__(self,user_agents=None, pickled_session=None, scraper_type="graphapi"):
         """Initialize the Facebook scraper."""
+        
+        self.scraper_type = scraper_type
+
+        self.api = None
+        self.cur_user = None
+
         if pickled_session: self.browser = pickle.loads(pickled_session)
         else:  self.browser = requests.Session()
         # TODO: write method to just pickle the whole FacebookScraper instead
+
         BaseScraper.__init__(self, user_agents)
         self.browser.headers = { 'User-Agent': self.cur_user_agent }
         self.browser.mount(FACEBOOK_MOBILE_URL, HTTPAdapter(pool_connections=500, pool_maxsize=500, max_retries=3))
