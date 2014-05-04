@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import logging, lxml.html, re
 from ..base import ScrapingError
 
