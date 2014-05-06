@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import logging, requests, pickle, os
 from requests.adapters import HTTPAdapter
 from facebook import GraphAPI, GraphAPIError
@@ -21,6 +23,16 @@ class FacebookUser(BaseUser):
 
 class FacebookScraper(BaseScraper):
 
+    class FacebookSession(requests.sessions.Session):
+
+        def get(self, url, **kwargs):
+            response = super(FacebookScraper.FacebookSession, self).get(url, **kwargs)
+
+            if not auth.state(response.text, auth.LOCKED) and not auth.state(response.text, auth.SECURITY_CHECK):
+                return response
+            else:
+                raise ScrapingError("Account locked. Stop scraping!")
+
     def __init__(self,user_agents=None, pickled_session=None, pickled_api=None, scraper_type="graphapi"):
         """Initialize the Facebook scraper."""
         
@@ -29,7 +41,7 @@ class FacebookScraper(BaseScraper):
         self.cur_user = None
 
         if pickled_session: self.browser = pickle.loads(pickled_session)
-        else:  self.browser = requests.Session()
+        else:  self.browser = FacebookScraper.FacebookSession()
 
         if pickled_api: self.api = pickle.loads(pickled_api)
         else: self.api = None

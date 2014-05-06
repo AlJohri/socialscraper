@@ -48,8 +48,16 @@ LOGGED_IN = [
 
 LOCKED = [
     "Your Account is Temporarily Locked",
-    "We’ve detected suspicious activity coming from your IP address"
+    "detected suspicious activity coming from your IP address"
 ]
+
+SECURITY_CHECK = [
+    "Security Check",
+    "Please enter the text below"
+]
+
+def state(response_text, test_strings):
+    return all(s in response_text for s in test_strings)
 
 def login(browser, email, password, username=None):
     """
@@ -88,9 +96,6 @@ def login(browser, email, password, username=None):
             'charset_test': doc.cssselect("input[name=charset_test]")[0].get('value'),
             'nh': doc.cssselect("input[name=nh]")[0].get('value')
         }
-
-    def state(response_text, test_strings):
-        return all(s in response_text for s in test_strings)
 
     if not state(response.text, LOGGED_IN):
         base_payload = get_base_payload(response.content)
