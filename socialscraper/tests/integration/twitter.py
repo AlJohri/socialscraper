@@ -23,8 +23,14 @@ class TestTwitterScraper(unittest.TestCase):
 		followers_from_user = self.scraper.get_followers(user)
 		followers_from_id = self.scraper.get_followers(id)
 		self.assertEqual([f.username for f in followers_from_user].sort(),[f.username for f in followers_from_id].sort())
+
 		for follower in self.scraper.get_followers('aljohri'):
 			print follower
+
+		for tweet in self.scraper.get_feed_by_screen_name('aljohri'):
+			print tweet
+
+		self.assertTrue(True)
 
 if __name__ == "__main__":
 	unittest.main()
