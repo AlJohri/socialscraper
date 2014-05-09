@@ -37,8 +37,12 @@ class TwitterScraper(BaseScraper):
             soup = bs4.BeautifulSoup(html)
             root_containers = soup.select(".ProfileTweet")
 
-            # TODO: check for old style twitter
-            # current code only works with new style twitter
+            # old style twitter profile
+            if not root_containers:
+                root_containers = soup.select(".js-stream-tweet")
+
+            if not root_containers:
+                break
 
             for container in root_containers:
 
