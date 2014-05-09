@@ -27,7 +27,7 @@ class TestTwitterScraper(unittest.TestCase):
 		# for follower in self.scraper.get_followers('aljohri'):
 		# 	print follower
 
-		for tweet in self.scraper.get_feed_by_screen_name('MaloneJena'):
+		for tweet in self.scraper.get_feed_by_screen_name('aljohri'):
 			print tweet
 
 		self.assertTrue(True)
