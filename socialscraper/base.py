@@ -1,6 +1,32 @@
 from mechanize import Browser
 import random
 
+class ScrapeAccount(object):
+
+    __attrs__ = ['password', 'email', 'username']
+
+    def __init__(self, password, email=None, username=None):
+        # if not email and not username: raise UsageError("Username or Email not specified.")
+        self.email = email
+        self.username = username
+        self.password = password
+
+    def __str__(self):
+        return "ScrapeAccount %s, %s, %s" % (self.email, self.username, "".join(map(lambda x: '*', self.password)))
+
+    def __repr__(self):
+        return "%s(email=%s, username=%s, password=%s)" % (self.__class__.__name__, 
+                                                           self.email, 
+                                                           self.username, 
+                                                           "".join(map(lambda x: '*', self.password)))
+
+    def __getstate__(self):
+        return dict((attr, getattr(self, attr, None)) for attr in self.__attrs__)
+
+    def __setstate__(self, state):
+        for attr, value in state.items():
+            setattr(self, attr, value)
+
 class BaseScraper(object):
     """The base class for all social media scrapers in the package.
 
@@ -9,22 +35,6 @@ class BaseScraper(object):
     """
 
     __attrs__ = ['browser', 'user_agents', 'cur_user_agent', 'users', 'cur_user']
-
-    class ScrapeAccount(object):
-        def __init__(self, password, email=None, username=None):
-            # if not email and not username: raise UsageError("Username or Email not specified.")
-            self.email = email
-            self.username = username
-            self.password = password
-
-        def __str__(self):
-            return "ScrapeAccount %s, %s, %s" % (self.email, self.username, "".join(map(lambda x: '*', self.password)))
-
-        def __repr__(self):
-            return "%s(email=%s, username=%s, password=%s)" % (self.__class__.__name__, 
-                                                               self.email, 
-                                                               self.username, 
-                                                               "".join(map(lambda x: '*', self.password)))
 
     default_user_agents = set([
         # 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.107 Safari/537.36'
@@ -80,7 +90,7 @@ class BaseScraper(object):
 
     def add_user(self, password, email=None, username=None):
         """Set the account information to use when a login is required."""
-        self.users.append(BaseScraper.ScrapeAccount(email=email, 
+        self.users.append(ScrapeAccount(email=email, 
                                                     username=username, 
                                                     password=password))
         return
@@ -99,6 +109,9 @@ class BaseScraper(object):
             setattr(self, attr, value)
 
 class BaseUser(object):
+
+    __attrs__ = ['id', 'username', 'email']
+
     def __init__(self, id=None, username=None, email=None):
         self.id = id
         self.username = username
@@ -109,6 +122,14 @@ class BaseUser(object):
 
     def __repr__(self):
         return "%s(id=%i, username=%s, email=%s)" % (self.__class__.__name__, self.id, self.username, self.email)
+
+    def __getstate__(self):
+        return dict((attr, getattr(self, attr, None)) for attr in self.__attrs__)
+
+    def __setstate__(self, state):
+        for attr, value in state.items():
+            setattr(self, attr, value)
+
 
 class FeedItem(object):
     def __init__(self, id, content=None, timestamp=None, type=None):
