@@ -12,8 +12,7 @@ class BaseScraper(object):
 
     class ScrapeAccount(object):
         def __init__(self, password, email=None, username=None):
-            if not email and not username: 
-                raise UsageError("Username or Email not specified.")
+            # if not email and not username: raise UsageError("Username or Email not specified.")
             self.email = email
             self.username = username
             self.password = password

@@ -35,14 +35,44 @@ class TwitterScraper(BaseScraper):
 
             html = tweet_json["items_html"]
             soup = bs4.BeautifulSoup(html)
-            text_containers = soup.findAll("p","js-tweet-text")
-            timestamp_containers = soup.findAll("span","_timestamp")
-            for container in zip(timestamp_containers,text_containers):
-                cur_tweet = Tweet(id=hash(container[1].text.encode('utf-8','ignore')),
-                                  content_timestamp=container[0]["data-time"],
-                                  content=container[1].text.encode('utf-8','ignore'))
-                # tweets.append(cur_tweet)
+            root_containers = soup.select(".ProfileTweet")
+
+            # old style twitter profile
+            if not root_containers:
+                root_containers = soup.select(".js-stream-tweet")
+
+            if not root_containers:
+                break
+
+            for container in root_containers:
+
+                # ignore retweets
+                if container.get('data-retweet-id'): continue
+
+                tweet_id = container.get('data-tweet-id')
+                text_container = container.select('.js-tweet-text')
+                timestamp_container = container.select('.js-short-timestamp')
+
+                if not tweet_id and not text_container and not timestamp_container: 
+                    continue
+
+                text_container = text_container[0]
+                timestamp_container = timestamp_container[0]
+
+                cur_tweet = Tweet(id=tweet_id,
+                                  content_timestamp=timestamp_container["data-time"],
+                                  content=text_container.text.encode('utf-8','ignore'))
+
                 yield cur_tweet
+
+            # # text_containers = soup.findAll("p","js-tweet-text")
+            # # timestamp_containers = soup.findAll("span","_timestamp")
+            # for container in zip(timestamp_containers,text_containers):
+            #     cur_tweet = Tweet(id=hash(container[1].text.encode('utf-8','ignore')),
+            #                       content_timestamp=container[0]["data-time"],
+            #                       content=container[1].text.encode('utf-8','ignore'))
+            #     # tweets.append(cur_tweet)
+            #     yield cur_tweet
 
             
             if not tweet_json["has_more_items"]:
