@@ -190,12 +190,14 @@ def get_about(browser, current_user, graph_name, graph_id=None):
     currentcity = unicode(currentcity) if currentcity is not None else None
     hometown = unicode(hometown) if hometown is not None else None
 
+    import pdb; pdb.set_trace()
+
     user = FacebookUser(
         uid=graph_id, 
         username=graph_name, 
         email=email, 
         birthday=birthday, 
-        sex=sex, 
+        sex=sex.lower(), 
         college=college, 
         employer=employer,
         highschool=highschool,

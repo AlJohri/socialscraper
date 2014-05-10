@@ -43,7 +43,7 @@ def get_about(api, username):
     currentcity = json.dumps(profile.get('currentcity')) if profile.get('currentcity') else None
 
     user = FacebookUser(
-        uid=profile.get('id'), 
+        uid=int(profile.get('id')), 
         username=username, 
         email=profile.get('email'), 
         birthday=profile.get('birthday'), 

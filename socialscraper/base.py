@@ -34,7 +34,7 @@ class BaseScraper(object):
     for the browser.
     """
 
-    __attrs__ = ['browser', 'user_agents', 'cur_user_agent', 'users', 'cur_user']
+    __attrs__ = ['browser', 'user_agents', 'cur_user_agent', 'users', 'cur_user', 'scraper_type', 'api']
 
     default_user_agents = set([
         # 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.107 Safari/537.36'
