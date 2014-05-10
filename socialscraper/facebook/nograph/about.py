@@ -183,6 +183,8 @@ def get_about(browser, current_user, graph_name, graph_id=None):
     currentcity = ret['places'].get('Current City', None)
     hometown = ret['places'].get('Hometown', None)
 
+    sex = sex.lower() if sex else None
+    
     email = email if email and not "Ask for" in email else None
     college = unicode(college) if college is not None else None
     employer = unicode(employer) if employer is not None else None
@@ -190,14 +192,12 @@ def get_about(browser, current_user, graph_name, graph_id=None):
     currentcity = unicode(currentcity) if currentcity is not None else None
     hometown = unicode(hometown) if hometown is not None else None
 
-    import pdb; pdb.set_trace()
-
     user = FacebookUser(
         uid=graph_id, 
         username=graph_name, 
         email=email, 
         birthday=birthday, 
-        sex=sex.lower(), 
+        sex=sex, 
         college=college, 
         employer=employer,
         highschool=highschool,
