@@ -8,7 +8,7 @@ class BaseScraper(object):
     for the browser.
     """
 
-    __attrs__ = ['browser', '_browser', 'user_agents', 'cur_user_agent', 'users', 'cur_user']
+    __attrs__ = ['browser', 'user_agents', 'cur_user_agent', 'users', 'cur_user']
 
     class ScrapeAccount(object):
         def __init__(self, password, email=None, username=None):
