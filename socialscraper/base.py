@@ -8,6 +8,8 @@ class BaseScraper(object):
     for the browser.
     """
 
+    __attrs__ = ['browser', '_browser', 'user_agents', 'cur_user_agent', 'users', 'cur_user']
+
     class ScrapeAccount(object):
         def __init__(self, password, email=None, username=None):
             if not email and not username: 
@@ -90,6 +92,13 @@ class BaseScraper(object):
         self.cur_user = random.choice(self.users)
         return self.cur_user
 
+    def __getstate__(self):
+        return dict((attr, getattr(self, attr, None)) for attr in self.__attrs__)
+
+    def __setstate__(self, state):
+        for attr, value in state.items():
+            setattr(self, attr, value)
+
 class BaseUser(object):
     def __init__(self, id=None, username=None, email=None):
         self.id = id
@@ -124,7 +133,6 @@ class UsageError(Exception):
 
 class ScrapingError(Exception):
     pass
-
 
 class BaseModel(object):
     """

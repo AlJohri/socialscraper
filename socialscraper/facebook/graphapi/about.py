@@ -1,5 +1,6 @@
-import logging
+import logging, json
 from ...base import ScrapingError
+from ..models import FacebookUser
 
 from . import get_object
 
@@ -36,4 +37,24 @@ def get_about(api, username):
 
     profile = get_object(api, username)
 
-    return profile, check_public_profile(profile)
+    employer = json.dumps(profile.get('work')) if profile.get('work') else None
+    data = json.dumps(profile) if profile else None
+    hometown = json.dumps(profile.get('hometown')) if profile.get('hometown') else None
+    currentcity = json.dumps(profile.get('currentcity')) if profile.get('currentcity') else None
+
+    user = FacebookUser(
+        uid=profile.get('id'), 
+        username=username, 
+        email=profile.get('email'), 
+        birthday=profile.get('birthday'), 
+        sex=profile.get('gender'), 
+        college=None, 
+        employer=employer,
+        highschool=None,
+        currentcity=currentcity,
+        hometown=hometown,
+        locale=profile.get('locale'),
+        data=data
+    )
+
+    return user
