@@ -25,11 +25,20 @@ def get_name(graph_id):
     name = json.loads(response.text).get('name', None)
     return name
 
-def get_attribute(graph_id,attribute):
-    """Get the graph name given a graph ID."""
-    response = requests.get('https://graph.facebook.com/' + graph_id)
-    name = json.loads(response.text).get('attribute', None)
+def get_attribute(graph_obj,attribute):
+    """Get attribute of a given a graph_name or graph_id."""
+    response = requests.get('https://graph.facebook.com/' + graph_obj)
+    name = json.loads(response.text).get(attribute, None)
     return name
+
+def get_attributes(graph_obj,attributes):
+    """Get multiple attributes of a given a graph_name or graph_id."""
+    ret_attributes = []
+    response = requests.get('https://graph.facebook.com/' + graph_obj)
+    data = json.loads(response.text)
+    for attribute in attributes:
+        ret_attributes.append(data.get(attribute, None))
+    return ret_attributes
 
 regex1 = re.compile("^https:\/\/www.facebook.com\/([^?\n]+)(?:\?ref.*)?$")
 regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")

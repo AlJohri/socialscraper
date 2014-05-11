@@ -73,10 +73,14 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
         name = result[1]
 
         username = public.parse_url(url)
-        uid = public.get_id(username)
+        uid, category = public.get_attributes(username, ["id", "category"])
+
+        if uid == None: raise ValueError("Couldn't find uid of %s" % username)
+
+        uid = int(uid)
 
         if method_name == "pages-liked":
-            return FacebookPage(page_id=uid, username=username, url=url, name=name)
+            return FacebookPage(page_id=uid, username=username, url=url, name=name, type=category)
         elif method_name == "likers":
             return FacebookUser(uid=uid, username=username, url=url, name=name)
         else:
