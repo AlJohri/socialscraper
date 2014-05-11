@@ -111,5 +111,5 @@ def get_pages_liked(username):
                 except ValueError:
                     continue
     else:
-        pdb.set_trace()
+        # pdb.set_trace()
         print "User %s has no likes or tight privacy settings." % username

@@ -58,8 +58,8 @@ class FacebookScraper(BaseScraper):
         else: self.api = GraphAPI(FACEBOOK_USER_TOKEN)
 
         try:
-            profile = self.api.get_object('me')
-        except AttributeError, GraphAPIError:
+            self.api.get_object('me')
+        except (GraphAPIError, AttributeError):
             raise ScrapingError("Need a valid FACEBOOK_USER_TOKEN or initializing the api.")
             self.api = None
 
@@ -105,10 +105,23 @@ class FacebookScraper(BaseScraper):
     def get_about(self, graph_name, graph_id=None):
         if self.scraper_type == "graphapi": return self.get_about_api(graph_name)
         elif self.scraper_type == "nograph": return self.get_about_nograph(graph_name, graph_id)
+        elif self.scraper_type == "graphsearch": raise NotImplementedError("get_about with graphsearch")
 
     def get_feed(self, graph_name, graph_id=None):
         if self.scraper_type == "api": return self.get_feed_api(graph_name)
         elif self.scraper_type == "nograph": return self.get_feed_nograph(graph_name, graph_id)
+        elif self.scraper_type == "graphsearch": raise NotImplementedError("get_feed with graphsearch")
+
+    def get_likes(self, graph_name, graph_id=None):
+        if self.scraper_type == "api": return self.get_likes_api(graph_name)
+        elif self.scraper_type == "nograph": raise NotImplementedError("get_likes with nograph")
+        elif self.scraper_type == "graphsearch": return self.graph_search(graph_name, "pages-liked")
+        elif self.scraper_type == "public": return public.get_pages_liked(graph_name)
+
+    def get_fans(self, graph_name, graph_id=None):
+        if self.scraper_type == "api": raise NotImplementedError("get_fans with graphapi")
+        elif self.scraper_type == "nograph": raise NotImplementedError("get_fans with nograph")
+        elif self.scraper_type == "graphsearch": return self.graph_search(graph_name, "likers")
 
     # graphapi
 
