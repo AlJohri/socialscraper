@@ -69,7 +69,7 @@ def get_pages_liked(username):
     resp = requests.get(url, headers = headers)
 
     if "Security Check" in resp.text:
-        pdb.set_trace()
+        # pdb.set_trace()
         raise ScrapingError("Security Check")
 
     html = re.sub(r'(<!--)|(-->)',' ',resp.text)
@@ -112,4 +112,4 @@ def get_pages_liked(username):
                     continue
     else:
         # pdb.set_trace()
-        print "User %s has no likes or tight privacy settings." % username
+        raise ScrapingError("User %s has no likes or tight privacy settings." % username)
