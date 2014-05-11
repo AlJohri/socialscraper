@@ -48,6 +48,7 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
         return data_parameter
 
     def _parse_cursor_data(raw_json):
+        if raw_json.get('error'): raise ScrapingError(raw_json.get('errorDescription'))
         require = raw_json['jsmods']['require']
         tester = lambda x: x[0] == "BrowseScrollingPager" and x[1] == "pageletComplete"
         cursor_parameter = map(lambda x: x[3][0], filter(tester, require))[0]
