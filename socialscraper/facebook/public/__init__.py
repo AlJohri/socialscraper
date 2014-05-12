@@ -8,6 +8,17 @@ regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")
 
 logger = logging.getLogger(__name__)
 
+"""
+Getting the id using the public method can get less data than ideal.
+
+Pages dealing with alcohol cannot be retrieved via the public method.
+For example: https://www.facebook.com/zeitgeistusn
+
+The graphapi can be helpful here. Using a user access token (or perhaps even an app 
+access token) we can get the id, name, and other attributes (in the same format).
+
+"""
+
 def get_id(graph_name):
     "Get the graph ID given a name."""
     get_response = lambda : requests.get('https://graph.facebook.com/' + graph_name)

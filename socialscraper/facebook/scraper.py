@@ -3,7 +3,7 @@
 import logging, requests, pickle, os
 from requests.adapters import HTTPAdapter
 from facebook import GraphAPI, GraphAPIError
-from ..base import BaseScraper, BaseUser, ScrapingError
+from ..base import BaseScraper, ScrapingError
 
 from . import auth
 from . import public
@@ -15,11 +15,6 @@ logger = logging.getLogger(__name__)
 
 FACEBOOK_MOBILE_URL = 'https://m.facebook.com'
 FACEBOOK_USER_TOKEN = os.getenv('FACEBOOK_USER_TOKEN')
-
-class FacebookUser(BaseUser):
-    """Container for the info associated w/ a Facebook user"""
-    def __init__(self, username=None, id=None):
-        super(FacebookUser, self).__init__(id=id, username=username)
 
 class FacebookSession(requests.sessions.Session):
 
@@ -68,7 +63,7 @@ class FacebookScraper(BaseScraper):
     def login(self):
         """Logs user into facebook."""
         self.cur_user = self.pick_random_user()
-        self.cur_user.username = auth.login(self.browser, self.cur_user.email, self.cur_user.password)
+        self.cur_user.username = auth.login(self.browser, self.cur_user.email, self.cur_user.password, username=self.cur_user.username)
         self.cur_user.id = self.get_graph_id(self.cur_user.username)
 
     def logout(self):
@@ -114,7 +109,7 @@ class FacebookScraper(BaseScraper):
 
     def get_likes(self, graph_name, graph_id=None):
         if self.scraper_type == "api": return self.get_likes_api(graph_name)
-        elif self.scraper_type == "nograph": raise NotImplementedError("get_likes with nograph")
+        elif self.scraper_type == "nograph": return self.get_likes_nograph(graph_name)
         elif self.scraper_type == "graphsearch": return self.graph_search(graph_name, "pages-liked")
         elif self.scraper_type == "public": return public.get_pages_liked(graph_name)
 
@@ -146,6 +141,10 @@ class FacebookScraper(BaseScraper):
     @login_required
     def get_about_nograph(self, graph_name, graph_id=None):
         return nograph.get_about(self.browser, self.cur_user, graph_name, graph_id=graph_id)
+
+    @login_required
+    def get_likes_nograph(self, graph_name, graph_id=None):
+        return nograph.get_likes(self.browser, self.cur_user, graph_name, graph_id=graph_id)
 
     # graphsearch
 

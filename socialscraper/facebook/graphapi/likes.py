@@ -9,10 +9,9 @@ from . import get_connections
 
 logger = logging.getLogger(__name__)
 
-def get_likes(api, username):
-    profile = get_connections(api, username, 'likes')
-    return profile
-
+# def get_likes(api, username):
+#     profile = get_connections(api, username, 'likes')
+#     return profile
 
 def get_likes(api, username):
     after = ''

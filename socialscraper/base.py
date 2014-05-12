@@ -17,8 +17,8 @@ class ScrapeAccount(object):
 
     def __repr__(self):
         return "%s(email=%s, id=%d, username=%s, password=%s)" % (self.__class__.__name__, 
-                                                           self.id,
                                                            self.email, 
+                                                           self.id,
                                                            self.username, 
                                                            "".join(map(lambda x: '*', self.password)))
 
@@ -90,11 +90,9 @@ class BaseScraper(object):
         """Pick a random user agent from the set of possible agents."""
         self.set_user_agent(random.choice(list(self.user_agents)))
 
-    def add_user(self, password, email=None, username=None):
+    def add_user(self, password, id=None, email=None, username=None):
         """Set the account information to use when a login is required."""
-        self.users.append(ScrapeAccount(email=email, 
-                                                    username=username, 
-                                                    password=password))
+        self.users.append(ScrapeAccount(id=int(id), email=email, username=username, password=password))
         return
 
     def pick_random_user(self):
