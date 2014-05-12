@@ -95,6 +95,7 @@ def get_pages_liked(username):
             username,uid = parse_url(link['href'])
             try:
                 link['class']
+                # @TODO: return facebook page instead
                 yield { 'link': link['href'],
                         'name': link.text,
                         'username': username,
