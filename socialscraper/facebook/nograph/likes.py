@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re, json, lxml, urllib
+from bs4 import BeautifulSoup
 from ...base import ScrapingError
 
 # TODO: write a nograph likes scraper
@@ -92,6 +93,7 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
 
     for likes_type in LIKES_TYPES:
         response = browser.get(LIKES_URL % (graph_name, likes_type))
+        # parse 1st page here
 
         cursor_tag = _find_script_tag(response.text, "enableContentLoader")
         cursor_data = _parse_cursor_data(cursor_tag) if cursor_tag else None
@@ -116,6 +118,24 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
 
         response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload))
     
+        data = json.loads(response.content[9:])
+        soup = BeautifulSoup(data['payload'])
+        for link in soup.findAll('a'):
+            try:
+                title = link['title']
+                name = link.text
+                href = link['href']
+
+                yield {
+                    "title": title,
+                    "name": name,
+                    "href": href
+                }
+            except KeyError:
+                pass
+        # import pdb; pdb.set_trace()
+
+
         regex = re.compile("href=\\\\\"(.*?)\"")
 
         tester = lambda x: x.find('cursor') != -1
