@@ -93,6 +93,8 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
     for likes_type in LIKES_TYPES:
         response = browser.get(LIKES_URL % (graph_name, likes_type))
 
+        # parse response first page
+
         cursor_tag = _find_script_tag(response.text, "enableContentLoader")
         cursor_data = _parse_cursor_data(cursor_tag) if cursor_tag else None
 
@@ -115,6 +117,8 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
         print AJAX_URL + "?%s" % urllib.urlencode(payload)
 
         response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload))
+
+        # parse response (2nd page)
     
         regex = re.compile("href=\\\\\"(.*?)\"")
 
@@ -123,8 +127,15 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
         thing2 = filter(tester, thing)
 
         if not thing2: continue
-        
-        return thing2[0] #[0].replace("\\\\", "\\")
 
+        regex2 = re.compile("next_cursor=(.*)")
+        new_cursor = regex2.findall(thing2[0])[0].replace("\\u00253D\\", "=")
 
+        ajax_data['cursor'] = new_cursor
+
+        payload2 = _get_payload(ajax_data, current_user.id)
+        response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload2))
+
+        print AJAX_URL + "?%s" % urllib.urlencode(payload2)
+        return response
 
