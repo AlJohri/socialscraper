@@ -48,6 +48,7 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
         return data_parameter
 
     def _parse_cursor_data(raw_json):
+        if raw_json.get('error'): raise ScrapingError(raw_json.get('errorDescription'))
         require = raw_json['jsmods']['require']
         tester = lambda x: x[0] == "BrowseScrollingPager" and x[1] == "pageletComplete"
         cursor_parameter = map(lambda x: x[3][0], filter(tester, require))[0]
@@ -73,10 +74,14 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
         name = result[1]
 
         username = public.parse_url(url)
-        uid = public.get_id(username)
+        uid, category = public.get_attributes(username, ["id", "category"])
+
+        if uid == None: raise ValueError("Couldn't find uid of %s" % username)
+
+        uid = int(uid)
 
         if method_name == "pages-liked":
-            return FacebookPage(page_id=uid, username=username, url=url, name=name)
+            return FacebookPage(page_id=uid, username=username, url=url, name=name, type=category)
         elif method_name == "likers":
             return FacebookUser(uid=uid, username=username, url=url, name=name)
         else:

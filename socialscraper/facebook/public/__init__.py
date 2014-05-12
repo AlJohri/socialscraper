@@ -8,6 +8,17 @@ regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")
 
 logger = logging.getLogger(__name__)
 
+"""
+Getting the id using the public method can get less data than ideal.
+
+Pages dealing with alcohol cannot be retrieved via the public method.
+For example: https://www.facebook.com/zeitgeistusn
+
+The graphapi can be helpful here. Using a user access token (or perhaps even an app 
+access token) we can get the id, name, and other attributes (in the same format).
+
+"""
+
 def get_id(graph_name):
     "Get the graph ID given a name."""
     get_response = lambda : requests.get('https://graph.facebook.com/' + graph_name)
@@ -25,11 +36,20 @@ def get_name(graph_id):
     name = json.loads(response.text).get('name', None)
     return name
 
-def get_attribute(graph_id,attribute):
-    """Get the graph name given a graph ID."""
-    response = requests.get('https://graph.facebook.com/' + graph_id)
-    name = json.loads(response.text).get('attribute', None)
+def get_attribute(graph_obj,attribute):
+    """Get attribute of a given a graph_name or graph_id."""
+    response = requests.get('https://graph.facebook.com/' + graph_obj)
+    name = json.loads(response.text).get(attribute, None)
     return name
+
+def get_attributes(graph_obj,attributes):
+    """Get multiple attributes of a given a graph_name or graph_id."""
+    ret_attributes = []
+    response = requests.get('https://graph.facebook.com/' + graph_obj)
+    data = json.loads(response.text)
+    for attribute in attributes:
+        ret_attributes.append(data.get(attribute, None))
+    return ret_attributes
 
 regex1 = re.compile("^https:\/\/www.facebook.com\/([^?\n]+)(?:\?ref.*)?$")
 regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")
@@ -60,7 +80,7 @@ def get_pages_liked(username):
     resp = requests.get(url, headers = headers)
 
     if "Security Check" in resp.text:
-        pdb.set_trace()
+        # pdb.set_trace()
         raise ScrapingError("Security Check")
 
     html = re.sub(r'(<!--)|(-->)',' ',resp.text)
@@ -103,5 +123,5 @@ def get_pages_liked(username):
                 except ValueError:
                     continue
     else:
-        pdb.set_trace()
-        print "User %s has no likes or tight privacy settings." % username
+        # pdb.set_trace()
+        raise ScrapingError("User %s has no likes or tight privacy settings." % username)

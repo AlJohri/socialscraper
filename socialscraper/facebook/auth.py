@@ -136,6 +136,9 @@ def login(browser, email, password, username=None):
         return username
 
     if not username: username = get_auth_username()
+
+    if username == "profile.php": 
+        raise ScrapingError("You need to pass in the id as the username to the auth method because this user only has an id.")
     
     return username
 
