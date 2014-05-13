@@ -121,15 +121,15 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
             soup = BeautifulSoup(data['payload'])
             for link in soup.findAll('a'):
                 try:
+                    if link['title'] == link.text:
+                        url = link['href']
+                        name = link.text
+                        result = (url, name)
 
-                    url = link['href']
-                    name = link.text
-                    result = (url, name)
-
-                    try:
-                        yield _result_to_model(result)
-                    except ValueError:
-                        continue
+                        try:
+                            yield _result_to_model(result)
+                        except ValueError:
+                            continue
 
                 except KeyError:
                     continue
