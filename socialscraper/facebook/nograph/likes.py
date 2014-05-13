@@ -64,8 +64,6 @@ LIKES_URL = "https://www.facebook.com/%s/%s"
 #   'likes_other'
 # ]
 
-LIKES_TYPES = ['likes_other']
-
 def get_likes(browser, current_user, graph_name, graph_id = None):
 
     def _find_script_tag(raw_html, phrase):
@@ -91,10 +89,23 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
             '__rev': 1243607
         }
 
-    for likes_type in LIKES_TYPES:
+    response = browser.get(LIKES_URL % (graph_name, 'likes'))
+    soup = BeautifulSoup(response.content.replace('<!--','').replace('-->',''))
+
+    CURRENT_LIKES_TYPES = []
+
+    for x in soup.findAll('div', {'aria-role': 'tablist'})[0]: 
+        if   'People' in x.text:        CURRENT_LIKES_TYPES.append('likes_people')
+        elif 'Restaurants' in x.text:   CURRENT_LIKES_TYPES.append('likes_restaurants')
+        elif 'Sports' in x.text:        CURRENT_LIKES_TYPES.append('likes_sports')
+        elif 'Clothing' in x.text:      CURRENT_LIKES_TYPES.append('likes_clothing')
+        elif 'Other' in x.text:         CURRENT_LIKES_TYPES.append('likes_other')
+
+    for likes_type in CURRENT_LIKES_TYPES:
         response = browser.get(LIKES_URL % (graph_name, likes_type))
+
         soup = BeautifulSoup(response.content.replace('<!--','').replace('-->',''))
-        print response.content
+        # print response.content
 
         for link in soup.findAll('a'):
             try:
@@ -103,6 +114,7 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
                     title = link['title']
                     name = link.text
                     yield {
+                        'type': likes_type,
                         'href': href,
                         'title': title,
                         'name': name
@@ -110,12 +122,6 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
 
             except KeyError:
                 pass
-
-
-        import pdb; pdb.set_trace()
-        # parse 1st page here
-
-        # parse response first page
 
         cursor_tag = _find_script_tag(response.text, "enableContentLoader")
         cursor_data = _parse_cursor_data(cursor_tag) if cursor_tag else None
@@ -134,48 +140,48 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
             'importer_state': 'null'
         }
 
-        payload = _get_payload(ajax_data, current_user.id)
+        while True:
 
-        print AJAX_URL + "?%s" % urllib.urlencode(payload)
+            # print ajax_data
 
-        response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload))
+            payload = _get_payload(ajax_data, current_user.id)
+            response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload))
+        
+            # PARSE PAGE
 
-        # parse response (2nd page)
-    
-        data = json.loads(response.content[9:])
-        soup = BeautifulSoup(data['payload'])
-        for link in soup.findAll('a'):
-            try:
-                title = link['title']
-                name = link.text
-                href = link['href']
+            data = json.loads(response.content[9:])
+            soup = BeautifulSoup(data['payload'])
+            for link in soup.findAll('a'):
+                try:
+                    title = link['title']
+                    name = link.text
+                    href = link['href']
 
-                yield {
-                    "title": title,
-                    "name": name,
-                    "href": href
-                }
-            except KeyError:
-                pass
-        # import pdb; pdb.set_trace()
+                    yield {
+                        'type': likes_type,
+                        "title": title,
+                        "name": name,
+                        "href": href
+                    }
+                except KeyError:
+                    pass
+
+            # FIND NEXT CURSOR
+
+            regex = re.compile("href=\\\\\"(.*?)\"")
+
+            tester = lambda x: x.find('cursor') != -1
+            thing = regex.findall(response.text)
+            thing2 = filter(tester, thing)
+
+            # NO NEXT CURSOR FOUND
+
+            if not thing2: break
+
+            regex2 = re.compile("next_cursor=(.*)")
+            new_cursor = regex2.findall(thing2[0])[0].replace("\\u00253D\\", "=").replace("u00253D\\", "=")
+
+            ajax_data['cursor'] = new_cursor
 
 
-        regex = re.compile("href=\\\\\"(.*?)\"")
-
-        tester = lambda x: x.find('cursor') != -1
-        thing = regex.findall(response.text)
-        thing2 = filter(tester, thing)
-
-        if not thing2: continue
-
-        regex2 = re.compile("next_cursor=(.*)")
-        new_cursor = regex2.findall(thing2[0])[0].replace("\\u00253D\\", "=")
-
-        ajax_data['cursor'] = new_cursor
-
-        payload2 = _get_payload(ajax_data, current_user.id)
-        response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload2))
-
-        print AJAX_URL + "?%s" % urllib.urlencode(payload2)
-        yield response
 
