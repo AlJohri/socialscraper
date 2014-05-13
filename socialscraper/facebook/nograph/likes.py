@@ -93,6 +93,26 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
 
     for likes_type in LIKES_TYPES:
         response = browser.get(LIKES_URL % (graph_name, likes_type))
+        soup = BeautifulSoup(response.content.replace('<!--','').replace('-->',''))
+        print response.content
+
+        for link in soup.findAll('a'):
+            try:
+                if link['title'] == link.text:
+                    href = link['href']
+                    title = link['title']
+                    name = link.text
+                    yield {
+                        'href': href,
+                        'title': title,
+                        'name': name
+                    }
+
+            except KeyError:
+                pass
+
+
+        import pdb; pdb.set_trace()
         # parse 1st page here
 
         # parse response first page
@@ -157,5 +177,5 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
         response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload2))
 
         print AJAX_URL + "?%s" % urllib.urlencode(payload2)
-        return response
+        yield response
 
