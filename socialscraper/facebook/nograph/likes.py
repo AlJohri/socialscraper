@@ -62,12 +62,15 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
 
     CURRENT_LIKES_TYPES = []
 
-    for x in soup.findAll('div', {'aria-role': 'tablist'})[0]: 
-        if   'People' in x.text:        CURRENT_LIKES_TYPES.append('likes_people')
-        elif 'Restaurants' in x.text:   CURRENT_LIKES_TYPES.append('likes_restaurants')
-        elif 'Sports' in x.text:        CURRENT_LIKES_TYPES.append('likes_sports')
-        elif 'Clothing' in x.text:      CURRENT_LIKES_TYPES.append('likes_clothing')
-        elif 'Other' in x.text:         CURRENT_LIKES_TYPES.append('likes_other')
+    try:
+        for x in soup.findAll('div', {'aria-role': 'tablist'})[0]: 
+            if   'People' in x.text:        CURRENT_LIKES_TYPES.append('likes_people')
+            elif 'Restaurants' in x.text:   CURRENT_LIKES_TYPES.append('likes_restaurants')
+            elif 'Sports' in x.text:        CURRENT_LIKES_TYPES.append('likes_sports')
+            elif 'Clothing' in x.text:      CURRENT_LIKES_TYPES.append('likes_clothing')
+            elif 'Other' in x.text:         CURRENT_LIKES_TYPES.append('likes_other')
+    except IndexError:
+        raise ScrapingError("No likes for username %s" % graph_name)
 
     for likes_type in CURRENT_LIKES_TYPES:
         response = browser.get(LIKES_URL % (graph_name, likes_type))
