@@ -152,7 +152,12 @@ class UsageError(Exception):
         return str(type(self)) + ((": %s" % self.message) if self.message else "")
 
 class ScrapingError(Exception):
-    pass
+
+    errno = -99
+
+    def __init__(self,message=None):
+        self.message = message
+        self.strerror = message
 
 class BaseModel(object):
     """
