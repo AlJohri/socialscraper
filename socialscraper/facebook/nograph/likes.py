@@ -3,55 +3,9 @@
 import re, json, lxml, urllib
 from bs4 import BeautifulSoup
 from ...base import ScrapingError
+from ..models import FacebookPage
 
-# TODO: write a nograph likes scraper
-
-"""
-notes:
-
-likes_recent # didn't work?
-likes_sports_teams # didn't work?
-likes_activities # didn't work?
-likes_interests # didn't work?
-likes_athletes # didn't work?
-likes_websites # didn't work?
-likes_foods # didn't work?
-
-https://www.facebook.com/al.johri/sports
-
-https://www.facebook.com/ajax/pagelet/generic.php/ManualCurationOGGridCollectionPagelet?data={"collection_token":"529398993:2409997254:45","cursor":"MDpub3Rfc3RydWN0dXJlZDoyNzYwMTA0ODEyMDE=","tab_key":"likes_other","profile_id":529398993,"overview":false,"ftid":null,"order":null,"sk":"likes","importer_state":null}&__user=100000862956701&__a=1&__dyn=7n8ahyj2qmumdDgDxyIJ3Ga58Ciq2W8GA8ABGeqheCu6popGiGw&__req=n&__rev=1243607
-
-http://graph.facebook.com/738743013
-738743013:2409997254:45
-collection_token <dudeyourscrapinid>:2409997254:45
-
-data={
-    "collection_token":"529398993:2409997254:45",
-    "cursor":"MDpub3Rfc3RydWN0dXJlZDoyNzYwMTA0ODEyMDE=",
-    "tab_key":"likes_other",
-    "profile_id":529398993,
-    "overview":false,
-    "ftid":null,
-    "order":null,
-    "sk":"likes",
-    "importer_state":null
-}
-__user=100000862956701
-__a=1
-__dyn=7n8ahyj2qmumdDgDxyIJ3Ga58Ciq2W8GA8ABGeqheCu6popGiGw
-__req=n
-__rev=1243607
-
-MDpub3Rfc3RydWN0dXJlZDoxMTQ2MDEyNDE4ODgxMjc=
-0:not_structured:114601241888127
-
-MDpub3Rfc3RydWN0dXJlZDoyNzYwMTA0ODEyMDE=
-0:not_structured:276010481201
-
-MDpub3Rfc3RydWN0dXJlZDoxMTI0ODg0NDA0NTg=
-0:not_structured:112488440458
-
-"""
+from ..import public
 
 AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/ManualCurationOGGridCollectionPagelet"
 LIKES_URL = "https://www.facebook.com/%s/%s"
@@ -89,6 +43,20 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
             '__rev': 1243607
         }
 
+    def _result_to_model(result):
+
+        url = result[0]
+        name = result[1]
+
+        username = public.parse_url(url)
+        page_id, category = public.get_attributes(username, ["id", "category"])
+
+        if page_id == None: raise ValueError("Couldn't find page_id of %s" % username)
+
+        page_id = int(page_id)
+
+        return FacebookPage(page_id=page_id, username=username, url=url, name=name, type=category)
+
     response = browser.get(LIKES_URL % (graph_name, 'likes'))
     soup = BeautifulSoup(response.content.replace('<!--','').replace('-->',''))
 
@@ -110,18 +78,18 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
         for link in soup.findAll('a'):
             try:
                 if link['title'] == link.text:
-                    href = link['href']
-                    title = link['title']
+
+                    url = link['href']
                     name = link.text
-                    yield {
-                        'type': likes_type,
-                        'href': href,
-                        'title': title,
-                        'name': name
-                    }
+                    result = (url, name)
+
+                    try:
+                        yield _result_to_model(result)
+                    except ValueError:
+                        continue
 
             except KeyError:
-                pass
+                continue
 
         cursor_tag = _find_script_tag(response.text, "enableContentLoader")
         cursor_data = _parse_cursor_data(cursor_tag) if cursor_tag else None
@@ -153,18 +121,18 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
             soup = BeautifulSoup(data['payload'])
             for link in soup.findAll('a'):
                 try:
-                    title = link['title']
-                    name = link.text
-                    href = link['href']
 
-                    yield {
-                        'type': likes_type,
-                        "title": title,
-                        "name": name,
-                        "href": href
-                    }
+                    url = link['href']
+                    name = link.text
+                    result = (url, name)
+
+                    try:
+                        yield _result_to_model(result)
+                    except ValueError:
+                        continue
+
                 except KeyError:
-                    pass
+                    continue
 
             # FIND NEXT CURSOR
 
