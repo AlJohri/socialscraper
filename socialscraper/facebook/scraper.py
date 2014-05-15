@@ -14,7 +14,7 @@ from . import graphsearch
 logger = logging.getLogger(__name__)
 
 FACEBOOK_MOBILE_URL = 'https://m.facebook.com'
-FACEBOOK_USER_TOKEN = os.getenv('FACEBOOK_USER_TOKEN')
+FACEBOOK_USER_TOKEN = os.getenv('FACEBOOK_APP_TOKEN')
 
 class FacebookSession(requests.sessions.Session):
 
