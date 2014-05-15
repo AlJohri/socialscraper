@@ -45,7 +45,7 @@ class FacebookScraper(BaseScraper):
 
         BaseScraper.__init__(self, user_agents)
         self.browser.headers = { 'User-Agent': self.cur_user_agent }
-        self.browser.mount(FACEBOOK_MOBILE_URL, HTTPAdapter(pool_connections=500, pool_maxsize=500, max_retries=3))
+        self.browser.mount(FACEBOOK_MOBILE_URL, HTTPAdapter(pool_connections=500, pool_maxsize=500, max_retries=3, pool_block=True))
 
     def init_api(self, pickled_api=None):
 

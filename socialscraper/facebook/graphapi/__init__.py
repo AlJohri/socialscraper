@@ -21,6 +21,14 @@ def get_connections(api, username, connection):
 
     return profile
 
+def get_attributes(graph_obj,attributes):
+    """Get multiple attributes of a given a graph_name or graph_id."""
+    ret_attributes = []
+    data = get_object(graph_obj)
+    for attribute in attributes:
+        ret_attributes.append(data.get(attribute, None))
+    return ret_attributes
+
 from .about import get_about
 from .feed import get_feed
 from .likes import get_likes
