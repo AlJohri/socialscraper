@@ -23,15 +23,13 @@ def get_feed(api, username):
     until = int(time())
     while True:
 
-        print "Getting Feed Until: " + datetime.utcfromtimestamp(until).strftime('%Y-%m-%d %H:%M:%S')
+        # print "Getting Feed Until: " + datetime.utcfromtimestamp(until).strftime('%Y-%m-%d %H:%M:%S')
         profile = api.get_object(username + "/feed", until=str(until))
         if profile['data'] == []:
-            print "End of Results"
+            # print "End of Results"
             break
         since = get_previous(profile['paging']['previous'])
         until = get_next(profile['paging']['next'])
 
-        print profile['data']
-
         for item in profile['data']:
-            print item.get('type') + ": " + item.get('story', '') + item.get('message', '')
+            yield item
