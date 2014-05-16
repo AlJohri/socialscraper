@@ -146,8 +146,13 @@ class FeedItem(object):
 
 
 class UsageError(Exception):
+    
+    errno = -98
+
     def __init__(self,message=None):
+        super(UsageError, self).__init__(message)
         self.message = message
+        self.strerror = message
     def __repr__(self):
         return str(type(self)) + ((": %s" % self.message) if self.message else "")
 
@@ -156,6 +161,7 @@ class ScrapingError(Exception):
     errno = -99
 
     def __init__(self,message=None):
+        super(ScrapingError, self).__init__(message)
         self.message = message
         self.strerror = message
 

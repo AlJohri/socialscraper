@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from ...base import ScrapingError
 from ..models import FacebookPage
 
-from ..import public
+from ..import graphapi, public
 
 AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/ManualCurationOGGridCollectionPagelet"
 LIKES_URL = "https://www.facebook.com/%s/%s"
@@ -18,7 +18,7 @@ LIKES_URL = "https://www.facebook.com/%s/%s"
 #   'likes_other'
 # ]
 
-def get_likes(browser, current_user, graph_name, graph_id = None):
+def get_likes(browser, current_user, graph_name, graph_id = None, api = None):
 
     def _find_script_tag(raw_html, phrase):
         doc = lxml.html.fromstring(raw_html)
@@ -49,7 +49,11 @@ def get_likes(browser, current_user, graph_name, graph_id = None):
         name = result[1]
 
         username = public.parse_url(url)
-        page_id, category = public.get_attributes(username, ["id", "category"])
+
+        if api:
+            page_id, category = graphapi.get_attributes(api, username, ["id", "category"])
+        else:
+            page_id, category = public.get_attributes(username, ["id", "category"])
 
         if page_id == None: raise ValueError("Couldn't find page_id of %s" % username)
 

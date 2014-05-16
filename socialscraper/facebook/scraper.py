@@ -53,7 +53,8 @@ class FacebookScraper(BaseScraper):
         else: self.api = GraphAPI(FACEBOOK_USER_TOKEN)
 
         try:
-            self.api.get_object('me')
+            #self.api.get_object('me')
+            pass
         except (GraphAPIError, AttributeError):
             raise ScrapingError("Need a valid FACEBOOK_USER_TOKEN or initializing the api.")
             self.api = None
@@ -144,7 +145,10 @@ class FacebookScraper(BaseScraper):
 
     @login_required
     def get_likes_nograph(self, graph_name, graph_id=None):
-        return nograph.get_likes(self.browser, self.cur_user, graph_name, graph_id=graph_id)
+        if self.api:
+            return nograph.get_likes(self.browser, self.cur_user, graph_name, graph_id=graph_id, api=self.api)
+        else:
+            return nograph.get_likes(self.browser, self.cur_user, graph_name, graph_id=graph_id)
 
     # graphsearch
 
