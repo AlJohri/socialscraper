@@ -42,6 +42,10 @@ def get_feed(api, graph_name, start="", end=datetime.now()):
 
     """
 
+    # if start, end ar passed in as None
+    if start == None: start = ""
+    if end == None: end = datetime.now()
+
     logger.info("Getting feed since %s until %s" % 
         (
             start.strftime('%Y-%m-%d %H:%M:%S') if isinstance(start, datetime) else "indefinite", 
