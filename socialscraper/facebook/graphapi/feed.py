@@ -1,4 +1,4 @@
-import logging
+import logging, requests
 from time import time
 from datetime import datetime
 from urlparse import urlparse, parse_qs
@@ -8,48 +8,57 @@ from . import get_object
 
 logger = logging.getLogger(__name__)
 
-def get_feed(api, username, earlier_date=None, later_date=None):
+def get_feed(api, graph_name, start="", end=datetime.now()):
     """
 
-    get_feed grabs posts reverse chronologically. it "starts" at the date 
-    specified in "until" and goes back in time until "since".
+    Returns:
 
-    if until is not specified, until is set to the current date
+        feed from start date to end date.
 
-    if since is not specified, it grabs posts indefinitely in the past
+    If dates not specified starts from present and continues
+    reverse chronologically.
+
+    Input:
+        api: GraphAPI
+        graph_name: string
+        start: datetime
+        end: datetime
+
+    Caveats:
+        The Facebook GraphAPI ['paging']['next'] and ['paging']['previous'] url 
+        ignores end limits.
+
+        For example, if I search for posts between Date X to Y. The first result
+        will be between these dates. 
+
+        If I blindly go to the next url, it will 
+        keep until=Y and traverse reverse chronologically indefinitely.
+
+        Similarly, if I blindly go to the previous url, it will keep since=X and
+        traverse forward chronologically indefinitely.
+
+        For this reason, I re-append the since parameter parameter to the next url
+        and reappend the until parameter to the previous url.
 
     """
-    
-    if not later_date:
-        until = int(time())
-    else:
-        until = later_date.strftime("%s")
 
-    if not earlier_date:
-        since = ""
-    else:
-        since = earlier_date.strftime("%s")
+    logger.info("Getting feed since %s until %s" % 
+        (
+            start.strftime('%Y-%m-%d %H:%M:%S') if isinstance(start, datetime) else "indefinite", 
+            end.strftime('%Y-%m-%d %H:%M:%S')
+        )
+    )
 
+    feed = api.get_connections(graph_name, "feed", 
+        since=start.strftime("%s") if isinstance(start, datetime) else "",
+        until=end.strftime("%s")
+    )
 
-    def get_previous(previous_url):
-        previous_url_parameters = parse_qs(urlparse(previous_url).query)
-        return int(previous_url_parameters['since'][0])
+    while feed['data']:
+        for item in feed['data']: yield item
 
-    def get_next(next_url):
-        next_url_parameters = parse_qs(urlparse(next_url).query)
-        return int(next_url_parameters['until'][0])
+        # Hacky fix for Facebook GraphAPI. See method doctstring.
+        feed['paging']['next'] += "&since=%s" % start.strftime("%s") if isinstance(start, datetime) else ""
+        feed['paging']['previous'] += "&until=%s" % end.strftime("%s")
 
-    profile = get_object(api, username)
-
-    while True:
-
-        # print "Getting Feed Until: " + datetime.utcfromtimestamp(until).strftime('%Y-%m-%d %H:%M:%S')
-        profile = api.get_object(username + "/feed", until=str(until), since=str(since))
-        if profile['data'] == []:
-            # print "End of Results"
-            break
-        # since = get_previous(profile['paging']['previous'])
-        until = get_next(profile['paging']['next'])
-
-        for item in profile['data']:
-            yield item
+        feed = requests.get(feed['paging']['next']).json()
