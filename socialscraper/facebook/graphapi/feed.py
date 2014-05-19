@@ -54,15 +54,16 @@ def get_feed(api, graph_name, start="", end=datetime.now()):
     )
 
     feed = api.get_connections(graph_name, "feed", 
-        since=start.strftime("%s") if isinstance(start, datetime) else "",
-        until=end.strftime("%s")
+        since=int((start-datetime(1970,1,1)).total_seconds()) if isinstance(start, datetime) else "",
+        until=int((end-datetime(1970,1,1)).total_seconds())
     )
 
+    
     while feed['data']:
         for item in feed['data']: yield item
 
         # Hacky fix for Facebook GraphAPI. See method doctstring.
-        feed['paging']['next'] += "&since=%s" % start.strftime("%s") if isinstance(start, datetime) else ""
-        feed['paging']['previous'] += "&until=%s" % end.strftime("%s")
+        feed['paging']['next'] += "&since=%d" % int((start-datetime(1970,1,1)).total_seconds()) if isinstance(start, datetime) else ""
+        feed['paging']['previous'] += "&until=%d" % int((end-datetime(1970,1,1)).total_seconds())
 
         feed = requests.get(feed['paging']['next']).json()
