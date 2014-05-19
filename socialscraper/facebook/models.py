@@ -19,6 +19,7 @@ class FacebookUser(BaseModel):
     hometown = Column("hometown")
     misc = Column("misc")
     data = Column("data")
+    donor = Column("donor")
 
 class FacebookFamily(BaseModel):
     __tablename__ = "facebook_families"
