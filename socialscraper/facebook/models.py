@@ -5,8 +5,8 @@ class FacebookUser(BaseModel):
     __attrs__ = [
         'uid', 'username', 'email', 'birthday', 
         'name', 'locale', 'profile_url', 'sex',
-        'college', 'employer', 'highschool', 'misc',
-        'data', 'donor', 'contact_time'
+        'college', 'employer', 'highschool', 'currentcity', 
+        'hometown', 'misc', 'data', 'donor', 'contact_time'
     ]
 
     uid = Column("uid", "BigInteger", primary_key=True)
