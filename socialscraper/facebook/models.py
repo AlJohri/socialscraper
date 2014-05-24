@@ -2,6 +2,12 @@ from ..base import BaseModel, Column
 
 class FacebookUser(BaseModel):
     __tablename__ = "facebook_users"
+    __attrs__ = [
+        'uid', 'username', 'email', 'birthday', 
+        'name', 'locale', 'profile_url', 'sex',
+        'college', 'employer', 'highschool', 'misc',
+        'data', 'donor', 'contact_time'
+    ]
 
     uid = Column("uid", "BigInteger", primary_key=True)
     username = Column("username")
@@ -24,6 +30,7 @@ class FacebookUser(BaseModel):
 
 class FacebookFamily(BaseModel):
     __tablename__ = "facebook_families"
+    __attrs__ = ['profile_id', 'relationship', 'uid', 'name']
 
     profile_id = Column("profile_id", "BigInteger", primary_key=True, foreign_key=True, foreign_key_reference="facebook_users.uid")
     relationship = Column("relationship")
@@ -32,6 +39,11 @@ class FacebookFamily(BaseModel):
 
 class FacebookPage(BaseModel):
     __tablename__ = "facebook_pages"
+    __attrs__ = [
+        'about', 'username', 'page_id', 'is_verified', 
+        'keywords', 'name', 'url', 'type', 'num_likes',
+        'talking_about_count', 'hometown', 'misc', 'data'
+    ]
 
     about = Column("about","Text")
     username = Column("username")
@@ -43,14 +55,14 @@ class FacebookPage(BaseModel):
     url = Column("url")
     type = Column("type")
     num_likes = Column("num_likes","BigInteger")
-    talking_about_count = Column("talking_about_count","BigInteger")
+    talking_about_count = Column("talking_about_count", "BigInteger")
     hometown = Column("hometown")
-    talking_about_count = Column("talking_about_count")
     misc = Column("misc")
     data = Column("data")
 
 class FacebookStatus(BaseModel):
-    __tablename__ = "facebook_statuses"
+    __tablename__ = "facebook_statuses"    
+    __attrs__ = ['like_count', 'message', 'status_id', 'uid', 'time']
 
     like_count = Column("like_count","Integer")
     message = Column("message","Text")
@@ -60,6 +72,11 @@ class FacebookStatus(BaseModel):
 
 class FacebookLocation(BaseModel):
     __tablename__ = "facebook_locations"
+    __attrs__ = [
+        'gid', 'loc_id', 'street', 'city', 
+        'state', 'country', 'zip', 'address', 
+        'latitude', 'longitude', 'name'
+    ]
 
     gid = Column("gid", "BigInteger")
     loc_id = Column("loc_id", "BigInteger", primary_key=True)
@@ -73,30 +90,30 @@ class FacebookLocation(BaseModel):
     longitude = Column("longitude")
     name = Column("name")
 
-# class FacebookCategory(BaseModel):
-#     __tablename__ = "facebook_categories"
-
 ######################################## Join Tables ########################################
-
 
 class FacebookFriend(BaseModel):
     __tablename__ = "facebook_friends"
+    __attrs__ = ['uid1', 'uid2']
 
-    uid1 = Column("uid1","BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
-    uid2 = Column("uid2","BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    uid1 = Column("uid1", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    uid2 = Column("uid2", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
 
 class FacebookPagesUsers(BaseModel):
     __tablename__ = "facebook_pages_users"
+    __attrs__ = ['uid', 'page_id', 'type']
 
-    uid = Column("uid","BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
-    page_id = Column("page_id","BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_pages.page_id")
+    uid = Column("uid", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    page_id = Column("page_id", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_pages.page_id")
     type = Column("type")
-    created_time = Column("created_time","Date")
 
-# class FacebookCategoriesPages(BaseModel):
-#     __tablename__ = "facebook_categories_pages"
+__all__ = [
+    'FacebookUser',
+    'FacebookFamily',
+    'FacebookPage',
+    'FacebookStatus',
+    'FacebookLocation',
+    'FacebookFriend',
+    'FacebookPagesUsers'
+]
 
-#     page_id = Column("page_id","BigInteger",primary_key=True)
-#     category = Column("category",primary_key=True)
-
-__all__ = ['FacebookUser', 'FacebookFamily', 'FacebookLocation', 'FacebookFriend', 'FacebookPage', 'FacebookStatus', 'FacebookPagesUsers']

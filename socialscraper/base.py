@@ -174,15 +174,11 @@ class BaseModel(object):
 
     @classmethod
     def get_columns(cls):
-        column_names = filter(lambda x: x[0:2] != '__' and x[-1: -2] != '__', cls.__dict__.keys())
-        columns = map(lambda x: getattr(cls, x), column_names)
+        columns = map(lambda x: getattr(cls, x), cls.__attrs__)
         return columns
 
     def __init__(self,**kwargs):
-
-        columns = self.get_columns()
-
-        for column in columns:
+        for column in self.__attrs__:
             setattr(self,column.name,kwargs.get(column.name,None))
 
     # the weird if statements are to prevent 
@@ -190,10 +186,8 @@ class BaseModel(object):
     # might want to create a datetime out of column.type == "Date" ?
     def __repr__(self):
         attributes = u""
-        columns = self.get_columns()
-        for column in columns:
+        for column in self.__attrs__:
             value = getattr(self,column.name)
-
             if value is None:
                 attributes += u"%s=None, " % (column.name)
             elif column.type == "BigInteger" or column.type == "Integer": 

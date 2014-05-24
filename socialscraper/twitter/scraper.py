@@ -1,18 +1,20 @@
 from ..base import BaseScraper, BaseUser, UsageError, FeedItem
 import requests, json, bs4
 
-class TwitterUser(BaseUser):
-    """Container for the info associated w/ a Twitter user"""
-    def __init__(self, screen_name=None, id=None):
-        super(TwitterUser, self).__init__(id=id, username=screen_name)
+from .models import TwitterUser, TwitterTweet
 
-    @property
-    def screen_name(self):
-        return self.username
+# class TwitterUser(BaseUser):
+#     """Container for the info associated w/ a Twitter user"""
+#     def __init__(self, screen_name=None, id=None):
+#         super(TwitterUser, self).__init__(id=id, username=screen_name)
 
-    @screen_name.setter
-    def screen_name(self, value):
-        self.username = value
+#     @property
+#     def screen_name(self):
+#         return self.username
+
+#     @screen_name.setter
+#     def screen_name(self, value):
+#         self.username = value
 
 class Tweet(FeedItem):
     """Container for a tweet on a timeline."""
@@ -148,7 +150,6 @@ class TwitterScraper(BaseScraper):
             return json.loads(resp.text)[0]["user"]["id"]
         except KeyError:
             return hash(screen_name)
-
     
     def _get_json(self, type_, screen_name, cursor):
         """Internal method to get the JSON response for a particular 
