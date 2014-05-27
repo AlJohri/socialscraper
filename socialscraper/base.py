@@ -178,7 +178,7 @@ class BaseModel(object):
         return columns
 
     def __init__(self,**kwargs):
-        for column in self.__attrs__:
+        for column in self.get_columns():
             setattr(self,column.name,kwargs.get(column.name,None))
 
     # the weird if statements are to prevent 
@@ -186,7 +186,7 @@ class BaseModel(object):
     # might want to create a datetime out of column.type == "Date" ?
     def __repr__(self):
         attributes = u""
-        for column in self.__attrs__:
+        for column in self.get_columns():
             value = getattr(self,column.name)
             if value is None:
                 attributes += u"%s=None, " % (column.name)
