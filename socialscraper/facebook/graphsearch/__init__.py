@@ -76,7 +76,9 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
         username = public.parse_url(url)
         uid, category = public.get_attributes(username, ["id", "category"])
 
-        if uid == None: raise ValueError("Couldn't find uid of %s" % username)
+        if uid == None: 
+            print "Couldn't find UID of %s" % username
+            raise ValueError("Couldn't find uid of %s" % username)
 
         uid = int(uid)
 

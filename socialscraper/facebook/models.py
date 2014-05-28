@@ -6,7 +6,8 @@ class FacebookUser(BaseModel):
         'uid', 'username', 'email', 'birthday', 
         'name', 'locale', 'profile_url', 'sex',
         'college', 'employer', 'highschool', 'currentcity', 
-        'hometown', 'misc', 'data', 'donor', 'contact_time'
+        'hometown', 'misc', 'data', 'donor', 'contact_time',
+        'scrape_status'
     ]
 
     uid = Column("uid", "BigInteger", primary_key=True)
@@ -25,8 +26,10 @@ class FacebookUser(BaseModel):
     hometown = Column("hometown")
     misc = Column("misc")
     data = Column("data")
-    donor = Column("donor")
+    donor = Column("donor", "String")
     contact_time = Column("contact_time")
+    scrape_status = Column("scrape_status", "Integer") # empty = not attempted, 0 = can't get likes, 1 = scrape in progress, 2 = scrape finished
+
 
 class FacebookFamily(BaseModel):
     __tablename__ = "facebook_families"
