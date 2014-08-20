@@ -108,6 +108,11 @@ class FacebookScraper(BaseScraper):
         elif self.scraper_type == "nograph": return self.get_feed_nograph(graph_name, graph_id)
         elif self.scraper_type == "graphsearch": raise NotImplementedError("get_feed with graphsearch")
 
+    def get_feed2(self, graph_name, graph_id=None):
+        if self.scraper_type == "api": raise NotImplementedError("")
+        elif self.scraper_type == "nograph": return self.get_feed_nograph2(graph_name, graph_id)
+        elif self.scraper_type == "graphsearch": raise NotImplementedError("")
+
     def get_likes(self, graph_name, graph_id=None):
         if self.scraper_type == "api": return self.get_likes_api(graph_name)
         elif self.scraper_type == "nograph": return self.get_likes_nograph(graph_name)
@@ -138,6 +143,10 @@ class FacebookScraper(BaseScraper):
     @login_required
     def get_feed_nograph(self, graph_name, graph_id=None):
         return nograph.get_feed(self.browser, self.cur_user, graph_name, graph_id=graph_id)
+
+    @login_required
+    def get_feed_nograph2(self, graph_name, graph_id=None):
+        return nograph.get_feed2(self.browser, self.cur_user, graph_name, graph_id=graph_id)
 
     @login_required
     def get_about_nograph(self, graph_name, graph_id=None):
