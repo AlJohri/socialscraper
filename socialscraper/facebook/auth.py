@@ -37,6 +37,17 @@ REMEMBER_BROWSER = [
     "For now, please save this browser."
 ]
 
+REMEMBER_BROWSER2 = [
+    "Remember Browser",
+    "Please save the browser you just verified."
+]
+
+REMEMBER_BROWSER3 = [
+    "Remember Browser",
+    "Please save this",
+    "browser if you use it often."
+]
+
 LOGGED_IN = [
     "Home", 
     "Messages", 
@@ -114,7 +125,7 @@ def login(browser, email, password, username=None):
             payload.update(base_payload)
             response = browser.post(MOBILE_CHECKPOINT_URL, data=payload)
             logger.debug('Review Recent Login -- Click Okay')
-        elif state(response.text, REMEMBER_BROWSER):
+        elif state(response.text, REMEMBER_BROWSER) or state(response.text, REMEMBER_BROWSER2) or state(response.text, REMEMBER_BROWSER3):
             payload = {
                 'submit[Continue]': 'Continue',
                 'name_action_selected': 'dont_save'
@@ -124,6 +135,9 @@ def login(browser, email, password, username=None):
             logger.debug('Remember Browser -- Click Don\'t Save')
         elif state(response.text, LOCKED):
             raise ScrapingError("Account is locked.")
+        else:
+            print response.text
+            import pdb; pdb.set_trace()
 
     logger.info("Facebook Authentication Complete")
 
