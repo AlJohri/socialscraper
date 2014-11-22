@@ -5,6 +5,7 @@ from models import Session, FacebookUser
 from socialscraper.facebook import FacebookScraper
 from celery import Celery
 from celery.signals import worker_init
+from celery import group, chord, subtask
 
 from lib import save_user
 
@@ -51,7 +52,7 @@ def dmap(it, callback):
 
 # celery -A tasks worker --loglevel=info
 
-# process_list = (scrape.get_usernames.s() | scrape.dmap.s(scrape.get_friends.s()))
+# process_list = (get_usernames.s() | dmap.s(get_friends.s()))
 # res = process_list()
 
 # python -i tasks.py
