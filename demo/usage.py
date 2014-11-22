@@ -1,4 +1,6 @@
-import os, pickle, logging, datetime
+import os, sys; sys.path.append(os.path.abspath('../'))
+
+import pickle, logging, datetime
 from socialscraper.facebook import FacebookScraper
 from socialscraper.adapters.adapter_sqlalchemy import convert_result
 

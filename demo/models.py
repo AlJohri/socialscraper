@@ -1,3 +1,5 @@
+import os, sys; sys.path.append(os.path.abspath('../'))
+
 # http://docs.sqlalchemy.org/en/rel_0_9/orm/tutorial.html
 
 from sqlalchemy import create_engine
