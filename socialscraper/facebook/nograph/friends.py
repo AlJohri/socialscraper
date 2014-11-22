@@ -9,7 +9,7 @@ from ..import graphapi, public
 
 # AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/ManualCurationOGGridCollectionPagelet"
 AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/AllFriendsAppCollectionPagelet"
-LIKES_URL = "https://www.facebook.com/%s/%s"
+FRIENDS_URL = "https://www.facebook.com/%s/%s"
 
 def get_friends(browser, current_user, graph_name, graph_id = None, api = None):
 
@@ -56,12 +56,7 @@ def get_friends(browser, current_user, graph_name, graph_id = None, api = None):
 
         return FacebookUser(uid=uid, username=username, url=url, name=name)
 
-    response = browser.get(LIKES_URL % (graph_name, 'likes'))
-    soup = BeautifulSoup(response.content.replace('<!--','').replace('-->',''))
-
-    CURRENT_LIKES_TYPES = []
-
-    response = browser.get(LIKES_URL % (graph_name, "friends_all"))
+    response = browser.get(FRIENDS_URL % (graph_name, "friends_all"))
 
     soup = BeautifulSoup(response.content.replace('<!--','').replace('-->',''))
     # print response.content
