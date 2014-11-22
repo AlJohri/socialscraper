@@ -44,9 +44,9 @@ def get_friends(browser, current_user, graph_name, graph_id = None, api = None):
         username = public.parse_url(url)
 
         if api:
-            uid = graphapi.get_attribute(api, username, "id")
+            uid, category = graphapi.get_attributes(api, username, ["id", "category"])
         else:
-            uid = public.get_attribute(username, "id")
+            uid, category = public.get_attributes(username, ["id", "category"])
 
         if uid == None: 
             print "Couldn't find UID of %s"

@@ -1,5 +1,6 @@
 import os, sys; sys.path.append(os.path.abspath('../'))
 from models import Session, FacebookUser
+from socialscraper.adapters.adapter_sqlalchemy import convert_result
 
 def save_user(result, session):
     user = session.query(FacebookUser).filter_by(uid=result.uid).first()
