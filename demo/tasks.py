@@ -5,12 +5,16 @@ from models import Session, FacebookUser
 from socialscraper.facebook import FacebookScraper
 from celery import Celery
 from celery.signals import worker_init
+from celery import group, chord, subtask
 
 from lib import save_user
 
 logging.basicConfig(level=logging.DEBUG)
 
-app = Celery('tasks', backend='amqp', broker='amqp://guest@localhost//')
+LOCAL_BROKER_URL = 'amqp://guest@localhost//'
+REMOTE_BROKER_URL = 'amqp://guest:guest@nusocialgraph.com:5672//'
+
+app = Celery('tasks', backend='amqp', broker=REMOTE_BROKER_URL)
 
 def manual_init(scraper_type='nograph'):
     global facebook_scraper
@@ -39,10 +43,18 @@ def get_usernames():
 @app.task()
 def get_friends(username): # add self if bind=True
     session = Session()
-    print "poop"
+    start_user = session.query(FacebookUser).filter_by(username=username).first()
+    
+    start_user.data = "scraping"
+    session.commit()
+
     for result in facebook_scraper.get_friends_nograph(username):
         print result
-        save_user(result, session)
+        current_user = save_user(result, session)
+        start_user.friend(current_user)
+
+    start_user.data = "complete"
+    session.commit()
 
 @app.task()
 def dmap(it, callback):
@@ -51,11 +63,11 @@ def dmap(it, callback):
 
 # celery -A tasks worker --loglevel=info
 
-# process_list = (scrape.get_usernames.s() | scrape.dmap.s(scrape.get_friends.s()))
-# res = process_list()
-
 # python -i tasks.py
 # get_friends.delay("divirgupta")
 
 if __name__ == "__main__":
+    session = Session()
     manual_init()
+    process_list = (get_usernames.s() | dmap.s(get_friends.s()))
+    print "res = process_list()"

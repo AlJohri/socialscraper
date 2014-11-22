@@ -17,3 +17,5 @@ def save_user(result, session):
         # print user.name, "updated"
     # user.updated_at = datetime.datetime.now()
     session.commit()
+
+    return user
