@@ -84,7 +84,7 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
 
         if method_name == "pages-liked":
             return FacebookPage(page_id=uid, username=username, url=url, name=name, type=category)
-        elif method_name == "likers":
+        elif method_name == "likers" or "friends":
             return FacebookUser(uid=uid, username=username, url=url, name=name)
         else:
             raise ScrapingError("Wut kinda model is %. Check out da _result_to_model method" % method_name)

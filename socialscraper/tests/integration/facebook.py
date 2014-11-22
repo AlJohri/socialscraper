@@ -1,8 +1,11 @@
-import unittest, os, pprint, logging, pickle
+import unittest, os, pprint, logging, pickle, itertools
 from ...facebook import FacebookScraper
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARN)
 pp = pprint.PrettyPrinter(indent=4)
+
+def enumerate_and_run_twice(gen):
+    return itertools.takewhile(lambda (i,x): i < 2, enumerate(gen))
 
 class TestFacebookScraper(unittest.TestCase):
 
@@ -38,18 +41,27 @@ class TestFacebookScraper(unittest.TestCase):
 
     # @unittest.skip("testing skipping")
     def test_graphsearch_pages_liked(self):
-        for item in self.scraper.graph_search(self.test_username, "pages-liked"):
+        gen = self.scraper.graph_search(self.test_username, "pages-liked")
+        for i,item in enumerate_and_run_twice(gen):
+            print i
             print item
 
     # @unittest.skip("testing skipping")
     def test_graphsearch_likers(self):
-        for item in self.scraper.graph_search(self.test_pagename, "likers"):
+        gen = self.scraper.graph_search(self.test_pagename, "likers")
+        for i,item in enumerate_and_run_twice(gen):
+            print i
             print item
 
     # @unittest.skip("testing skipping")
     def test_graphsearch_friends(self):
-        for item in self.scraper.graph_search(self.test_username, "friends"):
+        gen = self.scraper.graph_search(self.test_username, "friends")
+        for i,item in enumerate_and_run_twice(gen):
             print item
+
+    @unittest.skip("testing skipping")
+    def test_nograph_likes(self):
+        pass
 
 if __name__ == "__main__":
     unittest.main()
