@@ -8,7 +8,8 @@ from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('sqlite:///test.db', echo=False)
+# engine = create_engine('sqlite:///test.db', echo=False)
+engine = create_engine('postgresql:///nusocialgraph', echo=False)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
