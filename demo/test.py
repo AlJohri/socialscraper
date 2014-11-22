@@ -26,10 +26,10 @@ else:
 # for i, result in enumerate(scraper.graph_search(None, "groups", 357518484295082))
 # Example: Get groups of Facebook Group - 357518484295082 (Northwestern)
 # data = [result[3] for i, result in enumerate(scraper.graph_search(None, "groups", 357518484295082))]
-with open('groups.csv', 'a') as f:
+with open('groups.csv', 'wd') as f:
     writer = csv.writer(f)
     for i, result in enumerate(scraper.graph_search(None, "groups", 357518484295082)):
-    	print(result[3])
-    	if i>1456:
-			writer.writerow([result[0], result[1], result[2], result[3].encode('utf-8')])
-			print i
+    	if i>387:
+			writer.writerow([result[0], result[1], result[2].encode('utf-8'), result[3], result[4]])
+			print('success')
+		print i
