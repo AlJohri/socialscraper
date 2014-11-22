@@ -27,22 +27,28 @@ class TestFacebookScraper(unittest.TestCase):
            self.scraper = pickle.load(open('facebook_scraper.pickle', 'rb'))
            self.scraper.scraper_type = self.scraper_type
 
-    # def test_graphapi(self):
-    #     pass
+    @unittest.skip("testing skipping")
+    def test_graphapi(self):
+        self.scraper.init_api()
+        print self.scraper.get_about_api(self.test_username)
+        for page in self.scraper.get_likes_api(self.test_username):
+            pp.pprint(page)
 
-        # self.scraper.init_api()
-        # print self.scraper.get_about_api(self.test_username)
-        # for page in self.scraper.get_likes_api(self.test_username):
-        #     pp.pprint(page)
+        self.scraper.get_feed_api(self.test_username)
 
-        # self.scraper.get_feed_api(self.test_username)
-
+    # @unittest.skip("testing skipping")
     def test_graphsearch_pages_liked(self):
         for item in self.scraper.graph_search(self.test_username, "pages-liked"):
             print item
 
+    # @unittest.skip("testing skipping")
     def test_graphsearch_likers(self):
         for item in self.scraper.graph_search(self.test_pagename, "likers"):
+            print item
+
+    # @unittest.skip("testing skipping")
+    def test_graphsearch_friends(self):
+        for item in self.scraper.graph_search(self.test_username, "friends"):
             print item
 
 if __name__ == "__main__":
