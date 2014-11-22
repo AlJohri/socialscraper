@@ -12,6 +12,7 @@ import sqlalchemy
 #     raise Exception("You can't use the sqlalchemy adapter without installing sqlalchemy!")
 
 from sqlalchemy import Table, MetaData, Column, ForeignKey, Integer, String, BigInteger, Date, Text, Boolean, Float
+from sqlalchemy.orm import relationship, backref
 
 class BaseSQLModel(object):
 
@@ -56,20 +57,20 @@ def make_models(db, base_classes):
     TwitterUser = type('TwitterUser', base_classes, get_model_properties(twitter.models.TwitterUser))
     TwitterTweet = type('TwitterTweet', base_classes, get_model_properties(twitter.models.TwitterTweet))
 
-    FacebookUser.pages = db.relationship('FacebookPage', secondary=FacebookPagesUsers.__table__)
-    FacebookPage.users = db.relationship('FacebookUser', secondary=FacebookPagesUsers.__table__)
+    FacebookUser.pages = relationship('FacebookPage', secondary=FacebookPagesUsers.__table__)
+    FacebookPage.users = relationship('FacebookUser', secondary=FacebookPagesUsers.__table__)
 
     # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-viii-followers-contacts-and-friends
-    # FacebookUser.friends = db.relationship('FacebookUser', 
-    #   secondary = FacebookFriend.__table__, 
-    #   primaryjoin = (FacebookFriend.__table__.c.uid1 == FacebookUser.uid),
-    #   secondaryjoin = (FacebookFriend.__table__.c.uid2 == FacebookUser.uid),
-    #   backref = db.backref('facebook_friends', lazy = 'dynamic'), 
-    #   lazy = 'dynamic'
-    # )
+    FacebookUser.friends = relationship('FacebookUser', 
+      secondary = FacebookFriend.__table__, 
+      primaryjoin = (FacebookFriend.__table__.c.uid1 == FacebookUser.uid),
+      secondaryjoin = (FacebookFriend.__table__.c.uid2 == FacebookUser.uid),
+      backref = backref('facebook_friends', lazy = 'dynamic'), 
+      lazy = 'dynamic'
+    )
 
-    # FacebookUser.locations = db.relationship('FacebookLocation') uid -> gid
-    # FacebookPage.locations = db.relationship('FacebookLocation') page_id -> gid
+    # FacebookUser.locations = relationship('FacebookLocation') uid -> gid
+    # FacebookPage.locations = relationship('FacebookLocation') page_id -> gid
 
     def to_json(self):
         dic = super(FacebookUser,self).to_json()
