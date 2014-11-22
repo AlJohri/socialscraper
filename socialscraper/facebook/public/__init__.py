@@ -53,14 +53,17 @@ def get_attributes(graph_obj,attributes):
 
 regex1 = re.compile("^https:\/\/www.facebook.com\/([^?\n]+)(?:\?ref.*)?$")
 regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")
+regex3 = re.compile("\/groups\/(.*)\/.*")
 
 def parse_url(url):
     # fix this via regex
     url = url.replace("?fref=pb&hc_location=profile_browser", "")
     url = url.replace("?fref=pb&hc_location=friends_tab", "")
-    regex_result1 = regex1.findall(url)
-    if regex_result1:
-        username = regex_result1[0]
+    regex_result = regex1.findall(url)
+    if not regex_result:
+        regex_result = regex3.findall(url)
+    if regex_result:
+        username = regex_result[0]
         if username == None: raise ValueError("No username was parsed %s" % url)
         if 'pages/' in username:
             username = username.split('/')[-1]
