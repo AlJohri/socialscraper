@@ -70,6 +70,23 @@ def make_models(db, base_classes):
       lazy = 'dynamic'
     )
 
+    def friend(self, user):
+        if not self.is_friend(user):
+            self.friends.append(user)
+            return self
+
+    def unfriend(self, user):
+        if self.is_friend(user):
+            self.friends.remove(user)
+            return self
+
+    def is_friend(self, user):
+        return self.friends.filter(FacebookFriend.__table__.c.uid2 == user.uid).count() > 0
+
+    FacebookUser.friend = friend
+    FacebookUser.unfriend = unfriend
+    FacebookUser.is_friend = is_friend
+
     # FacebookUser.locations = relationship('FacebookLocation') uid -> gid
     # FacebookPage.locations = relationship('FacebookLocation') page_id -> gid
 

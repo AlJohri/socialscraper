@@ -8,6 +8,8 @@ from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.orm import sessionmaker
 
+from pprint import pprint as pp
+
 LOCAL_DATABASE_URL = 'postgresql:///nusocialgraph'
 REMOTE_DATABASE_URL = 'postgres://nusocialgraph:nucracker@nusocialgraph-production.cpc7uj1yh3bv.us-east-1.rds.amazonaws.com:5432/nusocialgraph'
 
@@ -43,3 +45,13 @@ __all__ = ['Session', 'FacebookPage', 'FacebookUser', 'FacebookPagesUsers', 'Fac
 
 if __name__ == '__main__':
 	session = Session()
+	scraping = lambda : session.query(FacebookUser).filter(FacebookUser.data=="scraping").all()
+	complete = lambda : session.query(FacebookUser).filter(FacebookUser.data=="complete").all()
+	
+	print "complete", session.query(FacebookUser).filter(FacebookUser.data=="complete").count()
+	pp(sorted([(user.name, user.uid, user.friends.count()) for user in complete()], key=lambda x: x[2], reverse=True))
+
+	print "scraping", session.query(FacebookUser).filter(FacebookUser.data=="scraping").count()
+	pp(sorted([(user.name, user.uid, user.friends.count()) for user in scraping()], key=lambda x: x[2], reverse=True))
+	
+
