@@ -92,7 +92,7 @@ class BaseScraper(object):
 
     def add_user(self, password, id=None, email=None, username=None):
         """Set the account information to use when a login is required."""
-        self.users.append(ScrapeAccount(id=int(id), email=email, username=username, password=password))
+        self.users.append(ScrapeAccount(id=int(id) if id else None, email=email, username=username, password=password))
         return
 
     def pick_random_user(self):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import logging, lxml.html, re
+import logging, lxml.html, re, sys
 from ..base import ScrapingError
 
 # logging.basicConfig(level=logging.DEBUG)
@@ -99,6 +99,9 @@ def login(browser, email, password, username=None):
     payload = {'email': email, 'pass': password}
     response = browser.post(MOBILE_LOGIN_URL , data=payload)
     logger.debug('Initial Login')
+
+    if "Your password was incorrect." in response.text:
+        raise ScrapingError("Your password was incorrect.")
 
     def get_base_payload(response_content):
         doc = lxml.html.fromstring(response_content)

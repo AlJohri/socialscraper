@@ -18,7 +18,7 @@ class TestTwitterScraper(unittest.TestCase):
 		self.scraper.add_user(username=self.username, password=self.password)
 
 	def test_with_id_and_screenname(self):
-		user = self.test_username
+		# user = self.test_username
 		# id = self.test_userid
 		# followers_from_user = self.scraper.get_followers(user)
 		# followers_from_id = self.scraper.get_followers(id)

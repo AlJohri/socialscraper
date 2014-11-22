@@ -1,7 +1,7 @@
-import unittest, os, pprint, logging
+import unittest, os, pprint, logging, pickle
 from ...facebook import FacebookScraper
 
-logging.basicConfig(level=logging.WARN)
+logging.basicConfig(level=logging.DEBUG)
 pp = pprint.PrettyPrinter(indent=4)
 
 class TestFacebookScraper(unittest.TestCase):
@@ -16,33 +16,34 @@ class TestFacebookScraper(unittest.TestCase):
         self.test_username = "todd.warren.seattle"
         self.test_pagename = "mightynest"
 
-        self.scraper = FacebookScraper()
+        self.scraper_type = "nograph"
 
-    def test_graphapi(self):
-        self.scraper.init_api()
-        print self.scraper.get_about_api(self.test_username)
-        for page in self.scraper.get_likes_api(self.test_username):
-            pp.pprint(page)
+        if not os.path.isfile('facebook_scraper.pickle'):
+           self.scraper = FacebookScraper(scraper_type=self.scraper_type)
+           self.scraper.add_user(email=os.getenv('FACEBOOK_EMAIL'), password=os.getenv('FACEBOOK_PASSWORD'))
+           self.scraper.login()
+           pickle.dump(self.scraper, open('facebook_scraper.pickle', 'wb'))
+        else:
+           self.scraper = pickle.load(open('facebook_scraper.pickle', 'rb'))
+           self.scraper.scraper_type = self.scraper_type
+
+    # def test_graphapi(self):
+    #     pass
+
+        # self.scraper.init_api()
+        # print self.scraper.get_about_api(self.test_username)
+        # for page in self.scraper.get_likes_api(self.test_username):
+        #     pp.pprint(page)
 
         # self.scraper.get_feed_api(self.test_username)
 
-    def test_graphsearch(self):
+    def test_graphsearch_pages_liked(self):
+        for item in self.scraper.graph_search(self.test_username, "pages-liked"):
+            print item
 
-        def init_graphsearch():
-            self.scraper.add_user(email=self.email, password=self.password)
-            self.scraper.login()
-
-        def test_pages_liked(username):
-            for item in self.scraper.graph_search(username, "pages-liked"):
-                print item
-
-        def test_likers(pagename):
-            for item in self.scraper.graph_search(pagename, "likers"):
-                print item
-
-        # init_graphsearch()
-        # test_pages_liked(self.test_username)
-        # test_likers(self.test_pagename)
+    def test_graphsearch_likers(self):
+        for item in self.scraper.graph_search(self.test_pagename, "likers"):
+            print item
 
 if __name__ == "__main__":
     unittest.main()
