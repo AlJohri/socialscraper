@@ -11,9 +11,6 @@ from ..import graphapi, public
 AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/LikesWithFollowCollectionPagelet"
 LIKES_URL = "https://www.facebook.com/%s/%s"
 
-# very similar
-# https://www.facebook.com/zenas.shi/friends_all
-
 def get_likes(browser, current_user, graph_name, graph_id = None, api = None):
 
     def _find_script_tag(raw_html, phrase):

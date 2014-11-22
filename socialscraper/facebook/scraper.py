@@ -124,6 +124,11 @@ class FacebookScraper(BaseScraper):
         elif self.scraper_type == "nograph": raise NotImplementedError("get_fans with nograph")
         elif self.scraper_type == "graphsearch": return self.graph_search(graph_name, "likers")
 
+    def get_friends(self, graph_name, graph_id=None):
+        if self.scraper_type == "api": raise Exception("can't do this using graph api any more")
+        elif self.scraper_type == "nograph": return self.get_friends_nograph(graph_name)
+        elif self.scraper_type == "graphsearch": return self.graph_search(graph_name, "friends")
+
     # graphapi
 
     @api_required
@@ -158,6 +163,13 @@ class FacebookScraper(BaseScraper):
             return nograph.get_likes(self.browser, self.cur_user, graph_name, graph_id=graph_id, api=self.api)
         else:
             return nograph.get_likes(self.browser, self.cur_user, graph_name, graph_id=graph_id)
+
+    @login_required
+    def get_friends_nograph(self, graph_name, graph_id=None):
+        if self.api:
+            return nograph.get_friends(self.browser, self.cur_user, graph_name, graph_id=graph_id, api=self.api)
+        else:
+            return nograph.get_friends(self.browser, self.cur_user, graph_name, graph_id=graph_id)
 
     # graphsearch
 
