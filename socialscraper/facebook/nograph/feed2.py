@@ -18,7 +18,7 @@ class QueryType(Enum):
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
-def get_feed2(browser, current_user, graph_name, graph_id = None):
+def get_feed2(browser, current_user, graph_name, graph_id = None, api = None):
 
     if not graph_id:
         graph_id = public.get_id(graph_name)

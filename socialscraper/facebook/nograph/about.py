@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 ABOUT_URL = "https://www.facebook.com/%s/info"
 
-def get_about(browser, current_user, graph_name, graph_id=None):
+def get_about(browser, current_user, graph_name, graph_id=None, api=None):
 
     # shit gets weird when graph_name == current_user.username
     if current_user.username == graph_name:

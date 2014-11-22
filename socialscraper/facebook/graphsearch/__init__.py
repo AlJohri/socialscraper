@@ -2,14 +2,14 @@ import logging, lxml.html, json, urllib, re
 from ...base import ScrapingError
 from ..models import FacebookUser, FacebookPage
 
-from ..import public
+from ..import graphapi, public
 
 logger = logging.getLogger(__name__)
 
 SEARCH_URL = 'https://www.facebook.com/search'
 AJAX_URL = 'https://www.facebook.com/ajax/pagelet/generic.php/BrowseScrollingSetPagelet'
 
-def search(browser, current_user, graph_name, method_name, graph_id=None):
+def search(browser, current_user, graph_name, method_name, graph_id = None, api = None):
     """
     
     Facebook Graph Search Generator
@@ -74,7 +74,11 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
         name = result[1]
 
         username = public.parse_url(url)
-        uid, category = public.get_attributes(username, ["id", "category"])
+
+        if api:
+            uid, category = graphapi.get_attributes(api, username, ["id", "category"])
+        else:
+            uid, category = public.get_attributes(username, ["id", "category"])
 
         if uid == None: 
             print "Couldn't find UID of %s" % username

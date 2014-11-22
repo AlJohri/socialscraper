@@ -14,7 +14,7 @@ from . import graphsearch
 logger = logging.getLogger(__name__)
 
 FACEBOOK_MOBILE_URL = 'https://m.facebook.com'
-FACEBOOK_USER_TOKEN = os.getenv('FACEBOOK_APP_TOKEN')
+FACEBOOK_USER_TOKEN = os.getenv('FACEBOOK_USER_TOKEN')
 
 class FacebookSession(requests.sessions.Session):
 
@@ -147,35 +147,29 @@ class FacebookScraper(BaseScraper):
 
     @login_required
     def get_feed_nograph(self, graph_name, graph_id=None):
-        return nograph.get_feed(self.browser, self.cur_user, graph_name, graph_id=graph_id)
+        return nograph.get_feed(self.browser, self.cur_user, graph_name, graph_id, self.api)
 
     @login_required
     def get_feed_nograph2(self, graph_name, graph_id=None):
-        return nograph.get_feed2(self.browser, self.cur_user, graph_name, graph_id=graph_id)
+        return nograph.get_feed2(self.browser, self.cur_user, graph_name, graph_id, self.api)
 
     @login_required
     def get_about_nograph(self, graph_name, graph_id=None):
-        return nograph.get_about(self.browser, self.cur_user, graph_name, graph_id=graph_id)
+        return nograph.get_about(self.browser, self.cur_user, graph_name, graph_id, self.api)
 
     @login_required
     def get_likes_nograph(self, graph_name, graph_id=None):
-        if self.api:
-            return nograph.get_likes(self.browser, self.cur_user, graph_name, graph_id=graph_id, api=self.api)
-        else:
-            return nograph.get_likes(self.browser, self.cur_user, graph_name, graph_id=graph_id)
+        return nograph.get_likes(self.browser, self.cur_user, graph_name, graph_id, self.api)
 
     @login_required
     def get_friends_nograph(self, graph_name, graph_id=None):
-        if self.api:
-            return nograph.get_friends(self.browser, self.cur_user, graph_name, graph_id=graph_id, api=self.api)
-        else:
-            return nograph.get_friends(self.browser, self.cur_user, graph_name, graph_id=graph_id)
+        return nograph.get_friends(self.browser, self.cur_user, graph_name, graph_id, self.api)
 
     # graphsearch
 
     @login_required
     def graph_search(self, graph_name, method_name, graph_id=None):
-        for result in graphsearch.search(self.browser, self.cur_user, graph_name, method_name, graph_id=graph_id): yield result
+        for result in graphsearch.search(self.browser, self.cur_user, graph_name, method_name, graph_id, api=self.api): yield result
 
     # for result in self.graph_search(page_name,"likers"): yield result
     # for result in self.graph_search(user_name,"pages-liked"): yield result

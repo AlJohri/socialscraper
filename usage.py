@@ -13,6 +13,7 @@ if not os.path.isfile('facebook_scraper.pickle'):
     scraper = FacebookScraper(scraper_type=scraper_type)
     scraper.add_user(email=os.getenv('FACEBOOK_EMAIL'), password=os.getenv('FACEBOOK_PASSWORD'))
     scraper.login()
+    scraper.init_api()
     pickle.dump(scraper, open('facebook_scraper.pickle', 'wb'))
 else:
     scraper = pickle.load(open('facebook_scraper.pickle', 'rb'))
