@@ -11,7 +11,10 @@ from lib import save_user
 
 logging.basicConfig(level=logging.DEBUG)
 
-app = Celery('tasks', backend='amqp', broker='amqp://guest@localhost//')
+LOCAL_BROKER_URL = 'amqp://guest@localhost//'
+REMOTE_BROKER_URL = 'amqp://guest:guest@nusocialgraph.com:5672//'
+
+app = Celery('tasks', backend='amqp', broker=REMOTE_BROKER_URL)
 
 def manual_init(scraper_type='nograph'):
     global facebook_scraper
@@ -40,10 +43,17 @@ def get_usernames():
 @app.task()
 def get_friends(username): # add self if bind=True
     session = Session()
-    print "poop"
+    user = session.query(FacebookUser).filter_by(username=username).first()
+    
+    user.data = "scraping"
+    session.commit()
+
     for result in facebook_scraper.get_friends_nograph(username):
         print result
         save_user(result, session)
+
+    user.data = "complete"
+    session.commit()
 
 @app.task()
 def dmap(it, callback):

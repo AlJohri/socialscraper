@@ -8,8 +8,10 @@ from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.orm import sessionmaker
 
-# engine = create_engine('sqlite:///test.db', echo=False)
-engine = create_engine('postgresql:///nusocialgraph', echo=False)
+LOCAL_DATABASE_URL = 'postgresql:///nusocialgraph'
+REMOTE_DATABASE_URL = 'postgres://nusocialgraph:nucracker@nusocialgraph-production.cpc7uj1yh3bv.us-east-1.rds.amazonaws.com:5432/nusocialgraph'
+
+engine = create_engine(REMOTE_DATABASE_URL, echo=False)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
