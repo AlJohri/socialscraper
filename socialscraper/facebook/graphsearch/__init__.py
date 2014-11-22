@@ -56,7 +56,14 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
 
     def _parse_result(raw_html):
         doc = lxml.html.fromstring(raw_html)
-        return map(lambda x: (x.get('href'), x.text_content()), doc.cssselect('div[data-bt*=title] > a'))
+        # import pdb; pdb.set_trace()
+        # items = map(lambda x: (x.get('href'), x.text_content()), doc.cssselect('div[data-bt*=title]'))
+        # items = doc.cssselect('div[data-bt*=title] > a')
+        # for item in items:
+        #     url = item.get('href')
+        #     number_of_items = item.getparent().getparent().cssselect('div[data-bt*=snippets] > div>div ')[0].text_content()
+            # print url, number_of_items
+        return map(lambda x: (x.get('href'), x.text_content(), x.getparent().getparent().cssselect('div[class="_52eh"]')[0].text_content()), doc.cssselect('div[data-bt*=title] > a'))
 
     def _get_payload(ajax_data, uid):
         return {
@@ -69,9 +76,11 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
         }
 
     def _result_to_model(result, method_name):
-
         url = result[0]
         name = result[1]
+        num_members = result[2]
+
+        # print(url, name, num_members)
 
         # import pdb; pdb.set_trace()
 
@@ -94,7 +103,7 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
         elif method_name == "likers" or method_name == "friends":
             return FacebookUser(uid=uid, username=username, url=url, name=name)
         elif method_name == "groups":
-            return (uid, username, url, name, category)
+            return (uid, url, name, category, num_members)
         else:
             raise ScrapingError("Wut kinda model is %. Check out da _result_to_model method" % method_name)
 
@@ -124,7 +133,7 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
                 if not comment: continue
                 element_from_comment = lxml.html.tostring(comment[0])[5:-4]
                 doc = lxml.html.fromstring(element_from_comment)
-                current_results += map(lambda x: (x.get('href'), x.text_content()), doc.cssselect('div[data-bt*=title] a'))
+                current_results += map(lambda x: (x.get('href'), x.text_content(), x.getparent().getparent().cssselect('div[class="_52eh"]')[0].text_content()), doc.cssselect('div[data-bt*=title] > a'))
         else:
             payload = _get_payload(post_data, current_user.id)
             response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload))
@@ -139,8 +148,8 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
 
     if not graph_id: graph_id = public.get_id(graph_name)
     post_data, current_results = _graph_request(graph_id, method_name)
+    # import pdb; pdb.set_trace()
     for result in current_results: 
-        # print result
         try:
             yield _result_to_model(result, method_name)
         except ValueError:
