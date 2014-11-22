@@ -1,11 +1,12 @@
 # http://docs.sqlalchemy.org/en/rel_0_9/orm/tutorial.html
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship, backref
-engine = create_engine('sqlite:///test.db', echo=True)
+from sqlalchemy.orm import sessionmaker
+
+engine = create_engine('sqlite:///test.db', echo=False)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
@@ -26,6 +27,14 @@ FacebookPage = fbmodels['FacebookPage']
 FacebookPagesUsers = fbmodels['FacebookPagesUsers']
 FacebookFriend = fbmodels['FacebookFriend']
 
-__all__ = ['FacebookPage', 'FacebookUser', 'FacebookPagesUsers', 'FacebookFriend']
+__all__ = ['Session', 'FacebookPage', 'FacebookUser', 'FacebookPagesUsers', 'FacebookFriend']
 
-Base.metadata.create_all(engine)
+# create sqllite db
+# python -c "from models import Base, engine; Base.metadata.create_all(engine)"
+
+# to query db
+# python -i models.py
+# [user.name for user in session.query(FacebookUser).all()]
+
+if __name__ == '__main__':
+	session = Session()
