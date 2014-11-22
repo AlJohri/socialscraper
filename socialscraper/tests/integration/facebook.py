@@ -30,45 +30,29 @@ class TestFacebookScraper(unittest.TestCase):
            self.scraper = pickle.load(open('facebook_scraper.pickle', 'rb'))
            self.scraper.scraper_type = self.scraper_type
 
-    @unittest.skip("testing skipping")
-    def test_graphapi(self):
-        self.scraper.init_api()
-        print self.scraper.get_about_api(self.test_username)
-        for page in self.scraper.get_likes_api(self.test_username):
-            pp.pprint(page)
-
-        self.scraper.get_feed_api(self.test_username)
-
-    @unittest.skip("testing skipping")
+    # @unittest.skip("testing skipping")
     def test_graphsearch_pages_liked(self):
         gen = self.scraper.graph_search(self.test_username, "pages-liked")
         for i,item in enumerate_and_run_twice(gen):
             print item
 
-    @unittest.skip("testing skipping")
+    # @unittest.skip("testing skipping")
     def test_graphsearch_likers(self):
         gen = self.scraper.graph_search(self.test_pagename, "likers")
         for i,item in enumerate_and_run_twice(gen):
             print item
 
-    @unittest.skip("testing skipping")
+    # @unittest.skip("testing skipping")
     def test_graphsearch_friends(self):
         gen = self.scraper.graph_search(self.test_username, "friends")
         for i,item in enumerate_and_run_twice(gen):
             print item
 
-    # NOT WORKING
-    @unittest.skip("testing skipping")
+    # @unittest.skip("testing skipping")
     def test_nograph_likes(self):
         gen = self.scraper.get_likes_nograph(self.test_username)
         for i,item in enumerate_and_run_twice(gen):
             print item
-
-    # NOT WORKING
-    # @unittest.skip("testing skipping")
-    def test_nograph_about(self):
-        about = self.scraper.get_about_nograph(self.test_username)
-        print about
 
 if __name__ == "__main__":
     unittest.main()

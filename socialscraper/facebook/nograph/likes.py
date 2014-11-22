@@ -7,16 +7,12 @@ from ..models import FacebookPage
 
 from ..import graphapi, public
 
-AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/ManualCurationOGGridCollectionPagelet"
+# AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/ManualCurationOGGridCollectionPagelet"
+AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/LikesWithFollowCollectionPagelet"
 LIKES_URL = "https://www.facebook.com/%s/%s"
 
-# LIKES_TYPES = [
-#   'likes_people', 
-#   'likes_restaurants', 
-#   'likes_sports', 
-#   'likes_clothing', 
-#   'likes_other'
-# ]
+# very similar
+# https://www.facebook.com/zenas.shi/friends_all
 
 def get_likes(browser, current_user, graph_name, graph_id = None, api = None):
 
@@ -38,9 +34,9 @@ def get_likes(browser, current_user, graph_name, graph_id = None, api = None):
             'data': json.dumps(ajax_data), 
             '__user': uid, 
             '__a': 1, 
-            '__req': 'n', 
-            '__dyn': '7n8ahyj2qmumdDgDxyIJ3Ga58Ciq2W8GA8ABGeqheCu6popGiGw',
-            '__rev': 1243607
+            '__req': 'o', 
+            '__dyn': '7n8ajEyl2qmumdDgDxyKBgWDxi9ACxO4oKA8ABGeqrWo8popyUWdDx24QqUkBBzEy78S8zU',
+            '__rev': 1505336
         }
 
     def _result_to_model(result):
@@ -55,9 +51,11 @@ def get_likes(browser, current_user, graph_name, graph_id = None, api = None):
         else:
             page_id, category = public.get_attributes(username, ["id", "category"])
 
-        if page_id == None: raise ValueError("Couldn't find page_id of %s" % username)
+        if page_id == None: 
+            print "Couldn't find page_id of %s"
+            raise ValueError("Couldn't find page_id of %s" % username)
 
-        page_id = int(page_id)
+        page_id = int(page_id) if page_id else None
 
         return FacebookPage(page_id=page_id, username=username, url=url, name=name, type=category)
 
@@ -76,8 +74,6 @@ def get_likes(browser, current_user, graph_name, graph_id = None, api = None):
     except IndexError:
         raise ScrapingError("No likes for username %s" % graph_name)
 
-    import pdb; pdb.set_trace()
-
     for likes_type in CURRENT_LIKES_TYPES:
         response = browser.get(LIKES_URL % (graph_name, likes_type))
 
@@ -86,7 +82,7 @@ def get_likes(browser, current_user, graph_name, graph_id = None, api = None):
 
         for link in soup.findAll('a'):
             try:
-                if link['title'] == link.text:
+                if 'eng_type' in link['data-gt']:
 
                     url = link['href']
                     name = link.text
@@ -108,7 +104,7 @@ def get_likes(browser, current_user, graph_name, graph_id = None, api = None):
         ajax_data = {
             'collection_token': cursor_data[0][0],
             'cursor': cursor_data[0][1],
-            'profile_id': cursor_data[0][0].split(':')[0],
+            'profile_id': int(cursor_data[0][0].split(':')[0]),
             'tab_key': likes_type,
             'overview': 'false',
             'sk': 'likes',
@@ -130,7 +126,7 @@ def get_likes(browser, current_user, graph_name, graph_id = None, api = None):
             soup = BeautifulSoup(data['payload'])
             for link in soup.findAll('a'):
                 try:
-                    if link['title'] == link.text:
+                    if 'eng_type' in link['data-gt']:
                         url = link['href']
                         name = link.text
                         result = (url, name)

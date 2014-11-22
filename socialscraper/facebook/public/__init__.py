@@ -55,6 +55,7 @@ regex1 = re.compile("^https:\/\/www.facebook.com\/([^?\n]+)(?:\?ref.*)?$")
 regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")
 
 def parse_url(url):
+    url = url.replace("?fref=pb&hc_location=profile_browser", "")
     regex_result1 = regex1.findall(url)
     if regex_result1:
         username = regex_result1[0]

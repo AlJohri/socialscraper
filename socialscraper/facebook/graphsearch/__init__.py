@@ -56,7 +56,7 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
 
     def _parse_result(raw_html):
         doc = lxml.html.fromstring(raw_html)
-        return map(lambda x: (x.get('href'), x.text_content()), doc.cssselect('div[data-bt*=title] a'))
+        return map(lambda x: (x.get('href'), x.text_content()), doc.cssselect('div[data-bt*=title] > a'))
 
     def _get_payload(ajax_data, uid):
         return {
@@ -78,9 +78,9 @@ def search(browser, current_user, graph_name, method_name, graph_id=None):
 
         if uid == None: 
             print "Couldn't find UID of %s" % username
-            raise ValueError("Couldn't find uid of %s" % username)
+            # raise ValueError("Couldn't find uid of %s" % username)
 
-        uid = int(uid)
+        uid = int(uid) if uid else None
 
         if method_name == "pages-liked":
             return FacebookPage(page_id=uid, username=username, url=url, name=name, type=category)
