@@ -53,6 +53,7 @@ def make_models(db, base_classes):
     FacebookPage = type('FacebookPage', base_classes, get_model_properties(facebook.models.FacebookPage))
     FacebookStatus = type('FacebookStatus', base_classes, get_model_properties(facebook.models.FacebookStatus))
     FacebookPagesUsers = type('FacebookPagesUsers', base_classes, get_model_properties(facebook.models.FacebookPagesUsers))
+    # FacebookGroups = type('FacebookGroup', base_classes, get_model_properties(facebook.models.FacebookGroup))
 
     TwitterUser = type('TwitterUser', base_classes, get_model_properties(twitter.models.TwitterUser))
     TwitterTweet = type('TwitterTweet', base_classes, get_model_properties(twitter.models.TwitterTweet))

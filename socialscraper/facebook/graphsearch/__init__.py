@@ -1,3 +1,4 @@
+from time import sleep
 import logging, lxml.html, json, urllib, re
 from ...base import ScrapingError
 from ..models import FacebookUser, FacebookPage
@@ -11,7 +12,6 @@ AJAX_URL = 'https://www.facebook.com/ajax/pagelet/generic.php/BrowseScrollingSet
 
 def search(browser, current_user, graph_name, method_name, graph_id = None, api = None):
     """
-    
     Facebook Graph Search Generator
 
     General Usage:
@@ -73,12 +73,15 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
         url = result[0]
         name = result[1]
 
+        # import pdb; pdb.set_trace()
+
         username = public.parse_url(url)
 
         if api:
             uid, category = graphapi.get_attributes(api, username, ["id", "category"])
         else:
             uid, category = public.get_attributes(username, ["id", "category"])
+
 
         if uid == None: 
             print "Couldn't find UID of %s" % username
@@ -88,8 +91,10 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
 
         if method_name == "pages-liked":
             return FacebookPage(page_id=uid, username=username, url=url, name=name, type=category)
-        elif method_name == "likers" or "friends":
+        elif method_name == "likers" or method_name == "friends":
             return FacebookUser(uid=uid, username=username, url=url, name=name)
+        elif method_name == "groups":
+            return (uid, username, url, name, category)
         else:
             raise ScrapingError("Wut kinda model is %. Check out da _result_to_model method" % method_name)
 
@@ -135,6 +140,7 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
     if not graph_id: graph_id = public.get_id(graph_name)
     post_data, current_results = _graph_request(graph_id, method_name)
     for result in current_results: 
+        # print result
         try:
             yield _result_to_model(result, method_name)
         except ValueError:
@@ -143,6 +149,7 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
     while post_data:
         current_post_data, current_results = _graph_request(graph_id, method_name, post_data)
         if current_post_data == None or current_results == None: break
+        # print current_results
         for result in current_results: 
             try:
                 yield _result_to_model(result, method_name)

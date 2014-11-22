@@ -110,6 +110,29 @@ class FacebookPagesUsers(BaseModel):
     page_id = Column("page_id", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_pages.page_id")
     type = Column("type")
 
+class FacebookGroup(BaseModel):
+    __tablename__ = "facebook_groups"
+    __attrs__ = [
+        'uid', 'username', 'url', 'name', 
+        'category',
+    ]
+
+    uid = Column("uid", "BigInteger", primary_key=True)
+    username = Column("username")
+    url = Column("url")
+    is_verified = Column("is_verified","Boolean")
+    keywords = Column("keywords")
+    # location = Column("location","BigInteger", foreign_key=True, foreign_key_reference="facebook_locations.loc_id") # foreign key
+    name = Column("name")
+    url = Column("url")
+    type = Column("type")
+    # num_likes = Column("num_likes","BigInteger")
+    # talking_about_count = Column("talking_about_count", "BigInteger")
+    # hometown = Column("hometown")
+    # misc = Column("misc")
+    # data = Column("data")
+
+
 __all__ = [
     'FacebookUser',
     'FacebookFamily',
@@ -117,6 +140,7 @@ __all__ = [
     'FacebookStatus',
     'FacebookLocation',
     'FacebookFriend',
-    'FacebookPagesUsers'
+    'FacebookPagesUsers',
+    'FacebookGroup'
 ]
 
