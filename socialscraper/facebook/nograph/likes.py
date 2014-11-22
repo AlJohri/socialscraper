@@ -76,6 +76,8 @@ def get_likes(browser, current_user, graph_name, graph_id = None, api = None):
     except IndexError:
         raise ScrapingError("No likes for username %s" % graph_name)
 
+    import pdb; pdb.set_trace()
+
     for likes_type in CURRENT_LIKES_TYPES:
         response = browser.get(LIKES_URL % (graph_name, likes_type))
 
