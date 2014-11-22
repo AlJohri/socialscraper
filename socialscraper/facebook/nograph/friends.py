@@ -129,7 +129,7 @@ def get_friends(browser, current_user, graph_name, graph_id = None, api = None):
             except KeyError:
                 continue
 
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
 
         # FIND NEXT CURSOR
 
