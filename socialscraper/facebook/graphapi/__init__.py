@@ -32,3 +32,5 @@ def get_attributes(api,graph_obj,attributes):
 from .about import get_about
 from .feed import get_feed
 from .likes import get_likes
+from .groups import get_groups
+from .members import get_members

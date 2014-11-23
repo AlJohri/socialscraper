@@ -9,14 +9,10 @@ from . import get_connections
 
 logger = logging.getLogger(__name__)
 
-# def get_likes(api, username):
-#     profile = get_connections(api, username, 'likes')
-#     return profile
-
 def get_likes(api, username):
     after = ''
     while True:
-        profile = api.get_object(username + "/likes", after=after, fields="category,id,name,username")
+        profile = api.get_object(str(username) + "/likes", after=after, fields="category,id,name,username")
         if profile['data'] == []: break
         after = profile['paging']['cursors']['after']
         for item in profile['data']:

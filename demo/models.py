@@ -13,7 +13,7 @@ from pprint import pprint as pp
 LOCAL_DATABASE_URL = 'postgresql:///nusocialgraph'
 REMOTE_DATABASE_URL = 'postgres://nusocialgraph:nucracker@nusocialgraph-production.cpc7uj1yh3bv.us-east-1.rds.amazonaws.com:5432/nusocialgraph'
 
-engine = create_engine(REMOTE_DATABASE_URL, echo=False)
+engine = create_engine(LOCAL_DATABASE_URL, echo=False)
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
@@ -33,8 +33,9 @@ FacebookUser = fbmodels['FacebookUser']
 FacebookPage = fbmodels['FacebookPage']
 FacebookPagesUsers = fbmodels['FacebookPagesUsers']
 FacebookFriend = fbmodels['FacebookFriend']
+FacebookGroup = fbmodels['FacebookGroup']
 
-__all__ = ['Session', 'FacebookPage', 'FacebookUser', 'FacebookPagesUsers', 'FacebookFriend']
+__all__ = ['Session', 'FacebookPage', 'FacebookUser', 'FacebookPagesUsers', 'FacebookFriend', 'FacebookGroup']
 
 # create sqllite db
 # python -c "from models import Base, engine; Base.metadata.create_all(engine)"
