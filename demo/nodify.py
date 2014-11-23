@@ -15,7 +15,7 @@ class Node:
 		self.group = group
 		self.name = group.name
 		self.id = group.id
-		self.size = sum([len(x.users) for x in group.facebook_groups])
+		self.size = len(set(reduce(lambda x, y: x + y, [fbgroup.users for fbgroup in group.facebook_groups], [])))
 		self.description = "" #group.description
 		self.icon = "" # group.icon
 		self.category = group.parents[0].name

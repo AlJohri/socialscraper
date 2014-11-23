@@ -44,11 +44,11 @@ def get_members(browser, current_user, graph_name, graph_id = None, api = None):
     soup = BeautifulSoup(response.content.replace('<!--','').replace('-->',''))
     num_members_text = soup.find(text=re.compile("Members\s\(\d+\)"))
     if num_members_text: 
-        num_members = int(num_members_text.replace("Members (", "").replace(")", ""))
+        num_members = int(num_members_text.replace("Members (", "").replace(")", "").replace(",", ""))
     else:
         num_members_text = soup.find(text=re.compile("\d+\smembers")) # groups i am part of
         if num_members_text:
-            num_members = int(num_members_text.replace(" members", ""))
+            num_members = int(num_members_text.replace(" members", "").replace(",", ""))
 
     step = 97
     for page in range(1,num_members,step):
