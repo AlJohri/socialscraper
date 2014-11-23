@@ -19,7 +19,7 @@ def get_members(api, graph_name):
     #         
 
     members = api.get_connections(str(graph_name), "members")
-    while members['data']:
+    while members.get('data', False):
         for item in members['data']:
         	yield FacebookUser(uid=int(item.get('id')), username=item.get('username'), name=item.get('name'))
         members = requests.get(members['paging']['next']).json()

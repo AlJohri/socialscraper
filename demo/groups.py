@@ -13,7 +13,12 @@ FACEBOOK_USER_TOKEN = os.getenv('FACEBOOK_USER_TOKEN')
 api = GraphAPI(FACEBOOK_USER_TOKEN)
 NORTHWESTERN_GROUP = "357518484295082"
 
+
+dontdoshit = True
+
 for group in graphapi.get_groups(api, NORTHWESTERN_GROUP):
+	if int(group.group_id) == 357858834261047: dontdoshit = False
+	if dontdoshit == True: continue
 	print group
 	group = save_group(group, session)
 
