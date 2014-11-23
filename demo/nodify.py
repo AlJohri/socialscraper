@@ -16,8 +16,8 @@ class Node:
 		self.name = group.name
 		self.id = group.id
 		self.size = len(set(reduce(lambda x, y: x + y, [fbgroup.users for fbgroup in group.facebook_groups], [])))
-		self.description = "" #group.description
-		self.icon = "" # group.icon
+		self.description = "\n".join([fbgroup.description or "" for fbgroup in group.facebook_groups])
+		self.icon = group.facebook_groups[0].icon
 		self.category = group.parents[0].name
 
 class NodeEncoder(JSONEncoder):
