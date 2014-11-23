@@ -37,8 +37,8 @@ class LinkEncoder(JSONEncoder):
 print "making nodes"
 nodes = [Node(group, group.name, group.group_id, len(group.users)) for group in groups]
 
-print "filter nodes"
-nodes = filter(lambda node: node.size > 0, nodes)
+# print "filter nodes"
+# nodes = filter(lambda node: node.size > 0, nodes)
 
 print "making linkes"
 links = Link.create_links(combinations(nodes, 2))
