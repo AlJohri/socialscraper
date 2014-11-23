@@ -25,3 +25,5 @@ def save_group(result, session):
         group.created_at = datetime.datetime.now()
         session.add(group)
         print group.name, "created"
+
+    return group
