@@ -35,6 +35,22 @@ FacebookPagesUsers = fbmodels['FacebookPagesUsers']
 FacebookFriend = fbmodels['FacebookFriend']
 FacebookGroup = fbmodels['FacebookGroup']
 
+class Category(Base):
+	__tablename__ = 'categories'
+
+	id = Column(Integer, primary_key=True)
+	name = Column(String)
+
+# ZBT, PI PHI
+class Group(Base):
+	__tablename__ = 'groups'
+	
+	id = Column(Integer, primary_key=True)
+	name = Column(String)
+
+class GroupsFacebookGroups(Base):
+	__tablename__ = 'groups'
+
 __all__ = ['Session', 'FacebookPage', 'FacebookUser', 'FacebookPagesUsers', 'FacebookFriend', 'FacebookGroup']
 
 # create sqllite db

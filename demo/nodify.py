@@ -49,8 +49,16 @@ for link in links:
 	target_members = set(link.target.group.users)
 	link.value=len(source_members.intersection(target_members))
 
-print "filter links"
+print "filter links by value"
 links = filter(lambda link: link.value > 5, links)
+
+source_node_ids = [link.source.id for link in links]
+target_node_ids = [link.target.id for link in links]
+
+print "filter links for missing nodes"
+links = filter(lambda link: 
+	link.source.id not in target_node_ids or 
+	link.target.id not in source_node_ids, links)
 
 print "writing to file"
 json.dump(nodes, open("nodes.json", "w"), cls=NodeEncoder)
