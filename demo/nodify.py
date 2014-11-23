@@ -10,15 +10,17 @@ session = Session()
 groups = session.query(FacebookGroup).all()
 
 class Node:
-	def __init__(self, group, name, id, size=0):
-		self.name = name
-		self.id = id
-		self.size = size
+	def __init__(self, group):
 		self.group = group
+		self.name = group.name
+		self.id = group.group_id
+		self.size = len(group.users)
+		self.description = group.description
+		self.icon = group.icon
 
 class NodeEncoder(JSONEncoder):
 	def default(self, o):
-		return { "id": o.id, "name": o.name, "size": o.size }
+		return { "id": o.id, "name": o.name, "size": o.size, "description": o.description, "icon": o.icon }
 
 class Link:
 	def __init__(self, source, target, value=0):
@@ -35,7 +37,7 @@ class LinkEncoder(JSONEncoder):
 		return { "source": o.source.id, "target": o.target.id, "value": o.value }
 
 print "making nodes"
-nodes = [Node(group, group.name, group.group_id, len(group.users)) for group in groups]
+nodes = [Node(group) for group in groups]
 
 print "filter nodes"
 nodes = filter(lambda node: node.size > 0, nodes)
