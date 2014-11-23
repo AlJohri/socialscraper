@@ -51,13 +51,15 @@ def get_attributes(graph_obj,attributes):
         ret_attributes.append(data.get(attribute, None))
     return ret_attributes
 
-regex1 = re.compile("^https:\/\/www.facebook.com\/([^?\n]+)(?:\?ref.*)?$")
-regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&(f)?ref")
+regex1 = re.compile("^https:\/\/www.facebook.com\/([^?\n]+)(?:\?(?:f)?ref.*)?$")
+regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&(?:f)?ref")
 regex3 = re.compile("\/groups\/(.*)\/.*")
 def parse_url(url):
     # fix this via regex
-    url = url.replace("?fref=pb&hc_location=profile_browser", "")
-    url = url.replace("?fref=pb&hc_location=friends_tab", "")
+    # url = url.replace("?fref=pb&hc_location=profile_browser", "")
+    # url = url.replace("?fref=pb&hc_location=friends_tab", "")
+    url = url.replace("=pb&hc_location=profile_browser", "")
+    url = url.replace("=pb&hc_location=friends_tab", "")
     regex_result = regex1.findall(url)
     if not regex_result:
         regex_result = regex3.findall(url)

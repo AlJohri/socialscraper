@@ -65,6 +65,8 @@ def make_models(db, base_classes):
     FacebookUser.groups = relationship('FacebookGroup', secondary=FacebookGroupsUsers.__table__)
     FacebookGroup.users = relationship('FacebookUser', secondary=FacebookGroupsUsers.__table__)
 
+    FacebookGroup.supergroup = relationship("SuperGroup")
+
     # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-viii-followers-contacts-and-friends
     FacebookUser.friends = relationship('FacebookUser', 
       secondary = FacebookFriend.__table__, 

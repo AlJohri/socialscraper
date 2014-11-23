@@ -68,15 +68,13 @@ class SuperGroupJointTable(Base):
     parent_id = Column(Integer, ForeignKey("supergroups.id"), primary_key=True, unique=False)
     child_id = Column(Integer, ForeignKey("supergroups.id"), primary_key=True, unique=False)
 
-# SuperGroup.children = relationship('SuperGroup',
-#     secondary = SuperGroupJointTable.__table__, 
-#     primaryjoin = (SuperGroupJointTable.__table__.c.parent_id == SuperGroupJointTable.parent_id),
-#     secondaryjoin = (SuperGroupJointTable.__table__.c.child_id == SuperGroupJointTable.child_id),
-#     backref = 'parents', 
-#     lazy = 'dynamic'
-# )
-
-
+SuperGroup.children = relationship('SuperGroup',
+    secondary = SuperGroupJointTable.__table__, 
+    primaryjoin = (SuperGroupJointTable.__table__.c.parent_id == SuperGroup.id),
+    secondaryjoin = (SuperGroupJointTable.__table__.c.child_id == SuperGroup.id),
+    backref = 'parents', 
+    lazy = 'dynamic'
+)
     
 __all__ = ['Session', 'FacebookPage', 'FacebookUser', 'FacebookPagesUsers', 'FacebookFriend', 'FacebookGroup', 'FacebookGroupsUsers']
 
@@ -87,15 +85,22 @@ __all__ = ['Session', 'FacebookPage', 'FacebookUser', 'FacebookPagesUsers', 'Fac
 # python -i models.py
 # [user.name for user in session.query(FacebookUser).all()]
 
+def status_groups():
+    print "todo", session.query(FacebookGroup).filter(FacebookGroup.status == "todo").count()
+    print "done", session.query(FacebookGroup).filter(FacebookGroup.status == "done").count()
+    print "in progress", session.query(FacebookGroup).filter(FacebookGroup.status == "in progress").count()
+
+def status_users():
+    scraping = lambda : session.query(FacebookUser).filter(FacebookUser.data=="scraping").all()
+    complete = lambda : session.query(FacebookUser).filter(FacebookUser.data=="complete").all()
+    
+    print "complete", session.query(FacebookUser).filter(FacebookUser.data=="complete").count()
+    pp(sorted([(user.name, user.uid, user.friends.count()) for user in complete()], key=lambda x: x[2], reverse=True))
+
+    print "scraping", session.query(FacebookUser).filter(FacebookUser.data=="scraping").count()
+    pp(sorted([(user.name, user.uid, user.friends.count()) for user in scraping()], key=lambda x: x[2], reverse=True))
+
+
 if __name__ == '__main__':
     session = Session()
-    # scraping = lambda : session.query(FacebookUser).filter(FacebookUser.data=="scraping").all()
-    # complete = lambda : session.query(FacebookUser).filter(FacebookUser.data=="complete").all()
-    
-    # print "complete", session.query(FacebookUser).filter(FacebookUser.data=="complete").count()
-    # pp(sorted([(user.name, user.uid, user.friends.count()) for user in complete()], key=lambda x: x[2], reverse=True))
-
-    # print "scraping", session.query(FacebookUser).filter(FacebookUser.data=="scraping").count()
-    # pp(sorted([(user.name, user.uid, user.friends.count()) for user in scraping()], key=lambda x: x[2], reverse=True))
-    
 

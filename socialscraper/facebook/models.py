@@ -95,7 +95,7 @@ class FacebookLocation(BaseModel):
 
 class FacebookGroup(BaseModel):
     __tablename__ = "facebook_groups"
-    __attrs__ = ['group_id', 'username', 'url', 'name', 'supergroup_id', 'size', 'description', 'icon', 'privacy']
+    __attrs__ = ['group_id', 'username', 'url', 'name', 'supergroup_id', 'size', 'description', 'icon', 'privacy', 'status']
 
     supergroup_id = Column("supergroup_id", "Integer", foreign_key=True, foreign_key_reference="supergroups.id")
     group_id = Column("group_id", "BigInteger", primary_key=True)
@@ -106,13 +106,9 @@ class FacebookGroup(BaseModel):
     description = Column("description")
     icon = Column("icon")
     privacy = Column("privacy")
+    status = Column("status")
 
-
-    #ALTER TABLE facebook_groups ADD COLUMN size integer;
-    #ALTER TABLE facebook_groups ADD COLUMN description text;
-    #ALTER TABLE facebook_groups ADD COLUMN icon text;
-    #ALTER TABLE facebook_groups ADD COLUMN privacy text; 
-    #ALTER TABLE facebook_groups ADD COLUMN supergroup_id integer;
+    #ALTER TABLE facebook_groups ADD COLUMN status text; 
 
 
 

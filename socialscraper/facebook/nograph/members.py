@@ -16,16 +16,24 @@ def get_members(browser, current_user, graph_name, graph_id = None, api = None):
         url = result[0]
         name = result[1]
 
+        # print url, name
+
         username = public.parse_url(url)
 
         if api:
-            uid, category = graphapi.get_attributes(api, username, ["id", "category"])
+            print username
+            try:
+                uid, category = graphapi.get_attributes(api, username, ["id", "category"])
+            except ValueError as e:
+                print e
+                uid = category = None
         else:
             uid, category = public.get_attributes(username, ["id", "category"])
 
         if uid == None: 
             print "Couldn't find UID of %s"
-            raise ValueError("Couldn't find uid of %s" % username)
+            return None
+            # raise ValueError("Couldn't find uid of %s" % username)
 
         uid = int(uid) if uid else None
 
@@ -35,7 +43,12 @@ def get_members(browser, current_user, graph_name, graph_id = None, api = None):
     response = browser.get("https://www.facebook.com/groups/%s/" % graph_id)
     soup = BeautifulSoup(response.content.replace('<!--','').replace('-->',''))
     num_members_text = soup.find(text=re.compile("Members\s\(\d+\)"))
-    if num_members_text: num_members = int(num_members_text.replace("Members (", "").replace(")", ""))
+    if num_members_text: 
+        num_members = int(num_members_text.replace("Members (", "").replace(")", ""))
+    else:
+        num_members_text = soup.find(text=re.compile("\d+\smembers")) # groups i am part of
+        if num_members_text:
+            num_members = int(num_members_text.replace(" members", ""))
 
     step = 97
     for page in range(1,num_members,step):
@@ -48,6 +61,8 @@ def get_members(browser, current_user, graph_name, graph_id = None, api = None):
         except lxml.etree.XMLSyntaxError as e:
             continue
         
-        current_results = filter(lambda (url,name): name != '' and name != 'See More' and name != 'FriendFriends', map(lambda x: (x.get('href'), unicode(x.text_content())) , doc.cssselect('a')))
+        current_results = filter(lambda (url,name): name != '' and name != 'See More' and 'FriendFriends' not in name, map(lambda x: (x.get('href'), unicode(x.text_content())) , doc.cssselect('a')))
         
-        for result in current_results:  yield _result_to_model(result)
+        for result in current_results: 
+            result2ield = _result_to_model(result)
+            if result2ield: yield result2ield
