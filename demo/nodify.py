@@ -8,7 +8,7 @@ from models import Session, FacebookGroup, FacebookUser, SuperGroup
 session = Session()
 
 # leaves only
-groups = filter(lambda group: len(group.children.all()) == 0,session.query(SuperGroup).all())
+groups = filter(lambda group: len(group.children.all()) == 0 and len(group.facebook_groups) != 0,session.query(SuperGroup).all())
 
 class Node:
 	def __init__(self, group):
