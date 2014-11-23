@@ -49,8 +49,12 @@ links = Link.create_links(combinations(nodes, 2))
 
 print "calculating link values"
 for link in links:
-	source_members = set(reduce(lambda x,y: x+y, [group.users for group in link.source.group.facebook_groups], []))
-	target_members = set(reduce(lambda x,y: x+y, [group.users for group in link.target.group.facebook_groups], []))
+	
+	source_members = set(reduce(lambda x, y: x + y, [fbgroup1.users for fbgroup1 in link.source.group.facebook_groups], []))
+	target_members = set(reduce(lambda x, y: x + y, [fbgroup2.users for fbgroup2 in link.target.group.facebook_groups], []))
+
+	# import pdb; pdb.set_trace()
+
 	link.value=len(source_members.intersection(target_members))
 
 print "filter links by value"
