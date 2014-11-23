@@ -101,6 +101,18 @@ class FacebookGroup(BaseModel):
     username = Column("username")
     url = Column("url")
     name = Column("name")
+    size = Column("size", "Integer")
+    description = Column("description")
+    icon = Column("icon")
+    privacy = Column("privacy")
+
+
+    #ALTER TABLE facebook_groups ADD COLUMN size integer;
+    #ALTER TABLE facebook_groups ADD COLUMN description text;
+    #ALTER TABLE facebook_groups ADD COLUMN icon text;
+    #ALTER TABLE facebook_groups ADD COLUMN privacy text; 
+
+
 
 ######################################## Join Tables ########################################
 
