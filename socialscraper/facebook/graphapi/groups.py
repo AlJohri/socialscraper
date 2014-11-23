@@ -16,4 +16,4 @@ def get_groups(api, username):
         if profile['data'] == []: break
         after = profile['paging']['cursors']['after']
         for item in profile['data']:
-            yield FacebookGroup(uid=int(item.get('id')), username=int(item.get('id')), name=item.get('name'))
+            yield FacebookGroup(group_id=int(item.get('id')), username=int(item.get('id')), name=item.get('name'))

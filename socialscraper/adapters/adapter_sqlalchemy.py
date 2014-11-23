@@ -52,14 +52,18 @@ def make_models(db, base_classes):
     FacebookFriend = type('FacebookFriend', base_classes, get_model_properties(facebook.models.FacebookFriend))
     FacebookPage = type('FacebookPage', base_classes, get_model_properties(facebook.models.FacebookPage))
     FacebookStatus = type('FacebookStatus', base_classes, get_model_properties(facebook.models.FacebookStatus))
-    FacebookPagesUsers = type('FacebookPagesUsers', base_classes, get_model_properties(facebook.models.FacebookPagesUsers))
     FacebookGroup = type('FacebookGroup', base_classes, get_model_properties(facebook.models.FacebookGroup))
+    FacebookPagesUsers = type('FacebookPagesUsers', base_classes, get_model_properties(facebook.models.FacebookPagesUsers))
+    FacebookGroupsUsers = type('FacebookGroupsUsers', base_classes, get_model_properties(facebook.models.FacebookGroupsUsers))
 
     TwitterUser = type('TwitterUser', base_classes, get_model_properties(twitter.models.TwitterUser))
     TwitterTweet = type('TwitterTweet', base_classes, get_model_properties(twitter.models.TwitterTweet))
 
     FacebookUser.pages = relationship('FacebookPage', secondary=FacebookPagesUsers.__table__)
     FacebookPage.users = relationship('FacebookUser', secondary=FacebookPagesUsers.__table__)
+
+    FacebookUser.groups = relationship('FacebookGroup', secondary=FacebookGroupsUsers.__table__)
+    FacebookGroup.users = relationship('FacebookUser', secondary=FacebookGroupsUsers.__table__)
 
     # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-viii-followers-contacts-and-friends
     FacebookUser.friends = relationship('FacebookUser', 

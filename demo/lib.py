@@ -18,7 +18,7 @@ def save_user(result, session):
     return user
 
 def save_group(result, session):
-    group = session.query(FacebookGroup).filter_by(uid=result.uid).first()
+    group = session.query(FacebookGroup).filter_by(group_id=result.group_id).first()
     if not group:
         group = FacebookGroup()
         convert_result(group, result)

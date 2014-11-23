@@ -16,6 +16,6 @@ NORTHWESTERN_GROUP = "357518484295082"
 for group in graphapi.get_groups(api, NORTHWESTERN_GROUP):
 	print group
 	save_group(group, session)
-	for member in graphapi.get_members(api, group.uid):
+	for member in graphapi.get_members(api, group.group_id):
 		print member
 		save_user(member, session)

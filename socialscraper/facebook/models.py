@@ -93,6 +93,15 @@ class FacebookLocation(BaseModel):
     longitude = Column("longitude")
     name = Column("name")
 
+class FacebookGroup(BaseModel):
+    __tablename__ = "facebook_groups"
+    __attrs__ = ['group_id', 'username', 'url', 'name']
+
+    group_id = Column("group_id", "BigInteger", primary_key=True)
+    username = Column("username")
+    url = Column("url")
+    name = Column("name")
+
 ######################################## Join Tables ########################################
 
 class FacebookFriend(BaseModel):
@@ -102,6 +111,7 @@ class FacebookFriend(BaseModel):
     uid1 = Column("uid1", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
     uid2 = Column("uid2", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
 
+
 class FacebookPagesUsers(BaseModel):
     __tablename__ = "facebook_pages_users"
     __attrs__ = ['uid', 'page_id', 'type']
@@ -110,16 +120,12 @@ class FacebookPagesUsers(BaseModel):
     page_id = Column("page_id", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_pages.page_id")
     type = Column("type")
 
-class FacebookGroup(BaseModel):
-    __tablename__ = "facebook_groups"
-    __attrs__ = [
-        'uid', 'username', 'url', 'name'
-    ]
+class FacebookGroupsUsers(BaseModel):
+    __tablename__ = "facebook_groups_users"
+    __attrs__ = ['uid', 'group_id']
 
-    uid = Column("uid", "BigInteger", primary_key=True)
-    username = Column("username")
-    url = Column("url")
-    name = Column("name")
+    uid = Column("uid", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    group_id = Column("group_id", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_groups.group_id")
 
 __all__ = [
     'FacebookUser',
