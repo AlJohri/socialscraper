@@ -15,13 +15,14 @@ class Node:
 		self.group = group
 		self.name = group.name
 		self.id = group.id
-		self.size = sum([len(group.users) for group in group.facebook_groups])
+		self.size = sum([len(x.users) for x in group.facebook_groups])
 		self.description = "" #group.description
 		self.icon = "" # group.icon
+		self.category = group.parents[0].name
 
 class NodeEncoder(JSONEncoder):
 	def default(self, o):
-		return { "id": o.id, "name": o.name, "size": o.size, "description": o.description, "icon": o.icon }
+		return { "id": o.id, "name": o.name, "size": o.size, "description": o.description, "icon": o.icon, "category": o.category }
 
 class Link:
 	def __init__(self, source, target, value=0):
