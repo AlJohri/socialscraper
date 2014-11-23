@@ -20,10 +20,6 @@ class Node:
 		self.icon = group.facebook_groups[0].icon
 		self.category = group.parents[0].name
 
-class NodeEncoder(JSONEncoder):
-	def default(self, o):
-		return { "id": o.id, "name": o.name, "size": o.size, "description": o.description, "icon": o.icon, "category": o.category }
-
 class Link:
 	def __init__(self, source, target, value=0):
 		self.source = source
@@ -33,10 +29,6 @@ class Link:
 	@classmethod
 	def create_links(cls, tuples):
 		return [Link(item[0], item[1]) for item in tuples]
-
-class LinkEncoder(JSONEncoder):
-	def default(self, o):
-		return { "source": o.source.id, "target": o.target.id, "value": o.value }
 
 print "making nodes"
 nodes = [Node(group) for group in groups]
@@ -68,5 +60,17 @@ links = filter(lambda link:
 	link.target.id not in source_node_ids, links)
 
 print "writing to file", len(nodes), "nodes", len(links), "links"
-json.dump(nodes, open("nodes.json", "w"), cls=NodeEncoder)
-json.dump(links, open("links.json", "w"), cls=LinkEncoder)
+
+results = {
+	"nodes": nodes,
+	"links": links
+}
+
+class MyEncoder(JSONEncoder):
+	def default(self, o):
+		if o.__class__.__name__ == 'Link':
+			return { "source": o.source.id, "target": o.target.id, "value": o.value }
+		elif o.__class__.__name__ == 'Node':
+			return { "id": o.id, "name": o.name, "size": o.size, "description": o.description, "icon": o.icon, "category": o.category }
+
+json.dump(results, open("data.json", "w"), cls=MyEncoder)
