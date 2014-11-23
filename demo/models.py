@@ -7,6 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import func
 
 from pprint import pprint as pp
 
@@ -34,6 +35,7 @@ FacebookPage = fbmodels['FacebookPage']
 FacebookPagesUsers = fbmodels['FacebookPagesUsers']
 FacebookFriend = fbmodels['FacebookFriend']
 FacebookGroup = fbmodels['FacebookGroup']
+FacebookGroupsUsers = fbmodels['FacebookGroupsUsers']
 
 class SuperGroup(Base):
     __tablename__ = 'supergroups'
@@ -66,17 +68,17 @@ class SuperGroupJointTable(Base):
     parent_id = Column(Integer, ForeignKey("supergroups.id"), primary_key=True, unique=False)
     child_id = Column(Integer, ForeignKey("supergroups.id"), primary_key=True, unique=False)
 
-SuperGroup.children = relationship('SuperGroup',
-    secondary = SuperGroupJointTable.__table__, 
-    primaryjoin = (SuperGroupJointTable.__table__.c.parent_id == SuperGroupJointTable.parent_id),
-    secondaryjoin = (SuperGroupJointTable.__table__.c.child_id == SuperGroupJointTable.child_id),
-    backref = 'parents', 
-    lazy = 'dynamic'
-)
+# SuperGroup.children = relationship('SuperGroup',
+#     secondary = SuperGroupJointTable.__table__, 
+#     primaryjoin = (SuperGroupJointTable.__table__.c.parent_id == SuperGroupJointTable.parent_id),
+#     secondaryjoin = (SuperGroupJointTable.__table__.c.child_id == SuperGroupJointTable.child_id),
+#     backref = 'parents', 
+#     lazy = 'dynamic'
+# )
 
 
     
-__all__ = ['Session', 'FacebookPage', 'FacebookUser', 'FacebookPagesUsers', 'FacebookFriend', 'FacebookGroup']
+__all__ = ['Session', 'FacebookPage', 'FacebookUser', 'FacebookPagesUsers', 'FacebookFriend', 'FacebookGroup', 'FacebookGroupsUsers']
 
 # create sqllite db
 # python -c "from models import Base, engine; Base.metadata.create_all(engine)"

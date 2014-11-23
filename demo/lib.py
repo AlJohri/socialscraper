@@ -1,8 +1,9 @@
 import os, sys; sys.path.append(os.path.abspath('../'))
+from socialscraper.facebook import FacebookScraper
 from models import Session, FacebookUser, FacebookGroup
 from socialscraper.adapters.adapter_sqlalchemy import convert_result
 
-import datetime
+import datetime, pickle
 
 def save_user(result, session):
     user = session.query(FacebookUser).filter_by(uid=result.uid).first()
@@ -27,3 +28,17 @@ def save_group(result, session):
         print group.name, "created"
 
     return group
+
+def get_scraper():
+    scraper_type = "nograph"
+    if not os.path.isfile('facebook_scraper.pickle'):
+        scraper = FacebookScraper(scraper_type=scraper_type)
+        scraper.add_user(email=os.getenv('FACEBOOK_EMAIL'), password=os.getenv('FACEBOOK_PASSWORD'))
+        scraper.login()
+        scraper.init_api()
+        pickle.dump(scraper, open('facebook_scraper.pickle', 'wb'))
+    else:
+        scraper = pickle.load(open('facebook_scraper.pickle', 'rb'))
+        scraper.scraper_type = scraper_type
+
+    return scraper

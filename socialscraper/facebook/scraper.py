@@ -165,6 +165,10 @@ class FacebookScraper(BaseScraper):
     def get_friends_nograph(self, graph_name, graph_id=None):
         return nograph.get_friends(self.browser, self.cur_user, graph_name, graph_id, self.api)
 
+    @login_required
+    def get_members_nograph(self, graph_name, graph_id=None):
+        return nograph.get_members(self.browser, self.cur_user, graph_name, graph_id, self.api)
+
     # graphsearch
 
     @login_required

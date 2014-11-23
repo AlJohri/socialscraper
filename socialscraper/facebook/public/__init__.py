@@ -52,9 +52,8 @@ def get_attributes(graph_obj,attributes):
     return ret_attributes
 
 regex1 = re.compile("^https:\/\/www.facebook.com\/([^?\n]+)(?:\?ref.*)?$")
-regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&ref")
+regex2 = re.compile("https:\/\/www.facebook.com\/profile.php\?id=(.*)\&(f)?ref")
 regex3 = re.compile("\/groups\/(.*)\/.*")
-
 def parse_url(url):
     # fix this via regex
     url = url.replace("?fref=pb&hc_location=profile_browser", "")

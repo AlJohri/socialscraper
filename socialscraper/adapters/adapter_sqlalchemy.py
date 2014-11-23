@@ -111,6 +111,7 @@ def make_models(db, base_classes):
         'FacebookGroup': FacebookGroup,
         'FacebookStatus': FacebookStatus,
         'FacebookPagesUsers': FacebookPagesUsers,
+        'FacebookGroupsUsers': FacebookGroupsUsers,
         'TwitterUser': TwitterUser,
         'TwitterTweet': TwitterTweet
     }
