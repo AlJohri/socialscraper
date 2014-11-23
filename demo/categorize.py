@@ -23,7 +23,7 @@ def get_groups(dl=False):
 
     return groups
 
-groups = get_groups()
+groups = get_groups(True)
 
 for group_id, name, num_members, new_name, category, _ in groups:
 	
@@ -48,3 +48,6 @@ for group_id, name, num_members, new_name, category, _ in groups:
 	print "Group:", group.group_id, group.name
 	print "Category:", super_group_parent.id, super_group_parent.name
 	print "Normalized Group:", super_group.id, super_group.name
+
+# TODO:
+# prune any SuperGroup nodes with no SuperGroup children OR FacebookGroup children
