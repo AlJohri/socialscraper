@@ -8,6 +8,7 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import func
+from sqlalchemy.orm import aliased
 
 from pprint import pprint as pp
 
@@ -60,6 +61,8 @@ class SuperGroup(Base):
 
     def is_parent(self, group):
         return self.children.filter(SuperGroupJointTable.__table__.c.child_id == group.id).count() > 0
+
+ParentSuperGroup = aliased(SuperGroup, name='parent_supergroup')
 
 class SuperGroupJointTable(Base):
     __tablename__ = 'supergroupsgroups'

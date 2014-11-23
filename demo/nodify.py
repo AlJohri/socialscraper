@@ -3,20 +3,21 @@ import os, sys; sys.path.append(os.path.abspath('../'))
 import json
 from json import JSONEncoder
 from itertools import combinations
-from models import Session, FacebookGroup, FacebookUser
+from models import Session, FacebookGroup, FacebookUser, SuperGroup
 
 session = Session()
 
-groups = session.query(FacebookGroup).all()
+# leaves only
+groups = filter(lambda group: len(group.children.all()) == 0,session.query(SuperGroup).all())
 
 class Node:
 	def __init__(self, group):
 		self.group = group
 		self.name = group.name
-		self.id = group.group_id
-		self.size = len(group.users)
-		self.description = group.description
-		self.icon = group.icon
+		self.id = group.id
+		self.size = sum([len(group.users) for group in group.facebook_groups])
+		self.description = "" #group.description
+		self.icon = "" # group.icon
 
 class NodeEncoder(JSONEncoder):
 	def default(self, o):
@@ -47,8 +48,8 @@ links = Link.create_links(combinations(nodes, 2))
 
 print "calculating link values"
 for link in links:
-	source_members = set(link.source.group.users)
-	target_members = set(link.target.group.users)
+	source_members = set(reduce(lambda x,y: x+y, [group.users for group in link.source.group.facebook_groups], []))
+	target_members = set(reduce(lambda x,y: x+y, [group.users for group in link.target.group.facebook_groups], []))
 	link.value=len(source_members.intersection(target_members))
 
 print "filter links by value"
@@ -62,6 +63,6 @@ links = filter(lambda link:
 	link.source.id not in target_node_ids or 
 	link.target.id not in source_node_ids, links)
 
-print "writing to file"
+print "writing to file", len(nodes), "nodes", len(links), "links"
 json.dump(nodes, open("nodes.json", "w"), cls=NodeEncoder)
 json.dump(links, open("links.json", "w"), cls=LinkEncoder)
