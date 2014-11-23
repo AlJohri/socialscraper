@@ -91,6 +91,7 @@ __all__ = ['Session', 'FacebookPage', 'FacebookUser', 'FacebookPagesUsers', 'Fac
 def status_groups():
     print "todo", session.query(FacebookGroup).filter(FacebookGroup.status == "todo").count()
     print "done", session.query(FacebookGroup).filter(FacebookGroup.status == "done").count()
+    print "skip", session.query(FacebookGroup).filter(FacebookGroup.status == "skip").count()
     print "in progress", session.query(FacebookGroup).filter(FacebookGroup.status == "in progress").count()
 
 def status_users():
@@ -102,7 +103,6 @@ def status_users():
 
     print "scraping", session.query(FacebookUser).filter(FacebookUser.data=="scraping").count()
     pp(sorted([(user.name, user.uid, user.friends.count()) for user in scraping()], key=lambda x: x[2], reverse=True))
-
 
 if __name__ == '__main__':
     session = Session()

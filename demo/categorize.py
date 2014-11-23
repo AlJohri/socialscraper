@@ -19,7 +19,7 @@ def get_groups(dl=False):
     with open("groups.csv", "r") as f:
 	    reader = csv.reader(f)
 	    next(reader) # skip header
-	    groups = filter(lambda x: x != None, [row if row[4] != "Trash" else None for row in reader])
+	    groups = filter(lambda x: x != None, [row if row[5] != "Trash" else None for row in reader])
 
     return groups
 
