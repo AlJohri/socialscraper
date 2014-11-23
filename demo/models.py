@@ -4,7 +4,7 @@ import os, sys; sys.path.append(os.path.abspath('../'))
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.orm import sessionmaker
 
@@ -35,22 +35,47 @@ FacebookPagesUsers = fbmodels['FacebookPagesUsers']
 FacebookFriend = fbmodels['FacebookFriend']
 FacebookGroup = fbmodels['FacebookGroup']
 
-class Category(Base):
-	__tablename__ = 'categories'
+class SuperGroup(Base):
+    __tablename__ = 'supergroups'
+    __attrs__ = ['name', 'id']
 
-	id = Column(Integer, primary_key=True)
-	name = Column(String)
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    inheritance = Column(String)
 
-# ZBT, PI PHI
-class Group(Base):
-	__tablename__ = 'groups'
-	
-	id = Column(Integer, primary_key=True)
-	name = Column(String)
+    def mkchild(self, group):
+        if not self.is_child(group):
+            self.friends.append(group)
+            return self
 
-class GroupsFacebookGroups(Base):
-	__tablename__ = 'groups'
+    def rmchild(self, group):
+        if self.is_child(group):
+            self.children.remove(group)
+            return self
 
+    def is_child(self, group):
+        return self.children.filter(SuperGroupJointTable.__table__.c.child_id == group.id).count() > 0
+
+    def is_parent(self, group):
+        return self.children.filter(SuperGroupJointTable.__table__.c.child_id == group.id).count() > 0
+
+class SuperGroupJointTable(Base):
+    __tablename__ = 'supergroupsgroups'
+    __attrs__ = ['parent_id', 'child_id']
+
+    parent_id = Column(Integer, ForeignKey("supergroups.id"), primary_key=True, unique=False)
+    child_id = Column(Integer, ForeignKey("supergroups.id"), primary_key=True, unique=False)
+
+SuperGroup.children = relationship('SuperGroup',
+    secondary = SuperGroupJointTable.__table__, 
+    primaryjoin = (SuperGroupJointTable.__table__.c.parent_id == SuperGroupJointTable.parent_id),
+    secondaryjoin = (SuperGroupJointTable.__table__.c.child_id == SuperGroupJointTable.child_id),
+    backref = 'parents', 
+    lazy = 'dynamic'
+)
+
+
+    
 __all__ = ['Session', 'FacebookPage', 'FacebookUser', 'FacebookPagesUsers', 'FacebookFriend', 'FacebookGroup']
 
 # create sqllite db
@@ -61,14 +86,14 @@ __all__ = ['Session', 'FacebookPage', 'FacebookUser', 'FacebookPagesUsers', 'Fac
 # [user.name for user in session.query(FacebookUser).all()]
 
 if __name__ == '__main__':
-	session = Session()
-	scraping = lambda : session.query(FacebookUser).filter(FacebookUser.data=="scraping").all()
-	complete = lambda : session.query(FacebookUser).filter(FacebookUser.data=="complete").all()
-	
-	print "complete", session.query(FacebookUser).filter(FacebookUser.data=="complete").count()
-	pp(sorted([(user.name, user.uid, user.friends.count()) for user in complete()], key=lambda x: x[2], reverse=True))
+    session = Session()
+    # scraping = lambda : session.query(FacebookUser).filter(FacebookUser.data=="scraping").all()
+    # complete = lambda : session.query(FacebookUser).filter(FacebookUser.data=="complete").all()
+    
+    # print "complete", session.query(FacebookUser).filter(FacebookUser.data=="complete").count()
+    # pp(sorted([(user.name, user.uid, user.friends.count()) for user in complete()], key=lambda x: x[2], reverse=True))
 
-	print "scraping", session.query(FacebookUser).filter(FacebookUser.data=="scraping").count()
-	pp(sorted([(user.name, user.uid, user.friends.count()) for user in scraping()], key=lambda x: x[2], reverse=True))
-	
+    # print "scraping", session.query(FacebookUser).filter(FacebookUser.data=="scraping").count()
+    # pp(sorted([(user.name, user.uid, user.friends.count()) for user in scraping()], key=lambda x: x[2], reverse=True))
+    
 
