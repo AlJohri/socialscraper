@@ -50,7 +50,7 @@ class FacebookScraper(BaseScraper):
     def init_api(self, pickled_api=None):
 
         if pickled_api: self.api = pickle.loads(pickled_api)
-        else: self.api = GraphAPI(FACEBOOK_USER_TOKEN)
+        else: self.api = GraphAPI(access_token=FACEBOOK_USER_TOKEN, version="2.2")
 
         try:
             #self.api.get_object('me')
