@@ -52,7 +52,7 @@ def make_models(db, base_classes):
     FacebookFriend = type('FacebookFriend', base_classes, get_model_properties(facebook.models.FacebookFriend))
     FacebookPage = type('FacebookPage', base_classes, get_model_properties(facebook.models.FacebookPage))
     FacebookStatus = type('FacebookStatus', base_classes, get_model_properties(facebook.models.FacebookStatus))
-    # FacebookGroup = type('FacebookGroup', base_classes, get_model_properties(facebook.models.FacebookGroup))
+    FacebookGroup = type('FacebookGroup', base_classes, get_model_properties(facebook.models.FacebookGroup))
     FacebookPagesUsers = type('FacebookPagesUsers', base_classes, get_model_properties(facebook.models.FacebookPagesUsers))
     FacebookGroupsUsers = type('FacebookGroupsUsers', base_classes, get_model_properties(facebook.models.FacebookGroupsUsers))
 
