@@ -30,7 +30,7 @@ def make_models(db, base_classes):
     make_models(base_classes)
     """
 
-    def get_model_properties(model):    
+    def get_model_properties(model):
         properties = {}
         pkeys = []
         for col in model.get_columns():
@@ -52,7 +52,7 @@ def make_models(db, base_classes):
     FacebookFriend = type('FacebookFriend', base_classes, get_model_properties(facebook.models.FacebookFriend))
     FacebookPage = type('FacebookPage', base_classes, get_model_properties(facebook.models.FacebookPage))
     FacebookStatus = type('FacebookStatus', base_classes, get_model_properties(facebook.models.FacebookStatus))
-    FacebookGroup = type('FacebookGroup', base_classes, get_model_properties(facebook.models.FacebookGroup))
+    # FacebookGroup = type('FacebookGroup', base_classes, get_model_properties(facebook.models.FacebookGroup))
     FacebookPagesUsers = type('FacebookPagesUsers', base_classes, get_model_properties(facebook.models.FacebookPagesUsers))
     FacebookGroupsUsers = type('FacebookGroupsUsers', base_classes, get_model_properties(facebook.models.FacebookGroupsUsers))
 
@@ -66,11 +66,11 @@ def make_models(db, base_classes):
     FacebookGroup.users = relationship('FacebookUser', secondary=FacebookGroupsUsers.__table__)
 
     # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-viii-followers-contacts-and-friends
-    FacebookUser.friends = relationship('FacebookUser', 
-      secondary = FacebookFriend.__table__, 
+    FacebookUser.friends = relationship('FacebookUser',
+      secondary = FacebookFriend.__table__,
       primaryjoin = (FacebookFriend.__table__.c.uid1 == FacebookUser.uid),
       secondaryjoin = (FacebookFriend.__table__.c.uid2 == FacebookUser.uid),
-      backref = backref('facebook_friends', lazy = 'dynamic'), 
+      backref = backref('facebook_friends', lazy = 'dynamic'),
       lazy = 'dynamic'
     )
 
