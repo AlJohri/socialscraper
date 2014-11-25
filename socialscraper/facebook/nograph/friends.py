@@ -11,6 +11,10 @@ from ..import graphapi, public
 AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/AllFriendsAppCollectionPagelet"
 FRIENDS_URL = "https://www.facebook.com/%s/%s"
 
+def get_id(browser, current_user, graph_name, graph_id=None, api=None):
+    response = browser.get("https://www.facebook.com/%s" % graph_name)
+    return re.search(r'&#123;&quot;profile_owner&quot;:&quot;(\d+)&quot;,&quot;ref&quot;:&quot;timeline:timeline&quot;&#125;', response.text).groups()[0]
+
 def get_friends(browser, current_user, graph_name, graph_id = None, api = None):
 
     def _find_script_tag(raw_html, phrase):
@@ -40,15 +44,19 @@ def get_friends(browser, current_user, graph_name, graph_id = None, api = None):
 
         url = result[0]
         name = result[1]
+        uid = result[2]
 
         username = public.parse_url(url)
 
-        if api:
-            uid, category = graphapi.get_attributes(api, username, ["id", "category"])
-        else:
-            uid, category = public.get_attributes(username, ["id", "category"])
+        # import pdb; pdb.set_trace()
 
-        if uid == None: 
+        # if api:
+        #     uid, category = graphapi.get_attributes(api, username, ["id", "category"])
+        # else:
+        #     uid = get_id(browser, current_user, username)
+        #     # uid, category = public.get_attributes(username, ["id", "category"])
+
+        if uid == None:
             print "Couldn't find UID of %s"
             raise ValueError("Couldn't find uid of %s" % username)
 
@@ -67,7 +75,8 @@ def get_friends(browser, current_user, graph_name, graph_id = None, api = None):
 
                 url = link['href']
                 name = link.text
-                result = (url, name)
+                uid = re.search(r'\/ajax\/hovercard\/user.php\?id=(\d+)&', link['data-hovercard']).groups()[0]
+                result = (url, name, uid)
 
                 # print result
 
@@ -102,7 +111,7 @@ def get_friends(browser, current_user, graph_name, graph_id = None, api = None):
 
         payload = _get_payload(ajax_data, current_user.id)
         response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload))
-    
+
         # PARSE PAGE
 
         data = json.loads(response.content[9:])
@@ -112,7 +121,8 @@ def get_friends(browser, current_user, graph_name, graph_id = None, api = None):
                 if 'eng_type' in link['data-gt']:
                     url = link['href']
                     name = link.text
-                    result = (url, name)
+                    uid = re.search(r'\/ajax\/hovercard\/user.php\?id=(\d+)&', link['data-hovercard']).groups()[0]
+                    result = (url, name, uid)
 
                     # print result
 
