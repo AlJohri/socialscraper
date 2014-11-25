@@ -30,6 +30,8 @@ def make_models(db, base_classes):
     make_models(base_classes)
     """
 
+    # valid_models = ['FacebookUser', 'FacebookFamily', 'FacebookLocation', 'FacebookFriend', 'FacebookPage', 'FacebookStatus', 'FacebookGroup', 'FacebookPagesUsers', 'FacebookGroupsUsers', 'TwitterUser', 'TwitterTweet']
+
     def get_model_properties(model):
         properties = {}
         pkeys = []
