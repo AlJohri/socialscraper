@@ -112,9 +112,10 @@ class FacebookFriend(BaseModel):
     __tablename__ = "facebook_friends"
     __attrs__ = ['uid1', 'uid2']
 
-    uid1 = Column("uid1", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
-    uid2 = Column("uid2", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
-
+    # uid1 = Column("uid1", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    # uid2 = Column("uid2", "BigInteger", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.uid")
+    username1 = Column("username1", "String", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.username")
+    username2 = Column("username2", "String", primary_key=True, unique=False, foreign_key=True, foreign_key_reference="facebook_users.username")
 
 class FacebookPagesUsers(BaseModel):
     __tablename__ = "facebook_pages_users"

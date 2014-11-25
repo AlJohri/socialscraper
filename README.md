@@ -25,7 +25,11 @@ dropdb buildchicago && createdb buildchicago
 cat latest.dump.txt | psql buildchicago
 ```
 1. Change FacebookFriend class to contain username1 and username2 columns.
-2. Add username1 and username2 columsn to facebook_friends.
+```
+username1 = Column("username1", "String")
+username2 = Column("username2", "String")
+```
+2. Add username1 and username2 columns to facebook_friends.
 ```
 ALTER TABLE facebook_friends ADD COLUMN username1 varchar;
 ALTER TABLE facebook_friends ADD COLUMN username2 varchar;
@@ -48,6 +52,10 @@ ALTER TABLE facebook_friends DROP COLUMN uid2;
 ALTER TABLE facebook_friends ALTER COLUMN username1 SET NOT NULL;
 ALTER TABLE facebook_friends ALTER COLUMN username2 SET NOT NULL;
 ALTER TABLE facebook_friends ADD CONSTRAINT facebook_friends_pkey PRIMARY KEY (username1, username2);
+ALTER TABLE facebook_friends DROP CONSTRAINT facebook_friends_uid1_fkey;
+ALTER TABLE facebook_friends DROP CONSTRAINT facebook_friends_uid2_fkey;
+ALTER TABLE facebook_friends ADD CONSTRAINT facebook_friends_username1_fkey FOREIGN KEY (username1) REFERENCES facebook_users (username) MATCH FULL;
+ALTER TABLE facebook_friends ADD CONSTRAINT facebook_friends_username2_fkey FOREIGN KEY (username2) REFERENCES facebook_users (username) MATCH FULL;
 ```
 6. Change FacebookUser class to have username as primary key.
 7.
