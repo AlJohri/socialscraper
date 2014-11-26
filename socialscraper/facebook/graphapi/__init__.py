@@ -29,6 +29,11 @@ def get_attributes(api,graph_obj,attributes):
         ret_attributes.append(data.get(attribute, None))
     return ret_attributes
 
+def get_username(api,graph_obj):
+    ret_attributes = []
+    data = get_object(api,graph_obj)
+    return data.get('username', None)
+
 from .about import get_about
 from .feed import get_feed
 from .likes import get_likes

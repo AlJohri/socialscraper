@@ -132,6 +132,10 @@ class FacebookScraper(BaseScraper):
     # graphapi
 
     @api_required
+    def get_username_api(self, graph_name):
+        return graphapi.get_username(self.api, graph_name)
+
+    @api_required
     def get_feed_api(self, graph_name):
         return graphapi.get_feed(self.api, graph_name)
 

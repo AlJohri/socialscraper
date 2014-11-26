@@ -10,6 +10,7 @@ from ..import graphapi, public
 # AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/ManualCurationOGGridCollectionPagelet"
 AJAX_URL = "https://www.facebook.com/ajax/pagelet/generic.php/AllFriendsAppCollectionPagelet"
 FRIENDS_URL = "https://www.facebook.com/%s/%s"
+FRIENDS_URL2 = "https://www.facebook.com/profile.php?id=%s&sk=%s"
 
 def get_id(browser, current_user, graph_name, graph_id=None, api=None):
     response = browser.get("https://www.facebook.com/%s" % graph_name)
@@ -64,7 +65,10 @@ def get_friends(browser, current_user, graph_name, graph_id = None, api = None):
 
         return FacebookUser(uid=uid, username=username, url=url, name=name)
 
-    response = browser.get(FRIENDS_URL % (graph_name, "friends_all"))
+    if re.match(r'^\d+$', graph_name):
+        response = browser.get(FRIENDS_URL2 % (graph_name, "friends_all"))
+    else:
+        response = browser.get(FRIENDS_URL % (graph_name, "friends_all"))
 
     soup = BeautifulSoup(response.content.replace('<!--','').replace('-->',''))
     # print response.content
