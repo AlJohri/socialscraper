@@ -63,7 +63,12 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
         #     url = item.get('href')
         #     number_of_items = item.getparent().getparent().cssselect('div[data-bt*=snippets] > div>div ')[0].text_content()
             # print url, number_of_items
-        return map(lambda x: (x.get('href'), x.text_content(), x.getparent().getparent().cssselect('div[class="_52eh"]')[0].text_content()), doc.cssselect('div[data-bt*=title] > a'))
+
+        # methods to get id
+        # x.getparent().getparent().cssselect('.FriendRequestOutgoing')[0].get('data-profileid'))
+        # 
+        el_id = lambda x: json.loads(x.getparent().getparent().getparent().getparent().getparent().get('data-bt'))['id']
+        return map(lambda x: (x.get('href'), x.text_content(), el_id(x)), doc.cssselect('div[data-bt*=title] > a'))
 
     def _get_payload(ajax_data, uid):
         return {
@@ -78,7 +83,8 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
     def _result_to_model(result, method_name):
         url = result[0]
         name = result[1]
-        num_members = result[2]
+        uid = result[2]
+        # num_members = result[2]
 
         # print(url, name, num_members)
 
@@ -86,10 +92,10 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
 
         username = public.parse_url(url)
 
-        if api:
-            uid, category = graphapi.get_attributes(api, username, ["id", "category"])
-        else:
-            uid, category = public.get_attributes(username, ["id", "category"])
+        # if api:
+        #     uid, category = graphapi.get_attributes(api, username, ["id", "category"])
+        # else:
+        #     uid, category = public.get_attributes(username, ["id", "category"])
 
 
         if uid == None: 
@@ -103,7 +109,7 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
         elif method_name == "likers" or method_name == "friends":
             return FacebookUser(uid=uid, username=username, url=url, name=name)
         elif method_name == "groups":
-            return (uid, url, name, category, num_members)
+            return (uid, url, name, category)
         else:
             raise ScrapingError("Wut kinda model is %. Check out da _result_to_model method" % method_name)
 
@@ -133,7 +139,10 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
                 if not comment: continue
                 element_from_comment = lxml.html.tostring(comment[0])[5:-4]
                 doc = lxml.html.fromstring(element_from_comment)
-                current_results += map(lambda x: (x.get('href'), x.text_content(), x.getparent().getparent().cssselect('div[class="_52eh"]')[0].text_content()), doc.cssselect('div[data-bt*=title] > a'))
+                # import pdb; pdb.set_trace()
+                # potentially num_members x.getparent().getparent().cssselect('div[class="_52eh"]')[0].text_content()
+                # potentially data profile id 
+                current_results += map(lambda x: (x.get('href'), x.text_content(), x.getparent().getparent().cssselect('.FriendRequestOutgoing')[0].get('data-profileid')), doc.cssselect('div[data-bt*=title] > a'))
         else:
             payload = _get_payload(post_data, current_user.id)
             response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload))
