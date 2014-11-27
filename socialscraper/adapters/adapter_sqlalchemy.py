@@ -70,8 +70,19 @@ def make_models(db, base_classes):
       secondary = FacebookFriend.__table__,
       primaryjoin = (FacebookFriend.__table__.c.uid1 == FacebookUser.uid),
       secondaryjoin = (FacebookFriend.__table__.c.uid2 == FacebookUser.uid),
-      backref = backref('facebook_friends', lazy = 'dynamic'),
+      backref = backref('_friends', lazy = 'dynamic'),
       lazy = 'dynamic'
+    )
+
+    # http://stackoverflow.com/questions/9116924/how-can-i-achieve-a-self-referencing-many-to-many-relationship-on-the-sqlalchemy
+    friendship_union = select([FacebookFriend.__table__.c.uid1, FacebookFriend.__table__.c.uid2]).
+                        union(select([FacebookFriend.__table__.c.uid2, FacebookFriend.__table__.c.uid1])).alias()
+
+    FacebookUser.all_friends = relationship('FacebookUser',
+       secondary=friendship_union,
+       primaryjoin=FacebookUser.uid==friendship_union.c.uid1,
+       secondaryjoin=FacebookUser.uid==friendship_union.c.uid2,
+       viewonly=True
     )
 
     def friend(self, user):
