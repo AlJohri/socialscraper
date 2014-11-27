@@ -142,7 +142,8 @@ def search(browser, current_user, graph_name, method_name, graph_id = None, api 
                 # import pdb; pdb.set_trace()
                 # potentially num_members x.getparent().getparent().cssselect('div[class="_52eh"]')[0].text_content()
                 # potentially data profile id 
-                current_results += map(lambda x: (x.get('href'), x.text_content(), x.getparent().getparent().cssselect('.FriendRequestOutgoing')[0].get('data-profileid')), doc.cssselect('div[data-bt*=title] > a'))
+                el_id = lambda x: json.loads(x.getparent().getparent().getparent().getparent().getparent().get('data-bt'))['id']
+                current_results += map(lambda x: (x.get('href'), x.text_content(), el_id(x)), doc.cssselect('div[data-bt*=title] > a'))
         else:
             payload = _get_payload(post_data, current_user.id)
             response = browser.get(AJAX_URL + "?%s" % urllib.urlencode(payload))

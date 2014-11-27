@@ -67,6 +67,10 @@ SECURITY_CHECK = [
     "Please enter the text below"
 ]
 
+PHONE_CONFIRMATION = [
+    "Phone Number Confirmation"
+]
+
 def state(response_text, test_strings):
     return all(s in response_text for s in test_strings)
 
@@ -111,7 +115,7 @@ def login(browser, email, password, username=None):
             'nh': doc.cssselect("input[name=nh]")[0].get('value')
         }
 
-    if not state(response.text, LOGGED_IN):
+    if not state(response.text, LOGGED_IN) and not state(response.text, PHONE_CONFIRMATION):
         base_payload = get_base_payload(response.content)
 
     while not state(response.text, LOGGED_IN):
@@ -138,6 +142,9 @@ def login(browser, email, password, username=None):
             logger.debug('Remember Browser -- Click Don\'t Save')
         elif state(response.text, LOCKED):
             raise ScrapingError("Account is locked.")
+        elif state(response.text, PHONE_CONFIRMATION):
+            response = browser.get("https://m.facebook.com/phoneacqwrite/?s=1&source=m_mobile_mirror_interstitial")
+            logger.debug('Phone Number Confirmation -- Click Skip')
         else:
             print response.text
             import pdb; pdb.set_trace()
