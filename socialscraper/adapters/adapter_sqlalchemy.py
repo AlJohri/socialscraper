@@ -13,6 +13,7 @@ import sqlalchemy
 
 from sqlalchemy import Table, MetaData, Column, ForeignKey, Integer, String, BigInteger, Date, Text, Boolean, Float
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy import select
 
 class BaseSQLModel(object):
 
@@ -75,14 +76,15 @@ def make_models(db, base_classes):
     )
 
     # http://stackoverflow.com/questions/9116924/how-can-i-achieve-a-self-referencing-many-to-many-relationship-on-the-sqlalchemy
-    friendship_union = select([FacebookFriend.__table__.c.uid1, FacebookFriend.__table__.c.uid2]).
+    friendship_union = select([FacebookFriend.__table__.c.uid1, FacebookFriend.__table__.c.uid2]). \
                         union(select([FacebookFriend.__table__.c.uid2, FacebookFriend.__table__.c.uid1])).alias()
 
     FacebookUser.all_friends = relationship('FacebookUser',
        secondary=friendship_union,
        primaryjoin=FacebookUser.uid==friendship_union.c.uid1,
        secondaryjoin=FacebookUser.uid==friendship_union.c.uid2,
-       viewonly=True
+       viewonly=True,
+       lazy = 'dynamic'
     )
 
     def friend(self, user):
