@@ -144,7 +144,7 @@ def get_friends(browser, current_user, graph_name, graph_id = None, api = None):
 
         regex = re.compile("href=\\\\\"(.*?)\"")
 
-        tester = lambda x: x.find('cursor') != -1
+        tester = lambda x: x.find('next_cursor') != -1
         thing = regex.findall(response.text)
         thing2 = filter(tester, thing)
 
@@ -154,7 +154,6 @@ def get_friends(browser, current_user, graph_name, graph_id = None, api = None):
 
         regex2 = re.compile("next_cursor=(.*)")
         new_cursor = regex2.findall(thing2[0])[0].replace("\\u00253D\\", "=").replace("u00253D\\", "=")
-
         ajax_data['cursor'] = new_cursor
 
 
