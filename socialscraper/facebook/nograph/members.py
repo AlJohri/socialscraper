@@ -30,7 +30,7 @@ def get_members(browser, current_user, graph_name, graph_id = None, api = None):
         else:
             uid, category = public.get_attributes(username, ["id", "category"])
 
-        if uid == None: 
+        if uid == None:
             print "Couldn't find UID of %s"
             return None
             # raise ValueError("Couldn't find uid of %s" % username)
@@ -43,7 +43,7 @@ def get_members(browser, current_user, graph_name, graph_id = None, api = None):
     response = browser.get("https://www.facebook.com/groups/%s/" % graph_id)
     soup = BeautifulSoup(response.content.replace('<!--','').replace('-->',''))
     num_members_text = soup.find(text=re.compile("Members\s\(\d+\)"))
-    if num_members_text: 
+    if num_members_text:
         num_members = int(num_members_text.replace("Members (", "").replace(")", "").replace(",", ""))
     else:
         num_members_text = soup.find(text=re.compile("\d+\smembers")) # groups i am part of
@@ -52,17 +52,17 @@ def get_members(browser, current_user, graph_name, graph_id = None, api = None):
 
     step = 97
     for page in range(1,num_members,step):
-        
+
         response = browser.get("https://www.facebook.com/ajax/browser/list/group_members/?id=%s&gid=%s&edge=groups%%3Amembers&order=default&view=list&start=%d&__a=1" % (graph_id, graph_id, page))
         data = json.loads(response.content[9:])
-        
+
         try:
             doc = lxml.html.fromstring(data['domops'][0][3]['__html'])
         except lxml.etree.XMLSyntaxError as e:
             continue
-        
+
         current_results = filter(lambda (url,name): name != '' and name != 'See More' and 'FriendFriends' not in name, map(lambda x: (x.get('href'), unicode(x.text_content())) , doc.cssselect('a')))
-        
-        for result in current_results: 
+
+        for result in current_results:
             result2ield = _result_to_model(result)
             if result2ield: yield result2ield
