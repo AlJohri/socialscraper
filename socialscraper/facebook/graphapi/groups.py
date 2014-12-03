@@ -9,6 +9,10 @@ from . import get_connections
 
 logger = logging.getLogger(__name__)
 
+def get_group(api, username):
+	item = api.get_object(str(username))
+	return FacebookGroup(group_id=int(item.get('id')), username=int(item.get('id')), name=item.get('name'), icon=item.get('icon'), privacy=item.get('privacy'), description=item.get('description'))
+
 def get_groups(api, username):
     after = ''
     while True:

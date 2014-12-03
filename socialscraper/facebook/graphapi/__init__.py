@@ -37,5 +37,5 @@ def get_username(api,graph_obj):
 from .about import get_about
 from .feed import get_feed
 from .likes import get_likes
-from .groups import get_groups
+from .groups import get_groups, get_group
 from .members import get_members
