@@ -43,7 +43,7 @@ def get_members(browser, current_user, graph_name, graph_id = None, api = None):
 
     response = browser.get("https://www.facebook.com/groups/%s/" % graph_id)
     soup = BeautifulSoup(response.content.replace('<!--','').replace('-->',''))
-    num_members_text = soup.find(text=re.compile("Members\s\(\d+\)"))
+    num_members_text = soup.find(text=re.compile("Members\s\([\d,]+\)"))
     if num_members_text:
         num_members = int(num_members_text.replace("Members (", "").replace(")", "").replace(",", ""))
     else:
