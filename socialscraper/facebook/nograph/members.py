@@ -15,20 +15,21 @@ def get_members(browser, current_user, graph_name, graph_id = None, api = None):
 
         url = result[0]
         name = result[1]
+        uid = result[2]
 
         # print url, name
 
         username = public.parse_url(url)
 
-        if api:
-            print username
-            try:
-                uid, category = graphapi.get_attributes(api, username, ["id", "category"])
-            except ValueError as e:
-                print e
-                uid = category = None
-        else:
-            uid, category = public.get_attributes(username, ["id", "category"])
+        # if api:
+        #     print username
+        #     try:
+        #         uid, category = graphapi.get_attributes(api, username, ["id", "category"])
+        #     except ValueError as e:
+        #         print e
+        #         uid = category = None
+        # else:
+        #     uid, category = public.get_attributes(username, ["id", "category"])
 
         if uid == None:
             print "Couldn't find UID of %s"
@@ -61,8 +62,12 @@ def get_members(browser, current_user, graph_name, graph_id = None, api = None):
         except lxml.etree.XMLSyntaxError as e:
             continue
 
-        current_results = filter(lambda (url,name): name != '' and name != 'See More' and 'FriendFriends' not in name, map(lambda x: (x.get('href'), unicode(x.text_content())) , doc.cssselect('a')))
-
-        for result in current_results:
+        for link in doc.cssselect("a[data-gt*=eng_type]"):
+            url = link.get('href')
+            name = link.text_content()
+            uid = re.search(r'\/ajax\/hovercard\/user.php\?id=(\d+)&', link.get('data-hovercard')).groups()[0]
+            result = (url, name, uid)
             result2ield = _result_to_model(result)
             if result2ield: yield result2ield
+
+        # current_results = filter(lambda (url,name): name != '' and name != 'See More' and 'FriendFriends' not in name, map(lambda x: (x.get('href'), unicode(x.text_content())) , doc.cssselect('a')))
